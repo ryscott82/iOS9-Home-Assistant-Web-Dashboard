@@ -1,0 +1,3793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Home Controls</title>
+<style>
+/* ======== RESET & BASE ======== */
+*, *:before, *:after {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+body {
+  min-height: 100%;
+  font-family: -apple-system, "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: #f2f2f7;
+  color: #1c1c1e;
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+/* Also color the html tag in dark mode to prevent white flashes when overscrolling */
+html.dark-theme {
+  background: #0d1117;
+}
+
+/* ======== SETUP OVERLAY ======== */
+.setup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #f2f2f7;
+  z-index: 9999;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.setup-overlay.hidden {
+  display: none;
+}
+
+.setup-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+}
+
+.setup-card h1 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #1c1c1e;
+}
+
+.setup-card p {
+  font-size: 14px;
+  color: #8e8e93;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.setup-card label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #8e8e93;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.setup-card input[type="text"],
+.setup-card input[type="password"] {
+  display: block;
+  width: 100%;
+  background: #f2f2f7;
+  border: 1px solid #e5e5ea;
+  border-radius: 12px;
+  color: #1c1c1e;
+  font-size: 16px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.setup-card input:focus {
+  border-color: #007aff;
+}
+
+.setup-card .setup-btn {
+  display: block;
+  width: 100%;
+  background: #007aff;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-transition: opacity 0.2s;
+  transition: opacity 0.2s;
+}
+
+.setup-card .setup-btn:active {
+  opacity: 0.7;
+}
+
+.setup-error {
+  background: rgba(255, 59, 48, 0.08);
+  border: 1px solid rgba(255, 59, 48, 0.3);
+  border-radius: 12px;
+  color: #ff3b30;
+  font-size: 14px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: none;
+}
+
+.setup-error.visible {
+  display: block;
+}
+
+/* ======== APP FOOTER ======== */
+.app-footer {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+body.dark-theme .app-footer {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.footer-btn {
+  background: none;
+  border: none;
+  color: #007aff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -webkit-transition: opacity 0.15s;
+  transition: opacity 0.15s;
+}
+
+.footer-btn:active {
+  opacity: 0.6;
+}
+
+body.dark-theme .footer-btn {
+  color: #2f89fc;
+}
+
+.footer-status-group {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 11.5px;
+  color: #8e8e93;
+}
+
+.footer-status {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #c7c7cc;
+  margin-right: 6px;
+  display: inline-block;
+  -webkit-transition: background 0.3s;
+  transition: background 0.3s;
+}
+
+.footer-status.connected {
+  background: #34c759;
+  box-shadow: 0 0 5px rgba(52, 199, 89, 0.5);
+}
+
+.footer-status.error {
+  background: #ff3b30;
+  box-shadow: 0 0 5px rgba(255, 59, 48, 0.5);
+}
+
+/* ======== MAIN CONTENT ======== */
+.app-content {
+  padding: 0 12px 24px 12px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .app-content {
+    max-width: 1024px;
+  }
+}
+
+/* ======== SECTION ======== */
+.section {
+  margin-bottom: 18px;
+}
+
+.section-title {
+  font-size: 19px;
+  font-weight: 700;
+  color: #1c1c1e;
+  padding: 0 8px;
+  margin-bottom: 8px;
+}
+
+/* ======== TILE GRID ======== */
+.tile-grid {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin: 0 -5px;
+}
+
+/* ======== TILE (base) ======== */
+.tile {
+  -webkit-flex: 0 0 calc(50% - 10px);
+  flex: 0 0 calc(50% - 10px);
+  margin: 5px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 12px;
+  min-height: 88px;
+  position: relative;
+  -webkit-transition: background 0.2s;
+  transition: background 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+@media (min-width: 768px) {
+  .tile {
+    -webkit-flex: 0 0 calc(25% - 10px);
+    flex: 0 0 calc(25% - 10px);
+  }
+}
+
+.tile.active {
+  background: #ffd60a;
+}
+
+.tile.active-green {
+  background: #34c759;
+}
+
+.tile.active-blue {
+  background: #007aff;
+}
+
+.tile.active-orange {
+  background: #ff9f0a;
+}
+
+.tile.active-red {
+  background: rgba(255, 59, 48, 0.12);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+}
+
+/* Alert States (Light Theme) */
+.tile.alert-yellow {
+  background: rgba(255, 214, 10, 0.14);
+  border: 1px solid rgba(255, 214, 10, 0.4);
+}
+.tile.alert-yellow .sensor-value {
+  color: #b58900;
+}
+.alert-text-yellow {
+  color: #b58900;
+}
+
+.tile.alert-red {
+  background: rgba(255, 59, 48, 0.12);
+  border: 1px solid rgba(255, 59, 48, 0.35);
+}
+.tile.alert-red .sensor-value {
+  color: #ff3b30;
+}
+
+.tile.unavailable {
+  opacity: 0.4;
+}
+
+/* ======== TILE LAYOUT ======== */
+.tile-top {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.tile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.05);
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.tile.active .tile-icon,
+.tile.active-green .tile-icon,
+.tile.active-blue .tile-icon,
+.tile.active-orange .tile-icon {
+  background: rgba(255,255,255,0.35);
+}
+
+.tile-bottom {
+  /* name and state at bottom */
+}
+
+.tile-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1c1c1e;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tile.active .tile-name,
+.tile.active-green .tile-name,
+.tile.active-blue .tile-name,
+.tile.active-orange .tile-name,
+.tile.active-red .tile-name {
+  color: rgba(0,0,0,0.85);
+}
+
+.tile-state {
+  font-size: 12px;
+  color: #8e8e93;
+  margin-top: 2px;
+}
+
+.tile.active .tile-state,
+.tile.active-green .tile-state,
+.tile.active-blue .tile-state,
+.tile.active-orange .tile-state,
+.tile.active-red .tile-state {
+  color: rgba(0,0,0,0.5);
+}
+
+/* ======== TOGGLE SWITCH ======== */
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 30px;
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.12);
+  border-radius: 15px;
+  cursor: pointer;
+  -webkit-transition: background 0.3s;
+  transition: background 0.3s;
+}
+
+.toggle-slider:before {
+  content: "";
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  left: 2px;
+  bottom: 2px;
+  background: #ffffff;
+  border-radius: 50%;
+  -webkit-transition: -webkit-transform 0.3s;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: rgba(255,255,255,0.5);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  -webkit-transform: translateX(20px);
+  transform: translateX(20px);
+}
+
+/* ======== BRIGHTNESS SLIDER ======== */
+.slider-row {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.slider-label {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #8e8e93;
+  margin-bottom: 6px;
+}
+
+.tile.active .slider-label {
+  color: rgba(0,0,0,0.45);
+}
+
+.tile.active .slider-row {
+  border-top-color: rgba(0,0,0,0.08);
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0,0,0,0.1);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+/* ======== FULL-WIDTH TILE (climate) ======== */
+.tile.tile-full {
+  -webkit-flex: 0 0 calc(100% - 10px);
+  flex: 0 0 calc(100% - 10px);
+}
+
+@media (min-width: 768px) {
+  .tile.tile-full {
+    -webkit-flex: 0 0 calc(50% - 10px);
+    flex: 0 0 calc(50% - 10px); /* Manual input cards match half width on landscape too */
+  }
+}
+
+/* ======== HISTORY METRICS CARD ======== */
+.tile.history-tile {
+  -webkit-flex: 0 0 calc(100% - 10px);
+  flex: 0 0 calc(100% - 10px);
+  height: 340px; /* Square in portrait */
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .tile.history-tile {
+    -webkit-flex: 0 0 calc(33.333% - 10px);
+    flex: 0 0 calc(33.333% - 10px); /* 3 cards wide in landscape */
+    height: 330px; /* Square in landscape */
+  }
+}
+
+/* ======== MEDIA PLAYER GRID CARD ======== */
+.tile.media-tile {
+  -webkit-flex: 0 0 calc(100% - 10px);
+  flex: 0 0 calc(100% - 10px);
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .tile.media-tile {
+    -webkit-flex: 0 0 calc(33.333% - 10px);
+    flex: 0 0 calc(33.333% - 10px); /* 3 cards wide in landscape */
+  }
+}
+
+/* ======== THERMOSTAT ======== */
+.thermostat-display {
+  text-align: center;
+  padding: 12px 0 4px;
+}
+
+.thermostat-current {
+  font-size: 13px;
+  color: #8e8e93;
+  margin-bottom: 4px;
+}
+
+.thermostat-target {
+  font-size: 48px;
+  font-weight: 300;
+  color: #1c1c1e;
+  line-height: 1;
+}
+
+.thermostat-unit {
+  font-size: 22px;
+  color: #8e8e93;
+  vertical-align: super;
+}
+
+.thermostat-controls {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.thermostat-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: #f2f2f7;
+  color: #1c1c1e;
+  font-size: 24px;
+  line-height: 48px;
+  text-align: center;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.thermostat-btn:active {
+  background: #e5e5ea;
+}
+
+.thermostat-mode {
+  margin: 0 28px;
+  font-size: 14px;
+  color: #8e8e93;
+  text-align: center;
+}
+
+.thermostat-mode-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #c7c7cc;
+  margin-bottom: 2px;
+}
+
+.mode-selector {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.mode-btn {
+  background: #f2f2f7;
+  border: 1px solid #e5e5ea;
+  color: #8e8e93;
+  font-size: 13px;
+  padding: 8px 16px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -webkit-transition: all 0.15s;
+  transition: all 0.15s;
+}
+
+.mode-btn:first-child {
+  border-radius: 8px 0 0 8px;
+}
+
+.mode-btn:last-child {
+  border-radius: 0 8px 8px 0;
+}
+
+.mode-btn.active {
+  background: #007aff;
+  border-color: #007aff;
+  color: #ffffff;
+}
+
+/* ======== COVER BUTTONS ======== */
+.cover-controls {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+}
+
+.cover-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.06);
+  color: #1c1c1e;
+  font-size: 14px;
+  line-height: 32px;
+  text-align: center;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-left: 6px;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.cover-btn:active {
+  background: rgba(0,0,0,0.12);
+}
+
+/* ======== SENSOR VALUE ======== */
+.sensor-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #007aff;
+  text-align: right;
+  margin-top: 10px;
+}
+
+/* ======== SPARKLINE GRAPH ======== */
+.sparkline-container {
+  margin-top: 12px;
+  position: relative;
+  height: 65px;
+  width: 100%;
+}
+
+.sparkline-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.sparkline-path {
+  fill: none;
+  stroke: #007aff;
+  stroke-width: 1.5;
+}
+
+.sparkline-fill {
+  fill: rgba(0, 122, 255, 0.08);
+}
+.grid-line {
+  stroke: rgba(0, 0, 0, 0.08);
+}
+.axis-line {
+  stroke: rgba(0, 0, 0, 0.15);
+}
+
+/* ======== DROPDOWNS (INPUT SELECT) ======== */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.select-wrapper select {
+  width: 100%;
+  padding: 10px 32px 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e5ea;
+  background: #f2f2f7;
+  color: #1c1c1e;
+  font-size: 14px;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  font-weight: 500;
+}
+
+/* ======== SEGMENTED TAB CONTROL ======== */
+.tab-bar {
+  display: -webkit-flex;
+  display: flex;
+  background: rgba(0,0,0,0.06);
+  padding: 3px;
+  border-radius: 12px;
+  margin: 0 4px 18px 4px;
+}
+
+body.dark-theme .tab-bar {
+  background: rgba(255,255,255,0.07);
+}
+
+.tab-btn {
+  -webkit-flex: 1;
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 9px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #8e8e93;
+  border-radius: 9px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -webkit-transition: all 0.15s;
+  transition: all 0.15s;
+}
+
+.tab-btn.active {
+  background: #ffffff;
+  color: #1c1c1e;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* ======== SLIDER CONFIRM BUTTON ======== */
+.confirm-btn {
+  background: #007aff;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-left: 12px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -webkit-transition: opacity 0.15s;
+  transition: opacity 0.15s;
+}
+
+.confirm-btn:active {
+  opacity: 0.7;
+}
+
+body.dark-theme .confirm-btn {
+  background: #30d158;
+}
+
+/* ======== MEDIA PLAYER CONTROL BUTTON ======== */
+.media-control-btn {
+  background: none;
+  border: 1px solid rgba(0,0,0,0.12);
+  color: #1c1c1e;
+  padding: 8px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -webkit-transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.media-control-btn:active {
+  background: rgba(0,0,0,0.06);
+}
+
+body.dark-theme .media-control-btn {
+  border-color: rgba(255,255,255,0.18);
+  color: #e6edf3;
+}
+
+body.dark-theme .media-control-btn:active {
+  background: rgba(255,255,255,0.06);
+}
+
+body.dark-theme .tab-btn.active {
+  background: #21262d;
+  color: #e6edf3;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.tab-btn:active {
+  opacity: 0.8;
+}
+
+/* ======== COMPACT OVERVIEW TILE ======== */
+.tile.overview-tile {
+  -webkit-flex: 0 0 calc(50% - 10px);
+  flex: 0 0 calc(50% - 10px);
+  min-height: 64px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  margin: 5px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .tile.overview-tile {
+    -webkit-flex: 0 0 calc(25% - 10px);
+    flex: 0 0 calc(25% - 10px);
+  }
+}
+
+.tile.overview-tile .tile-icon {
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+}
+
+.tile.overview-tile .tile-top {
+  margin-bottom: 4px;
+}
+
+.tile.overview-tile .tile-name {
+  font-size: 11.5px;
+}
+
+.tile.overview-tile .tile-state {
+  font-size: 10.5px;
+  margin-top: 1px;
+}
+
+.select-wrapper:after {
+  content: "▼";
+  font-size: 8px;
+  color: #8e8e93;
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  margin-top: -5px;
+  pointer-events: none;
+}
+
+/* ======== EFFECT BUTTONS ======== */
+.effect-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.tile.active .effect-section {
+  border-top-color: rgba(0,0,0,0.08);
+}
+
+.effect-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8e8e93;
+  margin-bottom: 8px;
+}
+
+.tile.active .effect-label {
+  color: rgba(0,0,0,0.45);
+}
+
+.effect-grid {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin: 0 -3px;
+}
+
+.effect-btn {
+  background: rgba(0,0,0,0.05);
+  border: none;
+  border-radius: 10px;
+  color: #1c1c1e;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  margin: 3px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  -webkit-transition: all 0.15s;
+  transition: all 0.15s;
+}
+
+.tile.active .effect-btn {
+  background: rgba(0,0,0,0.08);
+  color: rgba(0,0,0,0.85);
+}
+
+.effect-btn.active {
+  background: #007aff;
+  color: #ffffff;
+}
+
+.tile.active .effect-btn.active {
+  background: rgba(0,0,0,0.25);
+  color: #ffffff;
+}
+
+.effect-btn:active {
+  opacity: 0.6;
+}
+
+/* ======== SCENE BUTTON ======== */
+.tile.scene-tile {
+  cursor: pointer;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.tile.scene-tile:active {
+  background: #e5e5ea;
+}
+
+/* ======== LOADING ======== */
+.loading-spinner {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  align-items: center;
+  padding: 60px;
+  color: #8e8e93;
+  font-size: 15px;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #e5e5ea;
+  border-top-color: #007aff;
+  border-radius: 50%;
+  margin-right: 12px;
+  -webkit-animation: spin 0.8s linear infinite;
+  animation: spin 0.8s linear infinite;
+}
+
+@-webkit-keyframes spin {
+  to { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ======== TOAST ======== */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  -webkit-transform: translateX(-50%) translateY(80px);
+  transform: translateX(-50%) translateY(80px);
+  background: #1c1c1e;
+  color: #ffffff;
+  font-size: 14px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  z-index: 9999;
+  opacity: 0;
+  -webkit-transition: all 0.3s;
+  transition: all 0.3s;
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.toast.visible {
+  opacity: 1;
+  -webkit-transform: translateX(-50%) translateY(0);
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.error {
+  background: #ff3b30;
+}
+
+/* ======== EMPTY STATE ======== */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: #8e8e93;
+}
+
+.empty-state .empty-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ======== DARK THEME OVERRIDES ======== */
+body.dark-theme {
+  background: #0d1117;
+  color: #e6edf3;
+}
+
+body.dark-theme .app-header {
+  border-bottom-color: #21262d;
+}
+
+body.dark-theme .app-header h1 {
+  color: #e6edf3;
+}
+
+body.dark-theme .section-title {
+  color: #8b949e;
+}
+
+body.dark-theme .tile {
+  background: #161b22;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.25);
+}
+
+body.dark-theme .tile-name {
+  color: #e6edf3;
+}
+
+body.dark-theme .tile-state {
+  color: #8b949e;
+}
+
+body.dark-theme .tile-icon {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-theme .tile.active {
+  background: #ffd60a;
+}
+
+body.dark-theme .tile.active-green {
+  background: #34c759;
+}
+
+body.dark-theme .tile.active-blue {
+  background: #007aff;
+}
+
+body.dark-theme .tile.active-orange {
+  background: #ff9f0a;
+}
+
+body.dark-theme .tile.active-red {
+  background: rgba(255, 59, 48, 0.16);
+  border-color: rgba(255, 59, 48, 0.3);
+}
+
+/* Alert States (Dark Theme) */
+body.dark-theme .tile.alert-yellow {
+  background: rgba(255, 214, 10, 0.12);
+  border-color: rgba(255, 214, 10, 0.3);
+}
+body.dark-theme .tile.alert-yellow .sensor-value {
+  color: #ffd60a;
+}
+body.dark-theme .alert-text-yellow {
+  color: #ffd60a;
+}
+
+body.dark-theme .tile.alert-red {
+  background: rgba(255, 59, 48, 0.14);
+  border-color: rgba(255, 59, 48, 0.3);
+}
+body.dark-theme .tile.alert-red .sensor-value {
+  color: #ff453a;
+}
+
+body.dark-theme .tile.active .tile-name,
+body.dark-theme .tile.active-green .tile-name,
+body.dark-theme .tile.active-blue .tile-name,
+body.dark-theme .tile.active-orange .tile-name {
+  color: #000000;
+}
+
+body.dark-theme .tile.active .tile-state,
+body.dark-theme .tile.active-green .tile-state,
+body.dark-theme .tile.active-blue .tile-state,
+body.dark-theme .tile.active-orange .tile-state {
+  color: rgba(0,0,0,0.6);
+}
+
+body.dark-theme .tile.active .tile-icon,
+body.dark-theme .tile.active-green .tile-icon,
+body.dark-theme .tile.active-blue .tile-icon,
+body.dark-theme .tile.active-orange .tile-icon {
+  background: rgba(255,255,255,0.35);
+}
+
+body.dark-theme .toggle-slider {
+  background: rgba(255,255,255,0.15);
+}
+
+body.dark-theme .toggle-switch input:checked + .toggle-slider {
+  background: rgba(255,255,255,0.65);
+}
+
+body.dark-theme .slider-row {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-theme .slider-label {
+  color: #8b949e;
+}
+
+body.dark-theme .tile.active .slider-label {
+  color: rgba(0, 0, 0, 0.55);
+}
+
+body.dark-theme input[type="range"] {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-theme .thermostat-target {
+  color: #e6edf3;
+}
+
+body.dark-theme .thermostat-btn {
+  background: #21262d;
+  color: #e6edf3;
+}
+
+body.dark-theme .thermostat-btn:active {
+  background: #30363d;
+}
+
+body.dark-theme .thermostat-controls {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-theme .mode-btn {
+  background: #21262d;
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+body.dark-theme .mode-btn.active {
+  background: #007aff;
+  border-color: #007aff;
+  color: #ffffff;
+}
+
+body.dark-theme .cover-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e6edf3;
+}
+
+body.dark-theme .cover-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+body.dark-theme .sensor-value {
+  color: #58a6ff;
+}
+
+body.dark-theme .scene-tile:active {
+  background: #21262d;
+}
+
+body.dark-theme .select-wrapper select {
+  border-color: #30363d;
+  background: #21262d;
+  color: #e6edf3;
+}
+
+body.dark-theme .select-wrapper:after {
+  color: #8b949e;
+}
+
+body.dark-theme .effect-section {
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+body.dark-theme .effect-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: #e6edf3;
+}
+
+body.dark-theme .tile.active .effect-btn {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.85);
+}
+
+body.dark-theme .effect-btn.active {
+  background: #58a6ff;
+}
+
+body.dark-theme .tile.active .effect-btn.active {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Sparkline Dark Theme overrides */
+body.dark-theme .sparkline-path {
+  stroke: #58a6ff;
+}
+
+body.dark-theme .sparkline-fill {
+  fill: rgba(88, 166, 255, 0.08);
+}
+
+body.dark-theme .grid-line {
+  stroke: #21262d;
+}
+
+body.dark-theme .axis-line {
+  stroke: #30363d;
+}
+
+/* ======== ALERT BANNER ======== */
+.alert-banner {
+  background: #ff3b30;
+  color: #ffffff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.2);
+}
+
+.alert-banner.hidden {
+  display: none !important;
+}
+
+.alert-banner-text {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.alert-banner-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  -webkit-appearance: none;
+}
+
+.alert-banner-close:active {
+  color: #ffffff;
+}
+
+body.dark-theme .alert-banner {
+  background: #ff453a;
+  box-shadow: 0 4px 12px rgba(255, 69, 58, 0.15);
+}
+
+body.dark-theme .setup-card {
+  background: #1c1c1e;
+  color: #e6edf3;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+body.dark-theme .setup-card h1 {
+  color: #ffffff;
+}
+</style>
+</head>
+<body>
+
+<!-- DUMMY SETUP OVERLAY (Settings Disabled) -->
+<div id="setupOverlay" style="display:none;"></div>
+
+<!-- CHECKED TODAY PROMPT MODAL -->
+<div id="checkedTodayOverlay" class="setup-overlay hidden">
+  <div class="setup-card" style="max-width:320px; text-align:center; padding:24px; border-radius:20px;">
+    <div style="font-size:36px; margin-bottom:12px;">📋</div>
+    <div style="font-weight:700; font-size:17px; margin-bottom:8px;">Chemicals Log Needed</div>
+    <div style="font-size:13.5px; color:#8e8e93; line-height:1.4; margin-bottom:20px;">Please check and log pool chemicals today.</div>
+    <div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; gap:10px;">
+      <button class="confirm-btn" style="margin:0; padding:12px; border-radius:12px; font-size:14px; background:#007aff;" onclick="dismissCheckedToday(true)">Check Now</button>
+      <button class="media-control-btn" style="margin:0; padding:10px; border-radius:12px; font-size:13px;" onclick="dismissCheckedToday(false)">Later</button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<main class="app-content" id="appContent" style="display:none; padding-top: 15px;">
+  <!-- ALERT BANNER -->
+  <div id="alertBanner" class="alert-banner hidden">
+    <div style="-webkit-flex: 1; flex: 1; cursor: pointer;" onclick="switchTab('chemicals')">
+      <div class="alert-banner-text" id="alertBannerTitle" style="font-weight:700; margin-bottom:4px;">⚠️ Check Hot Tub Chemicals</div>
+      <div id="alertBannerContent" style="font-size:13px; line-height:1.4;"></div>
+    </div>
+    <button class="alert-banner-close" onclick="event.stopPropagation(); dismissBanner()">&times;</button>
+  </div>
+
+  <div id="entityContainer">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+      Loading...
+    </div>
+  </div>
+
+  <!-- FOOTER CONTROLS -->
+  <footer class="app-footer">
+    <div class="footer-status-group" onclick="showDebug()">
+      <span id="statusDot" class="footer-status"></span>
+      <span style="font-weight:500;">Connection Status</span>
+    </div>
+    <div style="display:-webkit-flex; display:flex; gap:12px;">
+      <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
+      <button class="footer-btn" onclick="location.reload()" title="Refresh">&#8635; Refresh</button>
+    </div>
+  </footer>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+(function() {
+  "use strict";
+
+  // ======== CONFIG ========
+  var HA_URL = "http://192.168.40.78:8123";
+  var HA_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJhZjlkNDM3YTMyMWQ0YzcyODU5ZDJjYjM4MGY3MmMxZiIsImlhdCI6MTc4MjgzNTAyMCwiZXhwIjoyMDk4MTk1MDIwfQ.TPwnCzHkIoIlaOwx_tVaerQYqt11RZseDLRSvizZKrA";
+  var STORAGE_KEY = "ha_controls_config";
+  var REFRESH_INTERVAL = 15000;
+  var refreshTimer = null;
+  var entities = {};
+  var allowedEntityIds = {};
+  var registryLoaded = false;
+  var sensorHistory = {};
+  var bannerDismissed = false;
+  var selectedRecVolume = "hottub";
+  var lastStatesCache = [];
+  var activeTab = "overview";
+  var activeChemTab = "inputs";
+  var lastActivatedScene = "";
+  var checkedTodayAlertDismissed = false;
+  var themeOverride = null;
+
+  // Load volume and tab choices from cache if available
+  try {
+    var cachedVol = localStorage.getItem("ha_rec_volume");
+    if (cachedVol) selectedRecVolume = cachedVol;
+    var cachedTab = localStorage.getItem("ha_active_tab");
+    if (cachedTab) activeTab = cachedTab;
+    var cachedChemTab = localStorage.getItem("ha_active_chem_tab");
+    if (cachedChemTab) activeChemTab = cachedChemTab;
+    var cachedScene = localStorage.getItem("ha_last_scene");
+    if (cachedScene) lastActivatedScene = cachedScene;
+    var cachedTheme = localStorage.getItem("ha_theme_override");
+    if (cachedTheme) themeOverride = cachedTheme;
+  } catch(e) {}
+
+  // ======== INIT ========
+  function init() {
+    hideSetup();
+    loadEntityRegistry();
+    startMediaTickers();
+  }
+
+  // ======== ENTITY REGISTRY (WebSocket) ========
+  function loadEntityRegistry() {
+    var wsUrl = HA_URL.replace(/^http/, "ws") + "/api/websocket";
+    var ws;
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch(e) {
+      showToast("WebSocket failed: " + e, true);
+      return;
+    }
+    var msgId = 1;
+
+    ws.onmessage = function(event) {
+      var msg;
+      try { msg = JSON.parse(event.data); } catch(e) { return; }
+
+      if (msg.type === "auth_required") {
+        ws.send(JSON.stringify({
+          type: "auth",
+          access_token: HA_TOKEN
+        }));
+      }
+      else if (msg.type === "auth_ok") {
+        ws.send(JSON.stringify({
+          id: msgId++,
+          type: "config/entity_registry/list"
+        }));
+      }
+      else if (msg.type === "auth_invalid") {
+        showToast("Auth failed", true);
+        ws.close();
+      }
+      else if (msg.type === "result" && msg.success) {
+        var entries = msg.result || [];
+        allowedEntityIds = {};
+        for (var i = 0; i < entries.length; i++) {
+          var labels = entries[i].labels || [];
+          for (var j = 0; j < labels.length; j++) {
+            if (labels[j] === "usefulpool") {
+              allowedEntityIds[entries[i].entity_id] = true;
+              break;
+            }
+          }
+        }
+        registryLoaded = true;
+        var debugList = [];
+        for (var k in allowedEntityIds) {
+          if (allowedEntityIds.hasOwnProperty(k)) debugList.push(k);
+        }
+        window._debugEntities = debugList;
+        ws.close();
+        refreshAll();
+      }
+    };
+
+    ws.onerror = function() {
+      showToast("WebSocket connection failed", true);
+    };
+  }
+
+  // ======== SETUP ========
+  window.connectHA = function() {
+    var url = document.getElementById("haUrl").value.replace(/\/+$/, "");
+    var token = document.getElementById("haToken").value.replace(/^\s+|\s+$/g, "");
+    var errEl = document.getElementById("setupError");
+
+    if (!url) {
+      errEl.textContent = "Please enter a Home Assistant URL.";
+      errEl.className = "setup-error visible";
+      return;
+    }
+    if (!token) {
+      errEl.textContent = "Please enter a long-lived access token.";
+      errEl.className = "setup-error visible";
+      return;
+    }
+
+    errEl.className = "setup-error";
+    document.getElementById("setupBtn").textContent = "Connecting...";
+
+    HA_URL = url;
+    HA_TOKEN = token;
+
+    haRequest("GET", "/api/", null, function(err, data) {
+      document.getElementById("setupBtn").textContent = "Connect";
+      if (err) {
+        errEl.textContent = "Connection failed: " + err;
+        errEl.className = "setup-error visible";
+        return;
+      }
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ url: HA_URL, token: HA_TOKEN }));
+      } catch(e) {}
+      hideSetup();
+      refreshAll();
+    });
+  };
+
+  function hideSetup() {
+    document.getElementById("setupOverlay").className = "setup-overlay hidden";
+    document.getElementById("appContent").style.display = "";
+  }
+
+  window.showSetup = function() {
+    document.getElementById("setupOverlay").className = "setup-overlay";
+    document.getElementById("haUrl").value = HA_URL;
+    document.getElementById("haToken").value = HA_TOKEN;
+  };
+
+  // ======== HTTP ========
+  function haRequest(method, path, body, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open(method, HA_URL + path, true);
+    xhr.setRequestHeader("Authorization", "Bearer " + HA_TOKEN);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.timeout = 10000;
+
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        var data = null;
+        try { data = JSON.parse(xhr.responseText); } catch(e) { data = xhr.responseText; }
+        callback(null, data);
+      } else {
+        callback("HTTP " + xhr.status);
+      }
+    };
+    xhr.onerror = function() { callback("Network error"); };
+    xhr.ontimeout = function() { callback("Timeout"); };
+
+    if (body) {
+      xhr.send(JSON.stringify(body));
+    } else {
+      xhr.send();
+    }
+  }
+
+  // ======== REFRESH ========
+  window.refreshAll = function() {
+    if (refreshTimer) clearTimeout(refreshTimer);
+
+    haRequest("GET", "/api/states", null, function(err, data) {
+      if (err) {
+        setStatus("error");
+        showToast("Connection error: " + err, true);
+        refreshTimer = setTimeout(refreshAll, REFRESH_INTERVAL);
+        return;
+      }
+
+      setStatus("connected");
+      entities = {};
+      var i;
+      for (i = 0; i < data.length; i++) {
+        entities[data[i].entity_id] = data[i];
+      }
+      renderDashboard(data);
+      refreshTimer = setTimeout(refreshAll, REFRESH_INTERVAL);
+    });
+  };
+
+  // ======== STATUS ========
+  function setStatus(status) {
+    var dot = document.getElementById("statusDot");
+    dot.className = "header-status";
+    if (status === "connected") dot.className = "header-status connected";
+    if (status === "error") dot.className = "header-status error";
+  }
+
+  // ======== TOAST ========
+  function showToast(msg, isError) {
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    el.className = isError ? "toast error visible" : "toast visible";
+    setTimeout(function() {
+      el.className = "toast";
+    }, 3000);
+  }
+  window.showToast = showToast;
+
+  window.showDebug = function() {
+    var list = window._debugEntities || [];
+    if (list.length === 0) {
+      alert("No entities matched the 'usefulpool' label.");
+    } else {
+      alert("Matched entities (" + list.length + "):\n\n" + list.join("\n"));
+    }
+  };
+
+  // ======== RENDER ========
+  function renderDashboard(allStates) {
+    var isNight = false;
+    if (themeOverride === "dark") {
+      isNight = true;
+    } else if (themeOverride === "light") {
+      isNight = false;
+    } else {
+      var sunFound = false;
+      for (var i = 0; i < allStates.length; i++) {
+        if (allStates[i].entity_id === "sun.sun") {
+          isNight = allStates[i].state === "below_horizon";
+          sunFound = true;
+          break;
+        }
+      }
+      if (!sunFound) {
+        var hr = new Date().getHours();
+        isNight = (hr >= 18 || hr < 6);
+      }
+    }
+
+    if (isNight) {
+      document.documentElement.className = "dark-theme";
+      document.body.className = "dark-theme";
+      var metaStatus = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+      if (metaStatus) metaStatus.setAttribute('content', 'black-translucent');
+    } else {
+      document.documentElement.className = "";
+      document.body.className = "";
+      var metaStatus = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+      if (metaStatus) metaStatus.setAttribute('content', 'default');
+    }
+
+    var themeToggleBtn = document.getElementById("themeToggleBtn");
+    if (themeToggleBtn) {
+      themeToggleBtn.textContent = isNight ? "☀️ Light" : "🌙 Dark";
+    }
+
+    var lights = [];
+    var switches = [];
+    var climates = [];
+    var covers = [];
+    var sensors = [];
+    var scenes = [];
+    var locks = [];
+    var fans = [];
+    var waterHeaters = [];
+    var inputSelects = [];
+    var inputNumbers = [];
+    var mediaPlayers = [];
+    var i, eid, domain;
+
+    for (i = 0; i < allStates.length; i++) {
+      eid = allStates[i].entity_id;
+      domain = eid.split(".")[0];
+      
+      if (!allowedEntityIds[eid] && domain !== "water_heater" && eid !== "input_boolean.chemicals_checked_today") continue;
+      if (eid === "input_boolean.chemicals_checked_today") continue;
+
+      if (domain === "light") lights.push(allStates[i]);
+      else if (domain === "switch" || domain === "input_boolean") switches.push(allStates[i]);
+      else if (domain === "climate") climates.push(allStates[i]);
+      else if (domain === "cover") covers.push(allStates[i]);
+      else if (domain === "sensor" || domain === "binary_sensor") sensors.push(allStates[i]);
+      else if (domain === "scene") scenes.push(allStates[i]);
+      else if (domain === "lock") locks.push(allStates[i]);
+      else if (domain === "fan") fans.push(allStates[i]);
+      else if (domain === "water_heater") waterHeaters.push(allStates[i]);
+      else if (domain === "input_select") inputSelects.push(allStates[i]);
+      else if (domain === "input_number") inputNumbers.push(allStates[i]);
+      else if (domain === "media_player") mediaPlayers.push(allStates[i]);
+    }
+
+    // Save states to cache for dynamic toggle changes
+    lastStatesCache = allStates;
+
+    // Check if chemicals were logged today
+    var chemicalsCheckedToday = true;
+    for (i = 0; i < allStates.length; i++) {
+      if (allStates[i].entity_id === "input_boolean.chemicals_checked_today") {
+        chemicalsCheckedToday = (allStates[i].state === "on" || allStates[i].state === "On");
+        break;
+      }
+    }
+
+    // Evaluate if dismissal has expired (3 hour cooldown snoozing)
+    if (!chemicalsCheckedToday) {
+      try {
+        var lastDismissed = localStorage.getItem("ha_chem_prompt_dismissed_time");
+        if (lastDismissed) {
+          var elapsed = Date.now() - parseInt(lastDismissed, 10);
+          if (elapsed >= 3 * 60 * 60 * 1000) { // 3 hours
+            checkedTodayAlertDismissed = false; // Reset cooldown
+          }
+        }
+      } catch(e) {}
+    } else {
+      // Clear dismissal timestamp once checked so tomorrow it prompts immediately
+      try { localStorage.removeItem("ha_chem_prompt_dismissed_time"); } catch(e) {}
+      checkedTodayAlertDismissed = false;
+    }
+
+    var checkedTodayOverlay = document.getElementById("checkedTodayOverlay");
+    if (checkedTodayOverlay) {
+      if (!chemicalsCheckedToday && !checkedTodayAlertDismissed) {
+        checkedTodayOverlay.className = "setup-overlay";
+      } else {
+        checkedTodayOverlay.className = "setup-overlay hidden";
+      }
+    }
+
+    // Generate recommendations lists separately by volume context
+    var htRedRecs = [];
+    var poolRedRecs = [];
+
+    var htRecData = getRecommendationsData(allStates, "hottub");
+    for (i = 0; i < htRecData.length; i++) {
+      if (htRecData[i].severity === "red") {
+        htRedRecs.push(htRecData[i].text);
+      }
+    }
+
+    var poolRecData = getRecommendationsData(allStates, "pool");
+    for (i = 0; i < poolRecData.length; i++) {
+      if (poolRecData[i].severity === "red") {
+        poolRedRecs.push(poolRecData[i].text);
+      }
+    }
+
+    var hasRedWarning = htRedRecs.length > 0 || poolRedRecs.length > 0;
+
+    if (!hasRedWarning) {
+      bannerDismissed = false; // Reset dismissal when state is clean
+    }
+
+    var bannerEl = document.getElementById("alertBanner");
+    var bannerTitleEl = document.querySelector("#alertBanner .alert-banner-text");
+    var bannerContentEl = document.getElementById("alertBannerContent");
+    if (bannerEl) {
+      if (hasRedWarning && !bannerDismissed) {
+        if (bannerTitleEl) {
+          if (htRedRecs.length > 0 && poolRedRecs.length > 0) {
+            bannerTitleEl.textContent = "⚠️ Check Pool & Hot Tub Chemicals";
+          } else if (htRedRecs.length > 0) {
+            bannerTitleEl.textContent = "⚠️ Check Hot Tub Chemicals";
+          } else {
+            bannerTitleEl.textContent = "⚠️ Check Pool Chemicals";
+          }
+        }
+        if (bannerContentEl) {
+          var bulletList = '<ul style="margin:4px 0 0 0; padding-left:20px; list-style-type:disc;">';
+          for (var r = 0; r < htRedRecs.length; r++) {
+            bulletList += '<li style="margin-top:2px;">[Hot Tub] ' + htRedRecs[r] + '</li>';
+          }
+          for (var r = 0; r < poolRedRecs.length; r++) {
+            bulletList += '<li style="margin-top:2px;">[Pool] ' + poolRedRecs[r] + '</li>';
+          }
+          bulletList += '</ul>';
+          bannerContentEl.innerHTML = bulletList;
+        }
+        bannerEl.className = "alert-banner";
+      } else {
+        bannerEl.className = "alert-banner hidden";
+      }
+    }
+
+    var html = "";
+
+    // Render Tab Segmented control
+    html += '<div class="tab-bar">';
+    var ovActive = activeTab === "overview" ? " active" : "";
+    var cActive = activeTab === "controls" ? " active" : "";
+    var chActive = activeTab === "chemicals" ? " active" : "";
+    html += '<button class="tab-btn' + ovActive + '" onclick="switchTab(\'overview\')">Overview</button>';
+    html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">Controls</button>';
+    html += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals & Sensors</button>';
+    html += '</div>';
+
+    // RENDER BASED ON ACTIVE TAB
+    if (activeTab === "overview") {
+      // 1. SCENES (in its own separate section at the top)
+      if (scenes.length > 0) {
+        html += '<div class="section"><div class="section-title">Scenes</div>';
+        html += '<div class="tile-grid">';
+        
+        // Log chemicals warning reminder scene card
+        if (!chemicalsCheckedToday) {
+          html += '<div class="tile overview-tile alert-yellow" onclick="switchTab(\'chemicals\')" style="cursor:pointer; min-height:48px; padding:8px 12px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; box-sizing:border-box;">';
+          html += '<div class="alert-text-yellow" style="font-weight:700; font-size:12.5px; text-align:center;">⚠️ Log Chemicals</div>';
+          html += '</div>';
+        }
+        
+        for (i = 0; i < scenes.length; i++) {
+          html += renderOverviewScene(scenes[i]);
+        }
+        html += '</div></div>';
+      }
+
+      // 2. MEDIA (compact media player tiles, grouped dynamically when linked)
+      if (mediaPlayers.length > 0) {
+        var mediaGroups = [];
+        var songGroups = {};
+        for (i = 0; i < mediaPlayers.length; i++) {
+          var mp = mediaPlayers[i];
+          var state = mp.state;
+          if (state !== "playing" && state !== "paused") continue;
+          
+          var attrs = mp.attributes || {};
+          var title = attrs.media_title;
+          var artist = attrs.media_artist;
+          
+          if (title && artist) {
+            var key = (title.trim() + "|||" + artist.trim()).toLowerCase();
+            if (!songGroups[key]) {
+              songGroups[key] = [];
+              mediaGroups.push(songGroups[key]);
+            }
+            songGroups[key].push(mp);
+          } else {
+            mediaGroups.push([mp]);
+          }
+        }
+
+        html += '<div class="section"><div class="section-title">Media</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < mediaGroups.length; i++) {
+          html += renderOverviewMediaPlayer(mediaGroups[i]);
+        }
+        html += '</div></div>';
+      }
+
+      // 3. DEVICES (consolidated status grid, clickable to toggle, smaller overview-tiles)
+      html += '<div class="section"><div class="section-title">Devices</div>';
+      html += '<div class="tile-grid">';
+      
+      for (i = 0; i < lights.length; i++) {
+        html += renderOverviewToggleEntity(lights[i], "light");
+      }
+      for (i = 0; i < switches.length; i++) {
+        html += renderOverviewToggleEntity(switches[i], "switch");
+      }
+      for (i = 0; i < fans.length; i++) {
+        html += renderOverviewToggleEntity(fans[i], "fan");
+      }
+      for (i = 0; i < waterHeaters.length; i++) {
+        html += renderOverviewWaterHeater(waterHeaters[i]);
+      }
+      
+      html += '</div></div>';
+    } else if (activeTab === "controls") {
+      // MEDIA PLAYERS (Moved to the very top of controls, grouped dynamically)
+      if (mediaPlayers.length > 0) {
+        var mediaGroups = [];
+        var songGroups = {};
+        for (i = 0; i < mediaPlayers.length; i++) {
+          var mp = mediaPlayers[i];
+          var state = mp.state;
+          if (state !== "playing" && state !== "paused") continue;
+          
+          var attrs = mp.attributes || {};
+          var title = attrs.media_title;
+          var artist = attrs.media_artist;
+          
+          if (title && artist) {
+            var key = (title.trim() + "|||" + artist.trim()).toLowerCase();
+            if (!songGroups[key]) {
+              songGroups[key] = [];
+              mediaGroups.push(songGroups[key]);
+            }
+            songGroups[key].push(mp);
+          } else {
+            mediaGroups.push([mp]);
+          }
+        }
+
+        html += '<div class="section"><div class="section-title">Media Players</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < mediaGroups.length; i++) {
+          html += renderMediaPlayer(mediaGroups[i]);
+        }
+        html += '</div></div>';
+      }
+
+      // LIGHTS
+      if (lights.length > 0) {
+        html += '<div class="section"><div class="section-title">Lights</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < lights.length; i++) {
+          html += renderLight(lights[i]);
+        }
+        html += '</div></div>';
+      }
+
+      // SWITCHES
+      if (switches.length > 0) {
+        html += '<div class="section"><div class="section-title">Switches</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < switches.length; i++) {
+          html += renderToggleEntity(switches[i], "switch");
+        }
+        html += '</div></div>';
+      }
+
+      // FANS
+      if (fans.length > 0) {
+        html += '<div class="section"><div class="section-title">Fans</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < fans.length; i++) {
+          html += renderToggleEntity(fans[i], "fan");
+        }
+        html += '</div></div>';
+      }
+
+      // CLIMATE
+      if (climates.length > 0) {
+        html += '<div class="section"><div class="section-title">Climate</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < climates.length; i++) {
+          html += renderClimate(climates[i]);
+        }
+        html += '</div></div>';
+      }
+
+      // WATER HEATERS
+      if (waterHeaters.length > 0) {
+        html += '<div class="section"><div class="section-title">Water Heaters</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < waterHeaters.length; i++) {
+          html += renderWaterHeater(waterHeaters[i]);
+        }
+        html += '</div></div>';
+      }
+
+      // COVERS
+      if (covers.length > 0) {
+        html += '<div class="section"><div class="section-title">Covers</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < covers.length; i++) {
+          html += renderCover(covers[i]);
+        }
+        html += '</div></div>';
+      }
+
+      // LOCKS
+      if (locks.length > 0) {
+        html += '<div class="section"><div class="section-title">Locks</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < locks.length; i++) {
+          html += renderLock(locks[i]);
+        }
+        html += '</div></div>';
+      }
+
+      // DROPDOWNS (INPUT SELECTS)
+      if (inputSelects.length > 0) {
+        html += '<div class="section"><div class="section-title">Dropdowns</div>';
+        html += '<div class="tile-grid">';
+        for (i = 0; i < inputSelects.length; i++) {
+          html += renderInputSelect(inputSelects[i]);
+        }
+        html += '</div></div>';
+      }
+    } else {
+      // TAB: CHEMICALS & SENSORS
+
+      // 1. Sub-tab segmented control (nested)
+      html += '<div class="tab-bar" style="margin-top: 0px; margin-bottom: 12px; font-size: 12.5px; background: rgba(0,0,0,0.03); border-radius: 9px; padding: 2px;">';
+      var iActive = activeChemTab === "inputs" ? " active" : "";
+      var hActive = activeChemTab === "history" ? " active" : "";
+      html += '<button class="tab-btn' + iActive + '" style="padding: 7px; font-size: 12.5px; border-radius: 7px;" onclick="switchChemTab(\'inputs\')">Sensors & Inputs</button>';
+      html += '<button class="tab-btn' + hActive + '" style="padding: 7px; font-size: 12.5px; border-radius: 7px;" onclick="switchChemTab(\'history\')">Chemical History</button>';
+      html += '</div>';
+
+      // 2. Volume Toggle (now placed BELOW sub-tabs)
+      html += '<div class="mode-selector" style="margin: 0 4px 18px 4px; padding: 2px;">';
+      var pActive = selectedRecVolume === "pool" ? " active" : "";
+      var htActive = selectedRecVolume === "hottub" ? " active" : "";
+      html += '<button class="mode-btn' + htActive + '" id="btn_rec_hottub" onclick="setRecVolume(\'hottub\')">Hot Tub (600 gal)</button>';
+      html += '<button class="mode-btn' + pActive + '" id="btn_rec_pool" onclick="setRecVolume(\'pool\')">Pool (200,000 gal)</button>';
+      html += '</div>';
+
+      // Gather entities matching selected volume
+      var volSensors = [];
+      for (i = 0; i < sensors.length; i++) {
+        if (isEntityForVolume(sensors[i].entity_id, friendlyName(sensors[i]), selectedRecVolume)) {
+          volSensors.push(sensors[i]);
+        }
+      }
+
+      var volInputs = [];
+      for (i = 0; i < inputNumbers.length; i++) {
+        if (isEntityForVolume(inputNumbers[i].entity_id, friendlyName(inputNumbers[i]), selectedRecVolume)) {
+          volInputs.push(inputNumbers[i]);
+        }
+      }
+
+      if (activeChemTab === "inputs") {
+        // CHEMICAL RECOMMENDATIONS CARD
+        html += '<div class="section"><div class="section-title">Chemical Recommendations</div>';
+        html += '<div id="recsCardContainer">' + renderRecommendationsCard(allStates) + '</div>';
+        html += '</div>';
+
+        // SENSORS (no sparklines)
+        if (volSensors.length > 0) {
+          html += '<div class="section"><div class="section-title">Sensors</div>';
+          html += '<div class="tile-grid">';
+          for (i = 0; i < volSensors.length; i++) {
+            html += renderSensor(volSensors[i], false);
+          }
+          html += '</div></div>';
+        }
+
+        // MANUAL LOGS / INPUTS (no sparklines)
+        if (volInputs.length > 0) {
+          html += '<div class="section"><div class="section-title">Chemical Inputs & Logs</div>';
+          html += '<div class="tile-grid">';
+          for (i = 0; i < volInputs.length; i++) {
+            html += renderInputNumber(volInputs[i], false);
+          }
+          html += '</div></div>';
+        }
+      } else {
+        // SUB-TAB: CHEMICAL HISTORY
+        html += '<div class="section"><div class="section-title">Chemical History Trends</div>';
+        html += '<div class="tile-grid" style="grid-template-columns: 1fr;">'; // Grid stretches trend cards full-width
+        
+        // Render history charts for active sensors (skip binary sensors)
+        for (i = 0; i < volSensors.length; i++) {
+          var sDomain = volSensors[i].entity_id.split(".")[0];
+          if (sDomain !== "binary_sensor") {
+            html += renderHistoryCard(volSensors[i]);
+          }
+        }
+        // Render history charts for active manual inputs
+        for (i = 0; i < volInputs.length; i++) {
+          html += renderHistoryCard(volInputs[i]);
+        }
+        
+        if (volSensors.length === 0 && volInputs.length === 0) {
+          html += '<div style="text-align:center; padding: 40px; color:#8e8e93; font-size:14px;">No history items found for this selection.</div>';
+        }
+        
+        html += '</div></div>';
+      }
+    }
+
+    if (!html) {
+      html = '<div class="empty-state"><div class="empty-icon">&#127968;</div><p>No entities with the <strong>usefulpool</strong> label found.<br>Add the label in Home Assistant to see devices here.</p></div>';
+    }
+
+    document.getElementById("entityContainer").innerHTML = html;
+  }
+
+  // ======== ENTITY RENDERERS ========
+  function friendlyName(entity) {
+    return (entity.attributes && entity.attributes.friendly_name) || entity.entity_id;
+  }
+
+  function escapeHtml(str) {
+    var div = document.createElement("div");
+    div.appendChild(document.createTextNode(str));
+    return div.innerHTML;
+  }
+
+  function renderLight(entity) {
+    var isOn = entity.state === "on";
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var attrs = entity.attributes || {};
+    var hasBrightness = typeof attrs.brightness !== "undefined" || (attrs.supported_features && (attrs.supported_features & 1));
+    var brightness = attrs.brightness || 0;
+    var pct = Math.round((brightness / 255) * 100);
+    var unavailable = entity.state === "unavailable";
+    var effectList = attrs.effect_list || [];
+    var currentEffect = attrs.effect || "";
+    var hasEffects = effectList.length > 0;
+
+    var tileClass = "tile" + (hasEffects ? " tile-full" : "") + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
+    var h = '<div class="' + tileClass + '">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">&#128161;</div>';
+    if (!unavailable) {
+      h += '<div class="toggle-switch">';
+      h += '<input type="checkbox" id="t_' + eid + '" ' + (isOn ? 'checked' : '') + ' onchange="toggleEntity(\'' + eid + '\', \'light\')">';
+      h += '<label class="toggle-slider" for="t_' + eid + '"></label>';
+      h += '</div>';
+    }
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    var stateText = escapeHtml(entity.state);
+    if (isOn && currentEffect) stateText += ' &middot; ' + escapeHtml(currentEffect);
+    else if (isOn && pct > 0) stateText += ' &middot; ' + pct + '%';
+    h += '<div class="tile-state">' + stateText + '</div>';
+    h += '</div>';
+
+    if (hasBrightness && isOn && !unavailable) {
+      h += '<div class="slider-row">';
+      h += '<input type="range" min="1" max="255" value="' + brightness + '" onchange="setBrightness(\'' + eid + '\', this.value)">';
+      h += '</div>';
+    }
+
+    if (hasEffects && !unavailable) {
+      h += '<div class="effect-section">';
+      h += '<div class="effect-label">Effect</div>';
+      h += '<div class="effect-grid">';
+      for (var e = 0; e < effectList.length; e++) {
+        var eff = effectList[e];
+        var effActive = (eff === currentEffect && isOn) ? " active" : "";
+        h += '<button class="effect-btn' + effActive + '" onclick="setEffect(\'' + eid + '\', \'' + escapeHtml(eff.replace(/'/g, "\\'")) + '\')">' + escapeHtml(eff) + '</button>';
+      }
+      h += '</div>';
+      h += '</div>';
+    }
+
+    h += '</div>';
+    return h;
+  }
+
+  function renderToggleEntity(entity, domain) {
+    var isOn = entity.state === "on";
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var unavailable = entity.state === "unavailable";
+    var icon = domain === "fan" ? "&#127744;" : "&#9889;";
+    var activeClass = domain === "fan" ? " active-blue" : " active-green";
+
+    var tileClass = "tile" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
+    var h = '<div class="' + tileClass + '">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">' + icon + '</div>';
+    if (!unavailable) {
+      h += '<div class="toggle-switch">';
+      h += '<input type="checkbox" id="t_' + eid + '" ' + (isOn ? 'checked' : '') + ' onchange="toggleEntity(\'' + eid + '\', \'' + domain + '\')">';
+      h += '<label class="toggle-slider" for="t_' + eid + '"></label>';
+      h += '</div>';
+    }
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    h += '<div class="tile-state">' + escapeHtml(entity.state) + '</div>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function renderClimate(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var attrs = entity.attributes || {};
+    var currentTemp = attrs.current_temperature || "--";
+    var targetTemp = attrs.temperature || "--";
+    var hvacMode = entity.state || "off";
+    var hvacModes = attrs.hvac_modes || ["off", "heat", "cool", "auto"];
+    var unit = attrs.unit_of_measurement || "\u00B0F";
+    var unavailable = entity.state === "unavailable";
+    var isActive = hvacMode !== "off" && !unavailable;
+    var activeClass = "";
+    if (hvacMode === "heat") activeClass = " active-orange";
+    else if (hvacMode === "cool") activeClass = " active-blue";
+    else if (isActive) activeClass = " active-green";
+
+    var h = '<div class="tile tile-full' + activeClass + (unavailable ? ' unavailable' : '') + '">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">&#127777;&#65039;</div>';
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    h += '<div class="tile-state">' + escapeHtml(hvacMode) + '</div>';
+    h += '</div>';
+
+    if (!unavailable) {
+      h += '<div class="thermostat-display">';
+      h += '<div class="thermostat-current">Current: ' + escapeHtml(String(currentTemp)) + escapeHtml(unit) + '</div>';
+      h += '<div class="thermostat-target">' + escapeHtml(String(targetTemp)) + '<span class="thermostat-unit">' + escapeHtml(unit) + '</span></div>';
+      h += '</div>';
+
+      h += '<div class="thermostat-controls">';
+      h += '<button class="thermostat-btn" onclick="adjustTemp(\'' + eid + '\', -0.5)">&#8722;</button>';
+      h += '<div class="thermostat-mode">';
+      h += '<div class="thermostat-mode-label">Mode</div>';
+      h += escapeHtml(hvacMode);
+      h += '</div>';
+      h += '<button class="thermostat-btn" onclick="adjustTemp(\'' + eid + '\', 0.5)">+</button>';
+      h += '</div>';
+
+      h += '<div class="mode-selector">';
+      for (var m = 0; m < hvacModes.length; m++) {
+        var mode = hvacModes[m];
+        var mActive = mode === hvacMode ? " active" : "";
+        h += '<button class="mode-btn' + mActive + '" onclick="setHvacMode(\'' + eid + '\', \'' + escapeHtml(mode) + '\')">' + escapeHtml(mode) + '</button>';
+      }
+      h += '</div>';
+    }
+
+    h += '</div>';
+    return h;
+  }
+
+  function renderCover(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var unavailable = entity.state === "unavailable";
+    var isOpen = entity.state === "open";
+
+    var tileClass = "tile" + (isOpen ? " active-blue" : "") + (unavailable ? " unavailable" : "");
+    var h = '<div class="' + tileClass + '">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">&#128726;</div>';
+    if (!unavailable) {
+      h += '<div class="cover-controls">';
+      h += '<button class="cover-btn" onclick="coverAction(\'' + eid + '\', \'open\')" title="Open">&#9650;</button>';
+      h += '<button class="cover-btn" onclick="coverAction(\'' + eid + '\', \'stop\')" title="Stop">&#9632;</button>';
+      h += '<button class="cover-btn" onclick="coverAction(\'' + eid + '\', \'close\')" title="Close">&#9660;</button>';
+      h += '</div>';
+    }
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    h += '<div class="tile-state">' + escapeHtml(entity.state) + '</div>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function renderLock(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var isLocked = entity.state === "locked";
+    var unavailable = entity.state === "unavailable";
+
+    var tileClass = "tile" + (isLocked ? " active-green" : "") + (unavailable ? " unavailable" : "");
+    var h = '<div class="' + tileClass + '">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">' + (isLocked ? '&#128274;' : '&#128275;') + '</div>';
+    if (!unavailable) {
+      h += '<div class="toggle-switch">';
+      h += '<input type="checkbox" id="t_' + eid + '" ' + (isLocked ? 'checked' : '') + ' onchange="toggleLock(\'' + eid + '\', this.checked)">';
+      h += '<label class="toggle-slider" for="t_' + eid + '"></label>';
+      h += '</div>';
+    }
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    h += '<div class="tile-state">' + escapeHtml(entity.state) + '</div>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function renderSensor(entity, showGraph) {
+    var name = escapeHtml(friendlyName(entity));
+    var attrs = entity.attributes || {};
+    var unit = attrs.unit_of_measurement || "";
+    var dc = attrs.device_class || "";
+    var eid = entity.entity_id;
+    var cleanEid = eid.replace(/\./g, "_");
+    var domain = eid.split(".")[0];
+    var isBinary = (domain === "binary_sensor");
+
+    var icon = "&#128202;";
+    if (dc === "temperature") icon = "&#127777;&#65039;";
+    else if (dc === "humidity") icon = "&#128167;";
+    else if (dc === "battery") icon = "&#128267;";
+    else if (dc === "power" || dc === "energy") icon = "&#9889;";
+    else if (dc === "illuminance") icon = "&#9728;&#65039;";
+    else if (dc === "motion") icon = "&#128694;";
+    else if (dc === "door" || dc === "window" || dc === "opening" || eid.indexOf("cover") !== -1) icon = "&#128726;";
+
+    // Binary sensor text formatting
+    var stateText = escapeHtml(entity.state);
+    if (isBinary) {
+      var devClass = dc || "";
+      var isOn = entity.state === "on";
+      if (devClass === "door" || devClass === "window" || devClass === "garage_door" || devClass === "opening" || eid.indexOf("cover") !== -1) {
+        stateText = isOn ? "Open" : "Closed";
+      } else if (devClass === "lock") {
+        stateText = isOn ? "Unlocked" : "Locked";
+      } else if (devClass === "moisture") {
+        stateText = isOn ? "Wet" : "Dry";
+      } else if (devClass === "motion" || devClass === "occupancy") {
+        stateText = isOn ? "Detected" : "Clear";
+      } else {
+        stateText = isOn ? "Active" : "Inactive";
+      }
+    }
+
+    // Alert calculation
+    var val = parseFloat(entity.state);
+    var alertClass = "";
+    var valueStyle = "";
+    var lowerName = name.toLowerCase();
+    var isPH = (eid.indexOf("ph") !== -1 || lowerName.indexOf("ph") !== -1);
+    var isORP = (eid.indexOf("orp") !== -1 || lowerName.indexOf("orp") !== -1);
+    var isSalt = (eid.indexOf("salt") !== -1 || lowerName.indexOf("salt") !== -1);
+
+    if (!isBinary && !isNaN(val)) {
+      if (isPH) {
+        if (val < 7.0 || val > 7.8) alertClass = " alert-red";
+        else if (val < 7.2 || val > 7.6) alertClass = " alert-yellow";
+        else valueStyle = "color: #34c759; font-weight: 700;";
+      } else if (isORP) {
+        if (val < 500 || val > 900) alertClass = " alert-red";
+        else if (val < 650 || val > 800) alertClass = " alert-yellow";
+        else valueStyle = "color: #34c759; font-weight: 700;";
+      } else if (isSalt) {
+        if (val < 3000 || val > 4500) alertClass = " alert-red";
+        else if (val < 3500 || val > 3600) alertClass = " alert-yellow";
+        else valueStyle = "color: #34c759; font-weight: 700;";
+      }
+    }
+
+    var h = '<div class="tile' + alertClass + '">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">' + icon + '</div>';
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    
+    if (isBinary) {
+      h += '<div class="sensor-value" style="font-size:18px; margin-top:10px;">' + stateText + '</div>';
+    } else {
+      var styleAttr = valueStyle ? ' style="' + valueStyle + '"' : '';
+      h += '<div class="sensor-value"' + styleAttr + '>' + escapeHtml(entity.state) + ' ' + escapeHtml(unit) + '</div>';
+    }
+    
+    // Display ideal ranges
+    var idealRange = "";
+    if (isPH) idealRange = "Ideal: 7.2 - 7.6";
+    else if (isORP) idealRange = "Ideal: 650 - 800";
+    else if (isSalt) idealRange = "Ideal: 3500 - 3600";
+    if (idealRange) {
+      h += '<div style="font-size:10.5px;color:#8e8e93;margin-top:4px;font-weight:500;">' + idealRange + '</div>';
+    }
+    
+    h += '</div>';
+    
+    if (!isBinary && showGraph !== false) {
+      // Sparkline Graph Container
+      h += '<div class="sparkline-container" id="graph_' + cleanEid + '">';
+      if (!sensorHistory[eid]) {
+        sensorHistory[eid] = "loading";
+        fetchSensorHistory(eid);
+        h += '<div style="font-size:10px;color:#8e8e93;text-align:center;line-height:35px;">Loading history...</div>';
+      } else if (sensorHistory[eid] === "loading") {
+        h += '<div style="font-size:10px;color:#8e8e93;text-align:center;line-height:35px;">Loading history...</div>';
+      } else if (sensorHistory[eid] === "error") {
+        h += '<div style="font-size:10px;color:#ff3b30;text-align:center;line-height:35px;">History error</div>';
+      } else {
+        h += buildSvgMarkup(eid, sensorHistory[eid]);
+      }
+      h += '</div>';
+    }
+    
+    h += '</div>';
+    return h;
+  }
+
+  function renderInputNumber(entity, showGraph) {
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var cleanEid = eid.replace(/\./g, "_");
+    var currentVal = parseFloat(entity.state);
+    var attrs = entity.attributes || {};
+    var min = typeof attrs.min !== "undefined" ? attrs.min : 0;
+    var max = typeof attrs.max !== "undefined" ? attrs.max : 100;
+    var step = typeof attrs.step !== "undefined" ? attrs.step : 1;
+    var unit = attrs.unit_of_measurement || "";
+    var unavailable = entity.state === "unavailable";
+
+    // Detect warning threshold for manual values
+    var alertClass = "";
+    var lowerName = name.toLowerCase();
+    var isAlkalinity = (eid.indexOf("alkalinity") !== -1 || lowerName.indexOf("alkalinity") !== -1);
+    var isTotalChlorine = (eid.indexOf("total_chlorine") !== -1 || lowerName.indexOf("total chlorine") !== -1 || lowerName.indexOf("tc") !== -1);
+    var isFreeChlorine = (eid.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && !isTotalChlorine));
+    var isCalcium = (eid.indexOf("calcium") !== -1 || lowerName.indexOf("hardness") !== -1 || lowerName.indexOf("ch") !== -1);
+    var isStabilizer = (eid.indexOf("stabilizer") !== -1 || lowerName.indexOf("cyanuric") !== -1 || lowerName.indexOf("cya") !== -1);
+    var isTubCYA = isStabilizer && (eid.indexOf("hot_tub") !== -1 || eid.indexOf("hottub") !== -1 || eid.indexOf("spa") !== -1 || lowerName.indexOf("hot tub") !== -1);
+    var isPoolCYA = isStabilizer && !isTubCYA;
+    var isPool = (eid.indexOf("pool") !== -1 || lowerName.indexOf("pool") !== -1);
+    var valueStyle = "";
+
+    if (!isNaN(currentVal)) {
+      if (isAlkalinity) {
+        if (currentVal < 80 || currentVal > 120) alertClass = " alert-yellow";
+        else valueStyle = "color: #34c759; font-weight: 700;";
+      } else if (isTotalChlorine) {
+        if (currentVal < 0.5 || currentVal > 10.0) alertClass = " alert-red";
+        else if (currentVal < 1.0 || currentVal > 5.0) alertClass = " alert-yellow";
+        else valueStyle = "color: #34c759; font-weight: 700;";
+      } else if (isFreeChlorine) {
+        if (isPool) {
+          if (currentVal < 0.5 || currentVal > 6.0) alertClass = " alert-red";
+          else if (currentVal < 1.0 || currentVal > 3.0) alertClass = " alert-yellow";
+          else valueStyle = "color: #34c759; font-weight: 700;";
+        } else { // Hot Tub
+          if (currentVal < 1.0 || currentVal > 8.0) alertClass = " alert-red";
+          else if (currentVal < 3.0 || currentVal > 5.0) alertClass = " alert-yellow";
+          else valueStyle = "color: #34c759; font-weight: 700;";
+        }
+      } else if (isCalcium) { // Hardness
+        if (currentVal < 150 || currentVal > 700) alertClass = " alert-red";
+        else if (currentVal < 250 || currentVal > 500) alertClass = " alert-yellow";
+        else valueStyle = "color: #34c759; font-weight: 700;";
+      } else if (isTubCYA) {
+        if (currentVal > 50) alertClass = " alert-red";
+        else if (currentVal > 30) alertClass = " alert-yellow";
+        else valueStyle = "color: #34c759; font-weight: 700;";
+      } else if (isPoolCYA) {
+        if (currentVal < 10 || currentVal > 150) alertClass = " alert-red";
+        else if (currentVal < 15 || currentVal > 100) alertClass = " alert-yellow";
+        else valueStyle = "color: #34c759; font-weight: 700;";
+      }
+    }
+
+    var h = '<div class="tile tile-full' + alertClass + (unavailable ? ' unavailable' : '') + '">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">&#9997;</div>';
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    var styleAttr = valueStyle ? ' style="' + valueStyle + '"' : '';
+    h += '<div class="sensor-value" id="val_' + cleanEid + '"' + styleAttr + '>' + (isNaN(currentVal) ? '--' : currentVal) + ' ' + escapeHtml(unit) + '</div>';
+    
+    // Ideal range guidelines
+    var idealText = "";
+    if (isAlkalinity) idealText = "Ideal: 80 - 120";
+    else if (isTotalChlorine) idealText = "Ideal: 1.0 - 5.0";
+    else if (isFreeChlorine) {
+      if (isPool) idealText = "Ideal: 1.0 - 3.0";
+      else idealText = "Ideal: 3.0 - 5.0";
+    }
+    else if (isCalcium) idealText = "Ideal: 250 - 500";
+    else if (isTubCYA) idealText = "Ideal: 0 - 30";
+    else if (isPoolCYA) idealText = "Ideal: 15 - 100";
+    if (idealText) {
+      h += '<div style="font-size:10.5px;color:#8e8e93;margin-top:4px;font-weight:500;">' + idealText + '</div>';
+    }
+    
+    h += '</div>';
+
+    if (!unavailable) {
+      h += '<div class="slider-row" style="margin-top:12px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
+      h += '<input type="range" id="slider_' + cleanEid + '" style="-webkit-flex:1; flex:1;" min="' + min + '" max="' + max + '" step="' + step + '" value="' + (isNaN(currentVal) ? min : currentVal) + '" oninput="updateInputNumberDisplay(\'' + eid + '\', this.value, \'' + escapeHtml(unit) + '\')">';
+      h += '<button class="confirm-btn" onclick="confirmInputNumber(\'' + eid + '\')">Confirm</button>';
+      h += '</div>';
+    }
+
+    if (showGraph === true) {
+      // Sparkline Graph Container for Manual Inputs
+      h += '<div class="sparkline-container" id="graph_' + cleanEid + '" style="margin-top:12px;">';
+      if (!sensorHistory[eid]) {
+        sensorHistory[eid] = "loading";
+        fetchSensorHistory(eid);
+        h += '<div style="font-size:10px;color:#8e8e93;text-align:center;line-height:35px;">Loading history...</div>';
+      } else if (sensorHistory[eid] === "loading") {
+        h += '<div style="font-size:10px;color:#8e8e93;text-align:center;line-height:35px;">Loading history...</div>';
+      } else if (sensorHistory[eid] === "error") {
+        h += '<div style="font-size:10px;color:#ff3b30;text-align:center;line-height:35px;">History error</div>';
+      } else {
+        h += buildSvgMarkup(eid, sensorHistory[eid]);
+      }
+      h += '</div>';
+    }
+
+    h += '</div>';
+    return h;
+  }
+
+  function isEntityForVolume(entityId, friendlyName, volumeType) {
+    var id = entityId.toLowerCase();
+    var name = friendlyName.toLowerCase();
+    
+    var isTub = (id.indexOf("hot_tub") !== -1 || id.indexOf("hottub") !== -1 || id.indexOf("spa") !== -1 || id.indexOf("tub") !== -1 ||
+                 name.indexOf("hot tub") !== -1 || name.indexOf("hottub") !== -1 || name.indexOf("spa") !== -1 || name.indexOf("tub") !== -1);
+                 
+    var isPool = (id.indexOf("pool") !== -1 || name.indexOf("pool") !== -1);
+
+    if (volumeType === "hottub") {
+      return isTub;
+    } else {
+      return isPool && !isTub;
+    }
+  }
+
+  function getRecommendationsData(allStates, volumeType) {
+    var phVal = null;
+    var orpVal = null;
+    var saltVal = null;
+    var alkVal = null;
+    var clVal = null;
+    var totClVal = null;
+    var calVal = null;
+    var cyaVal = null;
+
+    for (var i = 0; i < allStates.length; i++) {
+      var s = allStates[i];
+      var eid = s.entity_id;
+      var name = (s.attributes && s.attributes.friendly_name) || eid;
+      var lowerName = name.toLowerCase();
+      var val = parseFloat(s.state);
+      if (isNaN(val)) continue;
+
+      // Filter: only use values matching pool or hot tub context
+      if (!isEntityForVolume(eid, name, volumeType)) continue;
+
+      // STRICT CHECK: only evaluate entities actually allowed on the dashboard
+      var sDomain = eid.split(".")[0];
+      if (!allowedEntityIds[eid] && sDomain !== "water_heater") continue;
+
+      if (eid.indexOf("ph") !== -1 || lowerName.indexOf("ph") !== -1) phVal = val;
+      else if (eid.indexOf("orp") !== -1 || lowerName.indexOf("orp") !== -1) orpVal = val;
+      else if (eid.indexOf("salt") !== -1 || lowerName.indexOf("salt") !== -1) saltVal = val;
+      else if (eid.indexOf("alkalinity") !== -1 || lowerName.indexOf("alkalinity") !== -1) alkVal = val;
+      else if (eid.indexOf("total_chlorine") !== -1 || lowerName.indexOf("total chlorine") !== -1 || lowerName.indexOf("tc") !== -1) totClVal = val;
+      else if (eid.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && lowerName.indexOf("total") === -1)) clVal = val;
+      else if (eid.indexOf("calcium") !== -1 || lowerName.indexOf("hardness") !== -1 || lowerName.indexOf("ch") !== -1) calVal = val;
+      else if (eid.indexOf("stabilizer") !== -1 || lowerName.indexOf("cyanuric") !== -1 || lowerName.indexOf("cya") !== -1) cyaVal = val;
+    }
+
+    var volGallons = (volumeType === "pool" ? 200000 : 600);
+    var volRatio = volGallons / 10000;
+    var recList = [];
+
+    // Helper to format doses nicely based on pool vs hot tub
+    function formatDose(oz, isLiquid) {
+      if (selectedRecVolume === "pool") {
+        if (isLiquid) {
+          var gal = oz / 128;
+          if (gal >= 1) return gal.toFixed(1) + " gal";
+          var qt = oz / 32;
+          if (qt >= 1) return qt.toFixed(1) + " quarts";
+          return oz.toFixed(0) + " fl oz";
+        } else {
+          var lbs = oz / 16;
+          if (lbs >= 1) return lbs.toFixed(1) + " lbs";
+          return oz.toFixed(0) + " oz";
+        }
+      } else {
+        var tbsp = oz * 2;
+        if (tbsp < 1) {
+          var tsp = tbsp * 3;
+          if (tsp < 0.25) return "1/4 tsp";
+          if (tsp >= 0.25 && tsp < 0.4) return "1/3 tsp";
+          if (tsp >= 0.4 && tsp < 0.7) return "1/2 tsp";
+          return tsp.toFixed(0) + " tsp";
+        }
+        if (tbsp > 8) {
+          return oz.toFixed(1) + (isLiquid ? " fl oz" : " oz");
+        }
+        return tbsp.toFixed(1) + " tbsp";
+      }
+    }
+
+    // pH Calculations
+    if (phVal !== null) {
+      if (phVal < 7.2) {
+        var diff = 7.2 - phVal; // Target bottom limit (7.2) to prevent overshoot
+        var doseOz = (diff / 0.1) * 3 * volRatio; 
+        var severity = (phVal < 7.0) ? "red" : "yellow";
+        recList.push({
+          severity: severity,
+          text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Soda Ash to increase pH from " + phVal + " to 7.2."
+        });
+      } else if (phVal > 7.6) {
+        var diff = phVal - 7.6; // Target top limit (7.6) to prevent overshoot
+        var doseOz = (diff / 0.1) * 10 * volRatio; 
+        var severity = (phVal > 7.8) ? "red" : "yellow";
+        recList.push({
+          severity: severity,
+          text: "Add <strong>" + formatDose(doseOz, true) + "</strong> of Muriatic Acid to decrease pH from " + phVal + " to 7.6."
+        });
+      }
+    }
+
+    // ORP is informational warnings only (suppressed in hot tub if pH is out of range)
+    if (orpVal !== null) {
+      var suppressOrp = (volumeType === "hottub" && phVal !== null && (phVal < 7.0 || phVal > 7.8));
+      if (suppressOrp) {
+        recList.push({
+          severity: "red",
+          text: "Do not treat for ORP; hot tub pH is out of range (" + phVal + "), which makes ORP sensor readings inaccurate."
+        });
+      } else {
+        if (orpVal < 650) {
+          var severity = (orpVal < 500) ? "red" : "yellow";
+          recList.push({
+            severity: severity,
+            text: "Add sanitizer to increase ORP from " + orpVal + " mV to 650 mV."
+          });
+        } else if (orpVal > 800) {
+          var severity = (orpVal > 900) ? "red" : "yellow";
+          recList.push({
+            severity: severity,
+            text: "Wait/expose water to air to decrease ORP from " + orpVal + " mV to 800 mV."
+          });
+        }
+      }
+    }
+
+    // Salt Calculations
+    if (saltVal !== null) {
+      if (saltVal < 3500) {
+        var diff = 3500 - saltVal; // Target bottom limit (3500)
+        var doseOz = (diff / 10) * 13 * volRatio;
+        var severity = (saltVal < 3000) ? "red" : "yellow";
+        recList.push({
+          severity: severity,
+          text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of pool salt to increase salt from " + saltVal + " ppm to 3500 ppm."
+        });
+      } else if (saltVal > 3600) {
+        var severity = (saltVal > 4500) ? "red" : "yellow";
+        recList.push({
+          severity: severity,
+          text: "Dilute water to decrease salt from " + saltVal + " ppm to 3600 ppm."
+        });
+      }
+    }
+
+    // Alkalinity Calculations
+    if (alkVal !== null) {
+      if (alkVal < 80) {
+        var diff = 80 - alkVal; // Target bottom limit (80)
+        var doseOz = (diff / 10) * 24 * volRatio;
+        recList.push({
+          severity: "yellow",
+          text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Sodium Bicarbonate to increase alkalinity from " + alkVal + " ppm to 80 ppm."
+        });
+      } else if (alkVal > 120) {
+        var diff = alkVal - 120; // Target top limit (120)
+        var doseOz = (diff / 10) * 26 * volRatio; // ~26 fl oz Muriatic Acid per 10 ppm decrease per 10k gal
+        recList.push({
+          severity: "yellow",
+          text: "Add <strong>" + formatDose(doseOz, true) + "</strong> of Muriatic Acid to decrease alkalinity from " + alkVal + " ppm to 120 ppm."
+        });
+      }
+    }
+
+    // Total Chlorine Calculations
+    if (totClVal !== null) {
+      if (totClVal < 1.0) {
+        recList.push({
+          severity: "yellow",
+          text: "Total chlorine is low (" + totClVal + " ppm). Add sanitizer to increase to 1.0 ppm."
+        });
+      } else if (totClVal > 5.0) {
+        recList.push({
+          severity: "yellow",
+          text: "Total chlorine is high (" + totClVal + " ppm). Allow to drift down or add neutralizer to 5.0 ppm."
+        });
+      }
+    }
+
+    // Chlorine Calculations (Free Chlorine)
+    if (clVal !== null) {
+      if (volumeType === "pool") {
+        if (clVal < 1.0) {
+          var diff = 2.0 - clVal; // Target mid-range (2.0)
+          var severity = (clVal < 0.5) ? "red" : "yellow";
+          // IC40 Super Chlorinate Math: scale diff (usually 2-6 hrs)
+          var hrs = diff * 2;
+          if (hrs < 2) hrs = 2;
+          if (hrs > 6) hrs = 6;
+          var displayHrs = Math.round(hrs);
+          recList.push({
+            severity: severity,
+            text: "Turn on superchlorinate on the Pentair Salt Cell (IC40) for <strong>" + displayHrs + " hours</strong> to increase free chlorine from " + clVal + " ppm to 2.0 ppm."
+          });
+        } else if (clVal > 3.0) {
+          var diff = clVal - 3.0; // Target top limit (3.0)
+          var doseOz = diff * 10.66 * volRatio;
+          var severity = (clVal > 6.0) ? "red" : "yellow";
+          recList.push({
+            severity: severity,
+            text: "Add <strong>" + formatDose(doseOz, true) + "</strong> of Hydrogen Peroxide (12%) to decrease free chlorine from " + clVal + " ppm to 3.0 ppm."
+          });
+        }
+      } else { // Hot Tub
+        if (clVal < 3.0) {
+          var diff = 4.0 - clVal; // Target mid-range (4.0)
+          var severity = (clVal < 1.0) ? "red" : "yellow";
+          // IC20 Super Chlorinate Math: produces 0.467 oz/hr, raises hot tub (600 gal) FC by 5.84 ppm/hr
+          var mins = (diff / 5.84) * 60;
+          if (mins < 30) mins = 30;
+          if (mins > 60) mins = 60;
+          var displayMins = Math.round(mins);
+          recList.push({
+            severity: severity,
+            text: "Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine from " + clVal + " ppm to 4.0 ppm."
+          });
+        } else if (clVal > 5.0) {
+          var diff = clVal - 5.0; // Target top limit (5.0)
+          var doseOz = diff * 10.66 * volRatio;
+          var severity = (clVal > 8.0) ? "red" : "yellow";
+          recList.push({
+            severity: severity,
+            text: "Add <strong>" + formatDose(doseOz, true) + "</strong> of Hydrogen Peroxide (12%) to decrease free chlorine from " + clVal + " ppm to 5.0 ppm."
+          });
+        }
+      }
+    }
+
+    // Hardness Calculations
+    if (calVal !== null) {
+      if (calVal < 250) {
+        var diff = 375 - calVal; // Target mid-range (375)
+        var doseOz = (diff / 10) * 19.2 * volRatio;
+        var severity = (calVal < 150) ? "red" : "yellow";
+        recList.push({
+          severity: severity,
+          text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Calcium Chloride to increase hardness from " + calVal + " ppm to 375 ppm."
+        });
+      } else if (calVal > 500) {
+        var severity = (calVal > 700) ? "red" : "yellow";
+        recList.push({
+          severity: severity,
+          text: "Hardness is high (" + calVal + " ppm). Dilute water to decrease to 500 ppm."
+        });
+      }
+    }
+
+    // Stabilizer (CYA) Calculations
+    if (cyaVal !== null) {
+      if (volumeType === "hottub") {
+        if (cyaVal > 30) {
+          var severity = (cyaVal > 50) ? "red" : "yellow";
+          recList.push({
+            severity: severity,
+            text: "Partially drain and refill water to decrease CYA from " + cyaVal + " ppm to 30 ppm."
+          });
+        }
+      } else { // Pool
+        if (cyaVal < 15) {
+          var diff = 50 - cyaVal; // Target mid-range (50)
+          var doseOz = (diff / 10) * 13 * volRatio;
+          var severity = (cyaVal < 10) ? "red" : "yellow";
+          recList.push({
+            severity: severity,
+            text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Cyanuric Acid to increase CYA from " + cyaVal + " ppm to 50 ppm."
+          });
+        } else if (cyaVal > 100) {
+          var severity = (cyaVal > 150) ? "red" : "yellow";
+          recList.push({
+            severity: severity,
+            text: "Partially drain and refill water to decrease CYA from " + cyaVal + " ppm to 100 ppm."
+          });
+        }
+      }
+    }
+
+    return recList;
+  }
+
+  function renderRecommendationsCard(allStates) {
+    var recs = getRecommendationsData(allStates, selectedRecVolume);
+    var h = '<div class="tile tile-full" style="border-radius:18px; padding:16px;">';
+    
+    if (recs.length === 0) {
+      h += '<div style="color:#34c759; font-weight:600; font-size:15px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
+      h += '<span style="font-size:20px; margin-right:8px;">✨</span> Water Chemistry looks perfect! No action needed.</div>';
+    } else {
+      h += '<ul style="margin: 0; padding-left: 20px; font-size: 13.5px; line-height: 1.6;">';
+      for (var r = 0; r < recs.length; r++) {
+        h += '<li style="margin-bottom: 8px;">' + recs[r].text + '</li>';
+      }
+      h += '</ul>';
+    }
+    h += '</div>';
+
+    return h;
+  }
+
+  function renderScene(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var h = '<div class="tile scene-tile" onclick="activateScene(\'' + eid + '\')">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">&#127912;</div>';
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    h += '<div class="tile-state">Scene</div>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function renderOverviewScene(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var isActive = (eid === lastActivatedScene);
+    var activeClass = isActive ? " active" : "";
+    
+    var h = '<div class="tile overview-tile' + activeClass + '" onclick="activateScene(\'' + eid + '\')" style="cursor:pointer; min-height:48px; padding:8px 12px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; box-sizing:border-box;">';
+    h += '<div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; -webkit-flex:1; flex:1; text-align:left; margin-right:8px;">' + name + '</div>';
+    
+    // Toggle switch (iOS switch representation)
+    h += '<div class="toggle-switch" style="margin:0;">';
+    h += '<input type="checkbox" ' + (isActive ? 'checked' : '') + ' disabled>';
+    h += '<span class="toggle-slider"></span>';
+    h += '</div>';
+    
+    h += '</div>';
+    return h;
+  }
+
+  // ======== SENSOR HISTORY HELPERS ========
+  function parseISO8601(str) {
+    if (!str) return NaN;
+    var s = str.replace(' ', 'T');
+    // Remove microseconds (e.g. .123456)
+    s = s.replace(/\.\d+/, '');
+    // Remove colon in timezone offset (e.g. +00:00 -> +0000)
+    s = s.replace(/([+-]\d{2}):(\d{2})$/, "$1$2");
+    var t = Date.parse(s);
+    if (isNaN(t)) {
+      var parts = s.split(/[-T:+]/);
+      if (parts.length >= 6) {
+        return Date.UTC(
+          parseInt(parts[0], 10),
+          parseInt(parts[1], 10) - 1,
+          parseInt(parts[2], 10),
+          parseInt(parts[3], 10),
+          parseInt(parts[4], 10),
+          parseInt(parts[5], 10)
+        );
+      }
+    }
+    return t;
+  }
+
+  function fetchSensorHistory(entityId) {
+    var threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    var startTime = threeDaysAgo.toISOString();
+
+    var path = "/api/history/period/" + startTime + "?filter_entity_id=" + entityId + "&minimal_response";
+    haRequest("GET", path, null, function(err, data) {
+      var cleanEid = entityId.replace(/\./g, "_");
+      var el = document.getElementById("graph_" + cleanEid);
+      if (err) {
+        sensorHistory[entityId] = "error";
+        if (el) el.innerHTML = '<div style="font-size:10px;color:#ff3b30;text-align:center;line-height:35px;">History error</div>';
+        return;
+      }
+
+      var points = [];
+      if (data && data.length > 0 && data[0].length > 0) {
+        var rawPoints = data[0];
+        for (var i = 0; i < rawPoints.length; i++) {
+          var val = parseFloat(rawPoints[i].state);
+          var time = parseISO8601(rawPoints[i].last_changed);
+          if (!isNaN(val) && !isNaN(time)) {
+            points.push({ val: val, time: time });
+          }
+        }
+      }
+
+      // Handle flat-line scenarios (no state changes in 3 days)
+      var nowTime = new Date().getTime();
+      var threeDaysAgoTime = threeDaysAgo.getTime();
+      var currentEntity = entities[entityId];
+      var currentVal = currentEntity ? parseFloat(currentEntity.state) : NaN;
+
+      if (points.length === 0 && !isNaN(currentVal)) {
+        points.push({ val: currentVal, time: threeDaysAgoTime });
+        points.push({ val: currentVal, time: nowTime });
+      } else if (points.length === 1) {
+        points.push({ val: points[0].val, time: nowTime });
+      }
+
+      sensorHistory[entityId] = points;
+      if (el) {
+        el.innerHTML = buildSvgMarkup(entityId, points);
+      }
+    });
+  }
+
+  function buildSvgMarkup(entityId, points, customHeight) {
+    var height = customHeight || 65;
+    if (!points || points.length < 2) {
+      return '<div style="font-size:10px;color:#8e8e93;text-align:center;line-height:' + height + 'px;">No history data</div>';
+    }
+
+    var minVal = points[0].val;
+    var maxVal = points[0].val;
+    var minTime = points[0].time;
+    var maxTime = points[points.length - 1].time;
+
+    for (var i = 0; i < points.length; i++) {
+      if (points[i].val < minVal) minVal = points[i].val;
+      if (points[i].val > maxVal) maxVal = points[i].val;
+    }
+
+    var valRange = maxVal - minVal;
+    if (valRange === 0) {
+      minVal -= 1;
+      maxVal += 1;
+      valRange = 2;
+    }
+
+    var midVal = minVal + (valRange / 2);
+
+    // Padding the Y axis slightly for graph rendering
+    var renderMin = minVal - (valRange * 0.1);
+    var renderMax = maxVal + (valRange * 0.1);
+    var renderRange = renderMax - renderMin;
+
+    // SVG coordinates (Square layout matching height)
+    var width = height;
+    
+    // Plotting area boundaries
+    var plotLeft = 48;
+    var plotRight = width - 10;
+    var plotWidth = plotRight - plotLeft;
+    var plotTop = 6;
+    var plotBottom = height - 17;
+    var plotHeight = plotBottom - plotTop;
+
+    var pathCoords = [];
+    for (var j = 0; j < points.length; j++) {
+      var p = points[j];
+      var x = plotLeft + (((p.time - minTime) / (maxTime - minTime)) * plotWidth);
+      var y = plotBottom - (((p.val - renderMin) / renderRange) * plotHeight);
+      if (x < plotLeft) x = plotLeft;
+      if (x > plotRight) x = plotRight;
+      if (y < plotTop) y = plotTop;
+      if (y > plotBottom) y = plotBottom;
+      pathCoords.push(x.toFixed(1) + "," + y.toFixed(1));
+    }
+
+    var polylinePoints = pathCoords.join(" ");
+    var fillPoints = plotLeft + "," + plotBottom + " " + polylinePoints + " " + plotRight + "," + plotBottom;
+
+    var unit = "";
+    var entity = entities[entityId];
+    if (entity && entity.attributes && entity.attributes.unit_of_measurement) {
+      unit = entity.attributes.unit_of_measurement;
+    }
+
+    // Shorten label helper (omits decimals for integers or large numbers)
+    function formatLabel(val) {
+      if (val >= 100 || val % 1 === 0) {
+        return val.toFixed(0);
+      }
+      return val.toFixed(1);
+    }
+
+    var h = '<svg class="sparkline-svg" viewBox="0 0 ' + width + ' ' + height + '" preserveAspectRatio="none">';
+    
+    // Background Grid lines (Using CSS classes for theme toggling)
+    h += '<line x1="' + plotLeft + '" y1="' + plotTop + '" x2="' + plotRight + '" y2="' + plotTop + '" class="grid-line" stroke-dasharray="2,2" stroke-width="0.5"></line>';
+    h += '<line x1="' + plotLeft + '" y1="' + ((plotTop + plotBottom) / 2) + '" x2="' + plotRight + '" y2="' + ((plotTop + plotBottom) / 2) + '" class="grid-line" stroke-dasharray="2,2" stroke-width="0.5"></line>';
+    h += '<line x1="' + plotLeft + '" y1="' + plotBottom + '" x2="' + plotRight + '" y2="' + plotBottom + '" class="axis-line" stroke-width="0.5"></line>';
+    h += '<line x1="' + plotLeft + '" y1="' + plotTop + '" x2="' + plotLeft + '" y2="' + plotBottom + '" class="axis-line" stroke-width="0.5"></line>';
+
+    // Sparkline Path & Fill
+    h += '<polygon class="sparkline-fill" points="' + fillPoints + '"></polygon>';
+    h += '<polyline class="sparkline-path" points="' + polylinePoints + '"></polyline>';
+
+    // Y-Axis Labels (Reduced font-size to 7 and formatted)
+    h += '<text x="' + (plotLeft - 4) + '" y="' + (plotTop + 2.5) + '" font-size="7" fill="#8e8e93" text-anchor="end">' + formatLabel(maxVal) + unit + '</text>';
+    h += '<text x="' + (plotLeft - 4) + '" y="' + (((plotTop + plotBottom) / 2) + 2.5) + '" font-size="7" fill="#8e8e93" text-anchor="end">' + formatLabel(midVal) + unit + '</text>';
+    h += '<text x="' + (plotLeft - 4) + '" y="' + (plotBottom + 2.5) + '" font-size="7" fill="#8e8e93" text-anchor="end">' + formatLabel(minVal) + unit + '</text>';
+
+    // X-Axis Labels
+    h += '<text x="' + plotLeft + '" y="' + (height - 4) + '" font-size="7.5" fill="#8e8e93" text-anchor="start">3d ago</text>';
+    h += '<text x="' + plotRight + '" y="' + (height - 4) + '" font-size="7.5" fill="#8e8e93" text-anchor="end">Now</text>';
+
+    h += '</svg>';
+    return h;
+  }
+
+  function renderInputSelect(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var currentOption = entity.state || "";
+    var attrs = entity.attributes || {};
+    var options = attrs.options || [];
+    var unavailable = entity.state === "unavailable";
+
+    var h = '<div class="tile tile-full' + (unavailable ? ' unavailable' : '') + '">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">&#128221;</div>';
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    h += '<div class="tile-state">' + escapeHtml(currentOption) + '</div>';
+    h += '</div>';
+
+    if (!unavailable && options.length > 0) {
+      h += '<div class="select-wrapper">';
+      h += '<select onchange="selectOption(\'' + eid + '\', this.value)">';
+      for (var o = 0; o < options.length; o++) {
+        var opt = options[o];
+        var selected = opt === currentOption ? ' selected' : '';
+        h += '<option value="' + escapeHtml(opt) + '"' + selected + '>' + escapeHtml(opt) + '</option>';
+      }
+      h += '</select>';
+      h += '</div>';
+    }
+
+    h += '</div>';
+    return h;
+  }
+
+  function renderWaterHeater(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var attrs = entity.attributes || {};
+    var currentTemp = attrs.current_temperature || "--";
+    var targetTemp = attrs.temperature || "--";
+    var opMode = entity.state || "off";
+    var opList = attrs.operation_list || [];
+    var unit = attrs.unit_of_measurement || "\u00B0F";
+    var minTemp = attrs.min_temp || 60;
+    var maxTemp = attrs.max_temp || 104;
+    var unavailable = entity.state === "unavailable";
+    var isActive = opMode !== "off" && opMode !== "Off" && !unavailable;
+    var activeClass = isActive ? " active-red" : "";
+
+    var h = '<div class="tile tile-full' + activeClass + (unavailable ? ' unavailable' : '') + '">';
+    h += '<div class="tile-top">';
+    h += '<div class="tile-icon">&#9832;</div>';
+    h += '</div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    h += '<div class="tile-state">' + escapeHtml(opMode) + '</div>';
+    h += '</div>';
+
+    if (!unavailable) {
+      h += '<div class="thermostat-display">';
+      h += '<div class="thermostat-current">Current: ' + escapeHtml(String(currentTemp)) + escapeHtml(unit) + '</div>';
+      h += '<div class="thermostat-target">' + escapeHtml(String(targetTemp)) + '<span class="thermostat-unit">' + escapeHtml(unit) + '</span></div>';
+      h += '</div>';
+
+      h += '<div class="thermostat-controls">';
+      h += '<button class="thermostat-btn" onclick="adjustWaterHeaterTemp(\'' + eid + '\', -1)">&#8722;</button>';
+      h += '<div class="thermostat-mode">';
+      h += '<div class="thermostat-mode-label">Mode</div>';
+      h += escapeHtml(opMode);
+      h += '</div>';
+      h += '<button class="thermostat-btn" onclick="adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
+      h += '</div>';
+
+      if (opList.length > 0) {
+        h += '<div class="mode-selector">';
+        for (var m = 0; m < opList.length; m++) {
+          var mode = opList[m];
+          var mActive = mode === opMode ? " active" : "";
+          h += '<button class="mode-btn' + mActive + '" onclick="setWaterHeaterMode(\'' + eid + '\', \'' + escapeHtml(mode) + '\')">' + escapeHtml(mode) + '</button>';
+        }
+        h += '</div>';
+      }
+    }
+
+    h += '</div>';
+    return h;
+  }
+
+  // ======== ACTIONS ========
+  window.toggleEntity = function(entityId, domain) {
+    var entity = entities[entityId];
+    if (!entity) return;
+    var service = entity.state === "on" ? "turn_off" : "turn_on";
+    haRequest("POST", "/api/services/" + domain + "/" + service, { entity_id: entityId }, function(err) {
+      if (err) {
+        showToast("Error: " + err, true);
+      } else {
+        showToast(friendlyName(entity) + " " + (service === "turn_on" ? "on" : "off"));
+      }
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.setBrightness = function(entityId, value) {
+    haRequest("POST", "/api/services/light/turn_on", {
+      entity_id: entityId,
+      brightness: parseInt(value, 10)
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.setEffect = function(entityId, effect) {
+    haRequest("POST", "/api/services/light/turn_on", {
+      entity_id: entityId,
+      effect: effect
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      else showToast(effect);
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.adjustTemp = function(entityId, delta) {
+    var entity = entities[entityId];
+    if (!entity) return;
+    var current = (entity.attributes && entity.attributes.temperature) || 70;
+    var newTemp = current + delta;
+    haRequest("POST", "/api/services/climate/set_temperature", {
+      entity_id: entityId,
+      temperature: newTemp
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      else showToast("Set to " + newTemp + "\u00B0");
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.setHvacMode = function(entityId, mode) {
+    haRequest("POST", "/api/services/climate/set_hvac_mode", {
+      entity_id: entityId,
+      hvac_mode: mode
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      else showToast("Mode: " + mode);
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.coverAction = function(entityId, action) {
+    var service = "";
+    if (action === "open") service = "open_cover";
+    else if (action === "close") service = "close_cover";
+    else service = "stop_cover";
+
+    haRequest("POST", "/api/services/cover/" + service, {
+      entity_id: entityId
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.toggleLock = function(entityId, shouldLock) {
+    var service = shouldLock ? "lock" : "unlock";
+    haRequest("POST", "/api/services/lock/" + service, {
+      entity_id: entityId
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      else showToast(shouldLock ? "Locked" : "Unlocked");
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.mediaPlayPause = function(entityId) {
+    // Optimistic UI state toggle
+    for (var i = 0; i < lastStatesCache.length; i++) {
+      if (lastStatesCache[i].entity_id === entityId) {
+        var curState = lastStatesCache[i].state;
+        lastStatesCache[i].state = (curState === "playing") ? "paused" : "playing";
+        break;
+      }
+    }
+    if (lastStatesCache.length > 0) {
+      renderDashboard(lastStatesCache);
+    }
+
+    haRequest("POST", "/api/services/media_player/media_play_pause", {
+      entity_id: entityId
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      // Staggered refreshes to catch HA state updates after hardware syncs
+      setTimeout(refreshAll, 1000);
+      setTimeout(refreshAll, 3000);
+    });
+  };
+
+  window.mediaNext = function(entityId) {
+    haRequest("POST", "/api/services/media_player/media_next_track", {
+      entity_id: entityId
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      setTimeout(refreshAll, 1000);
+      setTimeout(refreshAll, 3000);
+    });
+  };
+
+  window.mediaSetVolume = function(entityId, value) {
+    var floatVal = parseFloat(value);
+    // Optimistic volume state update
+    for (var i = 0; i < lastStatesCache.length; i++) {
+      if (lastStatesCache[i].entity_id === entityId) {
+        if (!lastStatesCache[i].attributes) lastStatesCache[i].attributes = {};
+        lastStatesCache[i].attributes.volume_level = floatVal;
+        break;
+      }
+    }
+    if (lastStatesCache.length > 0) {
+      renderDashboard(lastStatesCache);
+    }
+
+    haRequest("POST", "/api/services/media_player/volume_set", {
+      entity_id: entityId,
+      volume_level: floatVal
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      setTimeout(refreshAll, 1000);
+      setTimeout(refreshAll, 3000);
+    });
+  };
+
+  window.activateScene = function(entityId) {
+    lastActivatedScene = entityId;
+    try { localStorage.setItem("ha_last_scene", entityId); } catch(e) {}
+    
+    // Optimistic repaint
+    if (lastStatesCache.length > 0) {
+      renderDashboard(lastStatesCache);
+    }
+    
+    haRequest("POST", "/api/services/scene/turn_on", {
+      entity_id: entityId
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      else showToast("Scene activated");
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.toggleWaterHeater = function(entityId, currentState) {
+    var ent = null;
+    for (var i = 0; i < lastStatesCache.length; i++) {
+      if (lastStatesCache[i].entity_id === entityId) {
+        ent = lastStatesCache[i];
+        break;
+      }
+    }
+    var name = ent ? (ent.attributes.friendly_name || "") : "";
+    var isTub = isEntityForVolume(entityId, name, "hottub");
+    
+    var targetTemp, newMode;
+    var isCurrentlyOff = (currentState.toLowerCase() === "off");
+    
+    if (isCurrentlyOff) {
+      // Turning ON
+      targetTemp = isTub ? 102 : 74;
+      // Find active operation mode
+      var otherMode = "electric";
+      if (ent && ent.attributes && ent.attributes.operation_list) {
+        var list = ent.attributes.operation_list;
+        for (var j = 0; j < list.length; j++) {
+          if (list[j].toLowerCase() !== "off") {
+            otherMode = list[j];
+            break;
+          }
+        }
+      }
+      newMode = otherMode;
+    } else {
+      // Turning OFF
+      targetTemp = isTub ? 70 : 68;
+      newMode = "off";
+    }
+    
+    // Step 1: Set operation mode
+    haRequest("POST", "/api/services/water_heater/set_operation_mode", {
+      entity_id: entityId,
+      operation_mode: newMode
+    }, function(err) {
+      if (err) {
+        showToast("Error setting mode: " + err, true);
+        return;
+      }
+      
+      // Step 2: Set target temperature
+      haRequest("POST", "/api/services/water_heater/set_temperature", {
+        entity_id: entityId,
+        temperature: targetTemp
+      }, function(err2) {
+        if (err2) {
+          showToast("Error setting temperature: " + err2, true);
+        } else {
+          showToast(name + " set to " + newMode + " (" + targetTemp + "\u00B0F)");
+        }
+        setTimeout(refreshAll, 500);
+      });
+    });
+  };
+
+  window.adjustWaterHeaterTemp = function(entityId, delta) {
+    var entity = entities[entityId];
+    if (!entity) return;
+    var current = (entity.attributes && entity.attributes.temperature) || 80;
+    var newTemp = current + delta;
+    haRequest("POST", "/api/services/water_heater/set_temperature", {
+      entity_id: entityId,
+      temperature: newTemp
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      else showToast("Set to " + newTemp + "\u00B0");
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.setWaterHeaterMode = function(entityId, mode) {
+    haRequest("POST", "/api/services/water_heater/set_operation_mode", {
+      entity_id: entityId,
+      operation_mode: mode
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      else showToast("Mode: " + mode);
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.selectOption = function(entityId, option) {
+    haRequest("POST", "/api/services/input_select/select_option", {
+      entity_id: entityId,
+      option: option
+    }, function(err) {
+      if (err) showToast("Error: " + err, true);
+      else showToast("Selected: " + option);
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.dismissBanner = function() {
+    bannerDismissed = true;
+    var bannerEl = document.getElementById("alertBanner");
+    if (bannerEl) {
+      bannerEl.className = "alert-banner hidden";
+    }
+  };
+
+  window.updateInputNumberDisplay = function(entityId, value, unit) {
+    var cleanEid = entityId.replace(/\./g, "_");
+    var el = document.getElementById("val_" + cleanEid);
+    if (el) {
+      el.textContent = value + " " + unit;
+      
+      // Calculate color dynamically on slide
+      var val = parseFloat(value);
+      var id = entityId.toLowerCase();
+      var isAlkalinity = (id.indexOf("alkalinity") !== -1);
+      var isTotalChlorine = (id.indexOf("total_chlorine") !== -1 || id.indexOf("tc") !== -1);
+      var isFreeChlorine = (id.indexOf("free_chlorine") !== -1 || id.indexOf("fc") !== -1 || (id.indexOf("chlorine") !== -1 && !isTotalChlorine));
+      var isCalcium = (id.indexOf("calcium") !== -1 || id.indexOf("hardness") !== -1 || id.indexOf("ch") !== -1);
+      var isStabilizer = (id.indexOf("stabilizer") !== -1 || id.indexOf("cyanuric") !== -1 || id.indexOf("cya") !== -1);
+      var isTubCYA = isStabilizer && (id.indexOf("hot_tub") !== -1 || id.indexOf("hottub") !== -1 || id.indexOf("spa") !== -1);
+      var isPoolCYA = isStabilizer && !isTubCYA;
+      var isPool = (id.indexOf("pool") !== -1);
+
+      var color = ""; // Default CSS fallback
+      var weight = "500";
+      
+      if (!isNaN(val)) {
+        if (isAlkalinity) {
+          if (val >= 80 && val <= 120) { color = "#34c759"; weight = "700"; }
+        } else if (isTotalChlorine) {
+          if (val >= 1.0 && val <= 5.0) { color = "#34c759"; weight = "700"; }
+        } else if (isFreeChlorine) {
+          if (isPool) {
+            if (val >= 1.0 && val <= 3.0) { color = "#34c759"; weight = "700"; }
+          } else { // Hot Tub
+            if (val >= 3.0 && val <= 5.0) { color = "#34c759"; weight = "700"; }
+          }
+        } else if (isCalcium) { // Hardness
+          if (val >= 250 && val <= 500) { color = "#34c759"; weight = "700"; }
+        } else if (isTubCYA) {
+          if (val <= 30) { color = "#34c759"; weight = "700"; }
+        } else if (isPoolCYA) {
+          if (val >= 15 && val <= 100) { color = "#34c759"; weight = "700"; }
+        }
+      }
+      
+      el.style.color = color;
+      el.style.fontWeight = weight;
+    }
+  };
+
+  window.setInputNumber = function(entityId, value) {
+    haRequest("POST", "/api/services/input_number/set_value", {
+      entity_id: entityId,
+      value: parseFloat(value)
+    }, function(err) {
+      if (err) {
+        showToast("Error: " + err, true);
+      } else {
+        showToast("Updated value");
+        // Delete history cache for this input so it refreshes with the new point
+        delete sensorHistory[entityId];
+
+        // Optimistically turn on chemicals checked today helper switch
+        haRequest("POST", "/api/services/input_boolean/turn_on", {
+          entity_id: "input_boolean.chemicals_checked_today"
+        }, function() {});
+      }
+      setTimeout(refreshAll, 500);
+    });
+  };
+
+  window.confirmInputNumber = function(entityId) {
+    var cleanEid = entityId.replace(/\./g, "_");
+    var slider = document.getElementById("slider_" + cleanEid);
+    if (slider) {
+      confirmInputNumberAction(entityId, slider.value);
+    }
+  };
+
+  function confirmInputNumberAction(entityId, val) {
+    setInputNumber(entityId, val);
+  }
+
+  window.toggleTheme = function() {
+    var isCurrentlyDark = document.body.classList.contains("dark-theme");
+    var nextTheme = isCurrentlyDark ? "light" : "dark";
+    try {
+      localStorage.setItem("ha_theme_override", nextTheme);
+    } catch(e) {}
+    themeOverride = nextTheme;
+    if (lastStatesCache.length > 0) {
+      renderDashboard(lastStatesCache);
+    }
+  };
+
+  window.setRecVolume = function(vol) {
+    selectedRecVolume = vol;
+    try { localStorage.setItem("ha_rec_volume", vol); } catch(e) {}
+    // Update button styling dynamically
+    var pBtn = document.getElementById("btn_rec_pool");
+    var htBtn = document.getElementById("btn_rec_hottub");
+    if (pBtn) pBtn.className = (vol === "pool" ? "mode-btn active" : "mode-btn");
+    if (htBtn) htBtn.className = (vol === "hottub" ? "mode-btn active" : "mode-btn");
+    
+    // Full re-render to update inputs, sensors, and recommendation card volumes
+    if (lastStatesCache.length > 0) {
+      renderDashboard(lastStatesCache);
+    }
+  };
+
+  window.switchTab = function(tabName) {
+    activeTab = tabName;
+    try { localStorage.setItem("ha_active_tab", tabName); } catch(e) {}
+    if (lastStatesCache.length > 0) {
+      renderDashboard(lastStatesCache);
+    }
+  };
+
+  window.dismissCheckedToday = function(goToTab) {
+    checkedTodayAlertDismissed = true;
+    try { localStorage.setItem("ha_chem_prompt_dismissed_time", Date.now()); } catch(e) {}
+    
+    var overlayEl = document.getElementById("checkedTodayOverlay");
+    if (overlayEl) {
+      overlayEl.className = "setup-overlay hidden";
+    }
+    if (goToTab) {
+      switchTab("chemicals");
+    }
+  };
+
+  window.switchChemTab = function(chemTabName) {
+    activeChemTab = chemTabName;
+    try { localStorage.setItem("ha_active_chem_tab", chemTabName); } catch(e) {}
+    if (lastStatesCache.length > 0) {
+      renderDashboard(lastStatesCache);
+    }
+  };
+
+  function renderHistoryCard(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var attrs = entity.attributes || {};
+    var unit = attrs.unit_of_measurement || "";
+    var eid = entity.entity_id;
+    var cleanEid = eid.replace(/\./g, "_");
+    var val = parseFloat(entity.state);
+    
+    // 250px height is a perfect square fit for both portrait (340px) and landscape (330px) cards
+    var graphHeight = 250;
+    
+    var h = '<div class="tile history-tile" style="border-radius:18px; padding:16px; box-sizing:border-box; display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-justify-content:space-between; justify-content:space-between;">';
+    h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:8px;">';
+    h += '<div class="tile-name" style="font-weight:600; font-size:14px;">' + name + ' Trend</div>';
+    h += '<div style="font-weight:700; font-size:16px; color:#007aff;">' + (isNaN(val) ? '--' : val) + ' ' + escapeHtml(unit) + '</div>';
+    h += '</div>';
+    
+    // Sparkline Container
+    h += '<div class="sparkline-container" id="graph_' + cleanEid + '" style="height:' + graphHeight + 'px; margin-top:12px;">';
+    if (!sensorHistory[eid]) {
+      sensorHistory[eid] = "loading";
+      fetchSensorHistory(eid);
+      h += '<div style="font-size:10px;color:#8e8e93;text-align:center;line-height:' + graphHeight + 'px;">Loading history...</div>';
+    } else if (sensorHistory[eid] === "loading") {
+      h += '<div style="font-size:10px;color:#8e8e93;text-align:center;line-height:' + graphHeight + 'px;">Loading history...</div>';
+    } else if (sensorHistory[eid] === "error") {
+      h += '<div style="font-size:10px;color:#ff3b30;text-align:center;line-height:' + graphHeight + 'px;">History error</div>';
+    } else {
+      h += buildSvgMarkup(eid, sensorHistory[eid], graphHeight);
+    }
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function renderOverviewToggleEntity(entity, domain) {
+    var name = escapeHtml(friendlyName(entity));
+    var eid = escapeHtml(entity.entity_id);
+    var isOn = entity.state === "on" || entity.state === "On";
+    var activeClass = isOn ? (domain === "light" ? " active" : " active-blue") : "";
+    var icon = domain === "light" ? "&#128161;" : (domain === "fan" ? "&#128168;" : "&#128268;");
+
+    var h = '<div class="tile overview-tile' + activeClass + '" onclick="toggleEntity(\'' + eid + '\', \'' + domain + '\')" style="cursor:pointer;">';
+    h += '<div class="tile-top"><div class="tile-icon">' + icon + '</div></div>';
+    h += '<div class="tile-bottom" style="margin-top:4px;">';
+    h += '<div class="tile-name" style="margin-bottom:0;">' + name + '</div>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function renderOverviewWaterHeater(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var attrs = entity.attributes || {};
+    var currentTemp = attrs.current_temperature || "--";
+    var opMode = entity.state || "off";
+    var eid = escapeHtml(entity.entity_id);
+    var unit = attrs.unit_of_measurement || "\u00B0F";
+    var isActive = opMode !== "off" && opMode !== "Off";
+    var activeClass = isActive ? " active-red" : "";
+
+    var h = '<div class="tile overview-tile' + activeClass + '" onclick="toggleWaterHeater(\'' + eid + '\', \'' + escapeHtml(opMode) + '\')" style="cursor:pointer;">';
+    h += '<div class="tile-top"><div class="tile-icon">&#9832;</div></div>';
+    h += '<div class="tile-bottom" style="margin-top:4px; display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; width:100%;">';
+    h += '<div class="tile-name" style="margin-bottom:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; -webkit-flex:1; flex:1; text-align:left; margin-right:4px;">' + name + '</div>';
+    h += '<div class="tile-state" style="margin-top:0; font-size:11px; font-weight:700; white-space:nowrap;">' + currentTemp + unit + '</div>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function renderOverviewInputSelect(entity) {
+    var name = escapeHtml(friendlyName(entity));
+    var currentOption = entity.state || "";
+
+    var h = '<div class="tile overview-tile">';
+    h += '<div class="tile-top"><div class="tile-icon">&#128221;</div></div>';
+    h += '<div class="tile-bottom">';
+    h += '<div class="tile-name">' + name + '</div>';
+    h += '<div class="tile-state">' + escapeHtml(currentOption) + '</div>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function formatTime(seconds) {
+    if (isNaN(seconds) || seconds === null || seconds === undefined) return "00:00";
+    var sec = Math.max(0, Math.floor(seconds));
+    var hrs = Math.floor(sec / 3600);
+    var mins = Math.floor((sec % 3600) / 60);
+    var secs = sec % 60;
+    if (hrs > 0) {
+      return hrs + ":" + (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
+    }
+    return (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
+  }
+
+  function startMediaTickers() {
+    setInterval(function() {
+      if (!lastStatesCache || lastStatesCache.length === 0) return;
+      for (var i = 0; i < lastStatesCache.length; i++) {
+        var entity = lastStatesCache[i];
+        if (entity.entity_id.split(".")[0] === "media_player") {
+          var eid = entity.entity_id;
+          var cleanEid = eid.replace(/\./g, "_");
+          var state = entity.state;
+          var attrs = entity.attributes || {};
+          
+          var fillCtrl = document.getElementById("prog_fill_ctrl_" + cleanEid);
+          var timeCurCtrl = document.getElementById("prog_cur_ctrl_" + cleanEid);
+          
+          if (fillCtrl && timeCurCtrl && attrs.media_duration) {
+            var position = attrs.media_position || 0;
+            var curPos = position;
+            if (state === "playing" && attrs.media_position_updated_at) {
+              var updatedAt = new Date(attrs.media_position_updated_at).getTime();
+              var elapsed = (Date.now() - updatedAt) / 1000;
+              curPos = position + elapsed;
+              if (curPos > attrs.media_duration) curPos = attrs.media_duration;
+            }
+            var pct = (curPos / attrs.media_duration) * 100;
+            fillCtrl.style.width = pct + "%";
+            timeCurCtrl.textContent = formatTime(curPos);
+          }
+        }
+      }
+    }, 1000);
+  }
+
+  function renderMediaPlayer(group) {
+    var primary = group[0];
+    
+    // Combine speaker names for grouped display
+    var names = [];
+    for (var g = 0; g < group.length; g++) {
+      names.push(friendlyName(group[g]));
+    }
+    var name = escapeHtml(names.join(" & "));
+    
+    var eid = escapeHtml(primary.entity_id);
+    var cleanEid = eid.replace(/\./g, "_");
+    var state = primary.state;
+    var attrs = primary.attributes || {};
+    var title = attrs.media_title || "Not Playing";
+    var artist = attrs.media_artist || "Unknown Artist";
+    var volume = typeof attrs.volume_level !== "undefined" ? attrs.volume_level : 0;
+    var isPlaying = state === "playing";
+    var unavailable = state === "unavailable";
+    
+    var artUrl = attrs.entity_picture ? HA_URL + attrs.entity_picture : "";
+    
+    var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="border-radius:24px; padding:20px; display:block; text-align:center; box-sizing:border-box;">';
+    
+    // Header
+    h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:14px;">';
+    h += '<div style="font-weight:700; font-size:13.5px; letter-spacing:-0.2px; text-align:left; -webkit-flex:1; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-right:8px;">' + name + '</div>';
+    h += '<div style="font-size:10px; font-weight:700; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px;">' + state + '</div>';
+    h += '</div>';
+    
+    // Album Art Container (centered, smaller 140px square to keep card extremely concise)
+    h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; margin-bottom:14px;">';
+    if (artUrl) {
+      h += '<img src="' + artUrl + '" style="width:140px; height:140px; border-radius:18px; object-fit:cover; box-shadow: 0 8px 20px rgba(0,0,0,0.12); background:#f2f2f7;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
+      h += '<div style="display:none; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
+    } else {
+      h += '<div style="display:-webkit-flex; display:flex; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
+    }
+    h += '</div>';
+    
+    // Title & Artist Info
+    h += '<div style="margin-bottom:14px; text-align:left; padding:0 4px;">';
+    h += '<div style="font-weight:700; font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + escapeHtml(title) + '</div>';
+    h += '<div style="font-size:13.5px; color:#8e8e93; font-weight:500; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(artist) + '</div>';
+    h += '</div>';
+    
+    if (!unavailable) {
+      var duration = attrs.media_duration || 0;
+      var position = attrs.media_position || 0;
+      var curPos = position;
+      if (state === "playing" && attrs.media_position_updated_at) {
+        var updatedAt = new Date(attrs.media_position_updated_at).getTime();
+        var elapsed = (Date.now() - updatedAt) / 1000;
+        curPos = position + elapsed;
+        if (curPos > duration) curPos = duration;
+      }
+      var pct = duration ? (curPos / duration) * 100 : 0;
+      
+      // Progress timeline (Dynamic view representing track progress)
+      if (duration > 0) {
+        h += '<div style="margin-bottom:18px; padding:0 4px;">';
+        h += '<div style="height:3px; background:rgba(0,0,0,0.06); border-radius:2px; position:relative; overflow:hidden;">';
+        h += '<div id="prog_fill_ctrl_' + cleanEid + '" style="width:' + pct + '%; height:100%; background:#007aff; border-radius:2px; transition: width 0.3s linear;"></div>';
+        h += '</div>';
+        h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; font-size:10px; color:#8e8e93; font-weight:600; margin-top:6px;">';
+        h += '<span id="prog_cur_ctrl_' + cleanEid + '">' + formatTime(curPos) + '</span>';
+        h += '<span id="prog_dur_ctrl_' + cleanEid + '">' + formatTime(duration) + '</span>';
+        h += '</div>';
+        h += '</div>';
+      } else {
+        h += '<div style="margin-bottom:18px; height:19px;"></div>'; // spacer fallback
+      }
+      
+      // Control Buttons (Textless SVG Icons - Back, Play/Pause, Next)
+      h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin-bottom:18px; gap: 20px;">';
+      
+      // Back (Previous track - placeholder button style)
+      h += '<button class="footer-btn" style="font-size:16px; padding:8px 12px; margin:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+      h += '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+      h += '</button>';
+      
+      // Play/Pause
+      var isDark = document.body.classList.contains("dark-theme");
+      var activeBg = isPlaying ? (isDark ? 'rgba(0, 122, 255, 0.25)' : '#e1f5fe') : (isDark ? 'rgba(255,255,255,0.08)' : '#f2f2f7');
+      var activeColor = '#007aff';
+      h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:50px; height:50px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 2px 6px rgba(0,0,0,0.05); padding:0; box-sizing:border-box;" onclick="mediaPlayPause(\'' + eid + '\')">';
+      if (isPlaying) {
+        h += '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+      } else {
+        h += '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      }
+      h += '</button>';
+      
+      // Next (Skip track)
+      h += '<button class="footer-btn" style="font-size:16px; padding:8px 12px; margin:0;" onclick="mediaNext(\'' + eid + '\')">';
+      h += '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+      h += '</button>';
+      
+      h += '</div>';
+      
+      // Volume Bars (Icon for single, stacked text labels for grouped)
+      for (var g = 0; g < group.length; g++) {
+        var m = group[g];
+        var mEid = escapeHtml(m.entity_id);
+        var mCleanEid = mEid.replace(/\./g, "_");
+        var mAttrs = m.attributes || {};
+        var mVolume = typeof mAttrs.volume_level !== "undefined" ? mAttrs.volume_level : 0;
+        var mName = friendlyName(m);
+        
+        h += '<div class="slider-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin-top:12px;' + (g === 0 ? ' border-top:1px solid rgba(0,0,0,0.05); padding-top:12px;' : '') + '">';
+        if (group.length === 1) {
+          h += '<span style="font-size:14px; margin-right:8px; color:#8e8e93;">';
+          h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+          h += '</span>';
+        } else {
+          h += '<span style="font-size:11px; margin-right:8px; color:#8e8e93; font-weight:700; -webkit-flex:0 0 95px; flex:0 0 95px; width:95px; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(mName) + '</span>';
+        }
+        h += '<input type="range" id="vol_' + mCleanEid + '" style="-webkit-flex:1; flex:1;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
+        h += '<span style="font-size:11px; margin-left:8px; font-weight:700; min-width:32px; text-align:right; color:#8e8e93;">' + Math.round(mVolume * 100) + '%</span>';
+        h += '</div>';
+      }
+    }
+    
+    h += '</div>';
+    return h;
+  }
+
+  function renderOverviewMediaPlayer(group) {
+    var primary = group[0];
+    
+    // Combine speaker names for grouped display
+    var names = [];
+    for (var g = 0; g < group.length; g++) {
+      names.push(friendlyName(group[g]));
+    }
+    var name = escapeHtml(names.join(" & "));
+    
+    var eid = escapeHtml(primary.entity_id);
+    var cleanEid = eid.replace(/\./g, "_");
+    var state = primary.state;
+    var attrs = primary.attributes || {};
+    var title = attrs.media_title || "Not Playing";
+    var artist = attrs.media_artist || "Unknown Artist";
+    var isPlaying = state === "playing";
+    var unavailable = state === "unavailable";
+    
+    var artUrl = attrs.entity_picture ? HA_URL + attrs.entity_picture : "";
+    
+    var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="border-radius:18px; padding:10px 14px; display:block; box-sizing:border-box; text-align:left; min-height: 0;">';
+    
+    // Top Row: Art + Info + Play/Skip Buttons
+    h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
+    
+    // Tiny Album Art
+    if (artUrl) {
+      h += '<img src="' + artUrl + '" style="width:44px; height:44px; border-radius:8px; object-fit:cover; margin-right:12px; background:#f2f2f7;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
+      h += '<div style="display:none; width:44px; height:44px; border-radius:8px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:9px; color:#8e8e93; font-weight:700; margin-right:12px;">NO ART</div>';
+    } else {
+      h += '<div style="display:-webkit-flex; display:flex; width:44px; height:44px; border-radius:8px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:9px; color:#8e8e93; font-weight:700; margin-right:12px;">NO ART</div>';
+    }
+    
+    // Metadata
+    h += '<div style="-webkit-flex:1; flex:1; min-width:0; margin-right:12px;">';
+    h += '<div style="font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.2px;">' + escapeHtml(title) + '</div>';
+    h += '<div style="font-size:11.5px; color:#8e8e93; font-weight:500; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(artist) + ' &bull; ' + name + '</div>';
+    h += '</div>';
+    
+    if (!unavailable) {
+      // Play/Pause & Skip Buttons side by side
+      h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px;">';
+      
+      // Play/Pause Button
+      var isDark = document.body.classList.contains("dark-theme");
+      var activeBgComp = isPlaying ? (isDark ? 'rgba(0, 122, 255, 0.25)' : '#e1f5fe') : (isDark ? 'rgba(255,255,255,0.08)' : '#f2f2f7');
+      var activeColorComp = '#007aff';
+      h += '<button class="footer-btn" style="background:' + activeBgComp + '; color:' + activeColorComp + '; width:36px; height:36px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); padding:0; box-sizing:border-box;" onclick="mediaPlayPause(\'' + eid + '\')">';
+      if (isPlaying) {
+        h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+      } else {
+        h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      }
+      h += '</button>';
+      
+      // Skip Button
+      h += '<button class="footer-btn" style="padding:6px; margin:0;" onclick="mediaNext(\'' + eid + '\')">';
+      h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+      h += '</button>';
+      
+      h += '</div>';
+    }
+    
+    h += '</div>';
+    
+    if (!unavailable) {
+      // Bottom Row: Thin Volume Scrubber (Loop through all speakers in the group)
+      for (var g = 0; g < group.length; g++) {
+        var m = group[g];
+        var mEid = escapeHtml(m.entity_id);
+        var mCleanEid = mEid.replace(/\./g, "_");
+        var mAttrs = m.attributes || {};
+        var mVolume = typeof mAttrs.volume_level !== "undefined" ? mAttrs.volume_level : 0;
+        var mName = friendlyName(m);
+        
+        h += '<div class="slider-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin-top:8px;' + (g === 0 ? ' border-top:1px solid rgba(0,0,0,0.05); padding-top:6px;' : '') + '">';
+        if (group.length === 1) {
+          h += '<span style="font-size:12px; margin-right:6px; color:#8e8e93; display:-webkit-flex; display:flex;">';
+          h += '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+          h += '</span>';
+        } else {
+          h += '<span style="font-size:10px; margin-right:6px; color:#8e8e93; font-weight:700; -webkit-flex:0 0 80px; flex:0 0 80px; width:80px; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(mName) + '</span>';
+        }
+        h += '<input type="range" id="vol_ov_' + mCleanEid + '" style="-webkit-flex:1; flex:1; height:2px; margin:0;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
+        h += '<span style="font-size:10px; margin-left:6px; font-weight:700; color:#8e8e93; min-width:28px; text-align:right;">' + Math.round(mVolume * 100) + '%</span>';
+        h += '</div>';
+      }
+    }
+    
+    h += '</div>';
+    return h;
+  }
+
+  // ======== GO ========
+  init();
+})();
+</script>
+</body>
+</html>
