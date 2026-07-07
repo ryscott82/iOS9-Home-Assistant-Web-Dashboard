@@ -3199,10 +3199,10 @@
       };
 
       window.mediaPlayPause = function (entityId) {
-        // Optimistic UI state toggle
+        var curState = "";
         for (var i = 0; i < lastStatesCache.length; i++) {
           if (lastStatesCache[i].entity_id === entityId) {
-            var curState = lastStatesCache[i].state;
+            curState = lastStatesCache[i].state;
             lastStatesCache[i].state = (curState === "playing") ? "paused" : "playing";
             break;
           }
@@ -3211,14 +3211,47 @@
           renderDashboard(lastStatesCache);
         }
 
-        haRequest("POST", "/api/services/media_player/media_play_pause", {
-          entity_id: entityId
-        }, function (err) {
-          if (err) showToast("Error: " + err, true);
-          // Staggered refreshes to catch HA state updates after hardware syncs
-          setTimeout(refreshAll, 1000);
-          setTimeout(refreshAll, 3000);
-        });
+        var isNotActive = curState !== "playing" && curState !== "paused";
+
+        if (isNotActive) {
+          // If the player is off or standby, we need to turn it on first
+          if (curState === "off" || curState === "standby") {
+            haRequest("POST", "/api/services/media_player/turn_on", {
+              entity_id: entityId
+            }, function (err) {
+              if (err) {
+                showToast("Error: " + err, true);
+              } else {
+                // Wait 800ms for hardware connection, then start playing
+                setTimeout(function () {
+                  haRequest("POST", "/api/services/media_player/media_play", {
+                    entity_id: entityId
+                  }, function (err) {
+                    if (err) showToast("Error starting playback: " + err, true);
+                    setTimeout(refreshAll, 1000);
+                  });
+                }, 800);
+              }
+            });
+          } else {
+            // Player is already on but idle, start playing directly
+            haRequest("POST", "/api/services/media_player/media_play", {
+              entity_id: entityId
+            }, function (err) {
+              if (err) showToast("Error starting playback: " + err, true);
+              setTimeout(refreshAll, 1000);
+            });
+          }
+        } else {
+          // Player is playing or paused, toggle normal play/pause
+          haRequest("POST", "/api/services/media_player/media_play_pause", {
+            entity_id: entityId
+          }, function (err) {
+            if (err) showToast("Error: " + err, true);
+            setTimeout(refreshAll, 1000);
+            setTimeout(refreshAll, 3000);
+          });
+        }
       };
 
       window.mediaNext = function (entityId) {
@@ -3794,6 +3827,26 @@
         var artist = attrs.media_artist || "Unknown Artist";
         var isPlaying = state === "playing";
         var unavailable = state === "unavailable";
+
+        var isIdle = state !== "playing" && state !== "paused";
+        if (isIdle && !unavailable) {
+          // Compact layout for idle media players
+          var h = '<div class="tile media-tile" style="background:#ffffff; border-radius:18px; padding:10px 14px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; box-sizing:border-box; min-height:54px;">';
+          
+          // Left: Music icon + Speaker name
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; min-width:0; -webkit-flex:1; flex:1; margin-right:12px;">';
+          h += '<div style="display:-webkit-flex; display:flex; width:34px; height:34px; border-radius:8px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:16px; margin-right:10px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
+          h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
+          h += '</div>';
+          
+          // Right: Compact Play button
+          h += '<button class="footer-btn" style="background:#f2f2f7; color:#007aff; width:34px; height:34px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+          h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+          h += '</button>';
+          
+          h += '</div>';
+          return h;
+        }
 
         var artUrl = attrs.entity_picture ? HA_URL + attrs.entity_picture : "";
 
