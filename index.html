@@ -2601,6 +2601,12 @@
       }
 
       function getRecommendationsData(allStates, volumeType) {
+        var isTimerActive = false;
+        var tState = entities["timer.superchlorinate_time"];
+        if (tState && tState.state === "active") {
+          isTimerActive = true;
+        }
+
         var phVal = null;
         var orpVal = null;
         var saltVal = null;
@@ -2701,10 +2707,12 @@
           } else {
             if (orpVal < 650) {
               var severity = (orpVal < 500) ? "red" : "yellow";
-              recList.push({
-                severity: severity,
-                text: "Add sanitizer to increase ORP from " + orpVal + " mV to 650 mV."
-              });
+              if (volumeType !== "hottub" || !isTimerActive) {
+                recList.push({
+                  severity: severity,
+                  text: "Add sanitizer to increase ORP from " + orpVal + " mV to 650 mV."
+                });
+              }
             } else if (orpVal > 800) {
               var severity = (orpVal > 900) ? "red" : "yellow";
               recList.push({
@@ -2794,17 +2802,19 @@
             }
           } else { // Hot Tub
             if (clVal < 3.0) {
-              var diff = 4.0 - clVal; // Target mid-range (4.0)
-              var severity = (clVal < 1.0) ? "red" : "yellow";
-              // IC20 Super Chlorinate Math: produces 0.467 oz/hr, raises hot tub (600 gal) FC by 5.84 ppm/hr
-              var mins = (diff / 5.84) * 60;
-              if (mins < 30) mins = 30;
-              if (mins > 60) mins = 60;
-              var displayMins = Math.round(mins);
-              recList.push({
-                severity: severity,
-                text: "Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine from " + clVal + " ppm to 4.0 ppm."
-              });
+              if (!isTimerActive) {
+                var diff = 4.0 - clVal; // Target mid-range (4.0)
+                var severity = (clVal < 1.0) ? "red" : "yellow";
+                // IC20 Super Chlorinate Math: produces 0.467 oz/hr, raises hot tub (600 gal) FC by 5.84 ppm/hr
+                var mins = (diff / 5.84) * 60;
+                if (mins < 30) mins = 30;
+                if (mins > 60) mins = 60;
+                var displayMins = Math.round(mins);
+                recList.push({
+                  severity: severity,
+                  text: "Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine from " + clVal + " ppm to 4.0 ppm."
+                });
+              }
             } else if (clVal > 5.0) {
               var diff = clVal - 5.0; // Target top limit (5.0)
               var doseOz = diff * 10.66 * volRatio;
@@ -2883,33 +2893,41 @@
           h += '</ul>';
         }
 
-        // Add "Fix Hot Tub Chlorine Levels" button if Hot Tub is active and Free Chlorine is low
+        // Add "Fix Hot Tub Chlorine Levels" button if Hot Tub is active and Free Chlorine is low and timer is not active
         if (selectedRecVolume === "hottub") {
-          var clVal = null;
-          for (var i = 0; i < allStates.length; i++) {
-            var s = allStates[i];
-            var eid = s.entity_id;
-            var name = (s.attributes && s.attributes.friendly_name) || eid;
-            var lowerName = name.toLowerCase();
-            
-            var isTub = (eid.indexOf("hot_tub") !== -1 || eid.indexOf("hottub") !== -1 || eid.indexOf("spa") !== -1 || eid.indexOf("tub") !== -1 ||
-              lowerName.indexOf("hot tub") !== -1 || lowerName.indexOf("hottub") !== -1 || lowerName.indexOf("spa") !== -1 || lowerName.indexOf("tub") !== -1);
-            
-            if (!isTub) continue;
-            
-            var val = parseFloat(s.state);
-            if (isNaN(val)) continue;
-            
-            if (eid.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && lowerName.indexOf("total") === -1)) {
-              clVal = val;
-              break;
-            }
+          var isTimerActive = false;
+          var tState = entities["timer.superchlorinate_time"];
+          if (tState && tState.state === "active") {
+            isTimerActive = true;
           }
-          
-          if (clVal !== null && clVal < 3.0) {
-            h += '<div style="margin-top: 14px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;">';
-            h += '<button class="confirm-btn" style="background:#007aff; color:#ffffff; font-size:13px; font-weight:700; padding:10px 16px; border-radius:10px; margin:0;" onclick="fixHotTubChlorine()">Fix Hot Tub Chlorine Levels</button>';
-            h += '</div>';
+
+          if (!isTimerActive) {
+            var clVal = null;
+            for (var i = 0; i < allStates.length; i++) {
+              var s = allStates[i];
+              var eid = s.entity_id;
+              var name = (s.attributes && s.attributes.friendly_name) || eid;
+              var lowerName = name.toLowerCase();
+              
+              var isTub = (eid.indexOf("hot_tub") !== -1 || eid.indexOf("hottub") !== -1 || eid.indexOf("spa") !== -1 || eid.indexOf("tub") !== -1 ||
+                lowerName.indexOf("hot tub") !== -1 || lowerName.indexOf("hottub") !== -1 || lowerName.indexOf("spa") !== -1 || lowerName.indexOf("tub") !== -1);
+              
+              if (!isTub) continue;
+              
+              var val = parseFloat(s.state);
+              if (isNaN(val)) continue;
+              
+              if (eid.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && lowerName.indexOf("total") === -1)) {
+                clVal = val;
+                break;
+              }
+            }
+            
+            if (clVal !== null && clVal < 3.0) {
+              h += '<div style="margin-top: 14px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;">';
+              h += '<button class="confirm-btn" style="background:#007aff; color:#ffffff; font-size:13px; font-weight:700; padding:10px 16px; border-radius:10px; margin:0;" onclick="fixHotTubChlorine()">Fix Hot Tub Chlorine Levels</button>';
+              h += '</div>';
+            }
           }
         }
 
@@ -3781,7 +3799,12 @@
 
         showToast("Starting timer for " + minutesToRun + " minutes...");
 
-        var durationStr = "00:" + padZero(minutesToRun) + ":00";
+        var hrs = Math.floor(minutesToRun / 60);
+        var mins = minutesToRun % 60;
+        var hrsStr = hrs < 10 ? "0" + hrs : String(hrs);
+        var minsStr = mins < 10 ? "0" + mins : String(mins);
+        var durationStr = hrsStr + ":" + minsStr + ":00";
+
         haRequest("POST", "/api/services/timer/start", {
           entity_id: "timer.superchlorinate_time",
           duration: durationStr
