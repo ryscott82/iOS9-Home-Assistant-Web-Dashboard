@@ -1413,21 +1413,20 @@
         0
       </div>
 
-      <!-- Keypad Grid (3x4) -->
-      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:16px;">
-        <button class="keypad-btn" onclick="pressKeypad('1')">1</button>
-        <button class="keypad-btn" onclick="pressKeypad('2')">2</button>
-        <button class="keypad-btn" onclick="pressKeypad('3')">3</button>
-        <button class="keypad-btn" onclick="pressKeypad('4')">4</button>
-        <button class="keypad-btn" onclick="pressKeypad('5')">5</button>
-        <button class="keypad-btn" onclick="pressKeypad('6')">6</button>
-        <button class="keypad-btn" onclick="pressKeypad('7')">7</button>
-        <button class="keypad-btn" onclick="pressKeypad('8')">8</button>
-        <button class="keypad-btn" onclick="pressKeypad('9')">9</button>
-        <button class="keypad-btn" onclick="pressKeypad('.')">.</button>
-        <button class="keypad-btn" onclick="pressKeypad('0')">0</button>
-        <button class="keypad-btn" style="background:#ff3b30; color:#ffffff;"
-          onclick="pressKeypad('backspace')">⌫</button>
+      <!-- Keypad Grid (3x4) (Flexbox for iOS 9 support) -->
+      <div style="display:-webkit-flex; display:flex; -webkit-flex-wrap:wrap; flex-wrap:wrap; margin: -5px -5px 11px -5px;">
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('1')">1</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('2')">2</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('3')">3</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('4')">4</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('5')">5</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('6')">6</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('7')">7</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('8')">8</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('9')">9</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('.')">.</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('0')">0</button>
+        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box; background:#ff3b30; color:#ffffff;" onclick="pressKeypad('backspace')">⌫</button>
       </div>
 
       <!-- Bottom buttons (Cancel / Save) -->
@@ -3723,7 +3722,7 @@
         var name = friendlyName(entity);
         var currentVal = parseFloat(entity.state);
 
-        keypadCurrentInput = isNaN(currentVal) ? "" : String(currentVal);
+        keypadCurrentInput = "";
 
         var titleEl = document.getElementById("keypadTitle");
         if (titleEl) titleEl.textContent = "Log " + name;
@@ -3754,7 +3753,7 @@
         if (idealEl) idealEl.textContent = idealText;
 
         var dispEl = document.getElementById("keypadDisplay");
-        if (dispEl) dispEl.textContent = (keypadCurrentInput || "0") + " " + keypadUnit;
+        if (dispEl) dispEl.innerHTML = '<span style="color:#a8a8a8;">0</span> ' + keypadUnit;
 
         var overlay = document.getElementById("keypadOverlay");
         if (overlay) overlay.className = "setup-overlay";
@@ -3783,7 +3782,7 @@
           keypadCurrentInput += key;
         }
 
-        dispEl.textContent = (keypadCurrentInput || "0") + " " + keypadUnit;
+        dispEl.innerHTML = (keypadCurrentInput ? keypadCurrentInput : '<span style="color:#a8a8a8;">0</span>') + " " + keypadUnit;
       };
 
       window.closeKeypad = function () {
