@@ -2701,7 +2701,7 @@
           var suppressOrp = (volumeType === "hottub" && phVal !== null && (phVal < 7.0 || phVal > 7.8));
           if (suppressOrp) {
             recList.push({
-              severity: "red",
+              severity: "yellow",
               text: "Do not treat for ORP; hot tub pH is out of range (" + phVal + "), which makes ORP sensor readings inaccurate."
             });
           } else {
@@ -2730,9 +2730,17 @@
             var diff = 3500 - saltVal; // Target bottom limit (3500)
             var doseOz = (diff / 10) * 13 * volRatio;
             var severity = "yellow";
+            var doseText = "";
+            if (volumeType === "hottub") {
+              var cups = doseOz / 9.6;
+              doseText = cups.toFixed(1) + " cup" + (cups.toFixed(1) !== "1.0" ? "s" : "");
+            } else {
+              var bags = (doseOz / 16) / 40;
+              doseText = bags.toFixed(1) + " bag" + (bags.toFixed(1) !== "1.0" ? "s" : "") + " (40 lb)";
+            }
             recList.push({
               severity: severity,
-              text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of pool salt to increase salt from " + saltVal + " ppm to 3500 ppm."
+              text: "Add <strong>" + doseText + "</strong> of pool salt to increase salt from " + saltVal + " ppm to 3500 ppm."
             });
           } else if (saltVal > 3600) {
             var severity = "yellow";
@@ -3753,6 +3761,13 @@
       };
 
       window.fixHotTubChlorine = function () {
+        var loggedState = entities["input_boolean.chlorine_logged_since_changing"];
+        var isLogged = loggedState && loggedState.state === "on";
+        if (!isLogged) {
+          showToast("Log current chlorine value", true);
+          return;
+        }
+
         var clVal = null;
         if (lastStatesCache && lastStatesCache.length > 0) {
           for (var i = 0; i < lastStatesCache.length; i++) {
