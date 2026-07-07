@@ -3779,7 +3779,7 @@
           }
         }
 
-        showToast("Setting timer to " + minutesToRun + " minutes... Waiting 15s to update...");
+        showToast("Starting timer for " + minutesToRun + " minutes...");
 
         var durationStr = "00:" + padZero(minutesToRun) + ":00";
         haRequest("POST", "/api/services/timer/start", {
@@ -3787,32 +3787,11 @@
           duration: durationStr
         }, function (err) {
           if (err) {
-            showToast("Failed to set timer: " + err, true);
-            return;
+            showToast("Failed to start timer: " + err, true);
+          } else {
+            showToast("Timer started successfully!");
           }
-
-          setTimeout(function () {
-            showToast("Turning on Superchlorinate...");
-            haRequest("POST", "/api/services/switch/turn_on", {
-              entity_id: "switch.hot_tub_superchlorinate"
-            }, function (errSw) {
-              if (errSw) {
-                haRequest("POST", "/api/services/switch/turn_on", {
-                  entity_id: "switch.superchlorinate"
-                }, function (errSw2) {
-                  if (errSw2) {
-                    showToast("Error turning on switch: " + errSw2, true);
-                  } else {
-                    showToast("Superchlorination started successfully!");
-                  }
-                  setTimeout(refreshAll, 1000);
-                });
-              } else {
-                showToast("Superchlorination started successfully!");
-                setTimeout(refreshAll, 1000);
-              }
-            });
-          }, 15000);
+          setTimeout(refreshAll, 1000);
         });
       };
 
