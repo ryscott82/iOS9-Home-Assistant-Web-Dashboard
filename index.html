@@ -2128,18 +2128,6 @@
         } else if (activeTab === "calendar") {
           // TAB: CALENDAR
           
-          function padZero(num) {
-            return num < 10 ? '0' + num : num;
-          }
-          function formatClockTime(d) {
-            var hrs = d.getHours();
-            var mins = d.getMinutes();
-            var ampm = hrs >= 12 ? 'PM' : 'AM';
-            hrs = hrs % 12;
-            hrs = hrs ? hrs : 12;
-            return hrs + ':' + (mins < 10 ? '0' + mins : mins) + ' ' + ampm;
-          }
-
           var calendarEntities = [];
           for (var eid in entities) {
             if (entities.hasOwnProperty(eid) && eid.indexOf("calendar.") === 0) {
@@ -2384,6 +2372,19 @@
       }
 
       // ======== ENTITY RENDERERS ========
+      function padZero(num) {
+        return num < 10 ? '0' + num : num;
+      }
+
+      function formatClockTime(d) {
+        var hrs = d.getHours();
+        var mins = d.getMinutes();
+        var ampm = hrs >= 12 ? 'PM' : 'AM';
+        hrs = hrs % 12;
+        hrs = hrs ? hrs : 12;
+        return hrs + ':' + (mins < 10 ? '0' + mins : mins) + ' ' + ampm;
+      }
+
       function friendlyName(entity) {
         return (entity.attributes && entity.attributes.friendly_name) || entity.entity_id;
       }
