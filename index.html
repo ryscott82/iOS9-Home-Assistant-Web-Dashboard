@@ -1692,6 +1692,73 @@
         }
       };
 
+      function buildMediaGroups(mediaPlayers) {
+        var mediaGroups = [];
+        var virtualGroups = {};
+        try {
+          var stored = localStorage.getItem("ha_virtual_media_groups");
+          if (stored) virtualGroups = JSON.parse(stored);
+        } catch (e) {}
+
+        var validVirtualGroups = {};
+        for (var master in virtualGroups) {
+          if (entities[master]) {
+            var members = virtualGroups[master];
+            var validMembers = [];
+            for (var m = 0; m < members.length; m++) {
+              if (entities[members[m]] && members[m] !== master) {
+                validMembers.push(members[m]);
+              }
+            }
+            if (validMembers.length > 0) {
+              validVirtualGroups[master] = validMembers;
+            }
+          }
+        }
+        virtualGroups = validVirtualGroups;
+
+        var memberSet = {};
+        for (var master in virtualGroups) {
+          var members = virtualGroups[master];
+          for (var m = 0; m < members.length; m++) {
+            memberSet[members[m]] = true;
+          }
+        }
+
+        for (var i = 0; i < mediaPlayers.length; i++) {
+          var mp = mediaPlayers[i];
+          var mpEid = mp.entity_id;
+
+          if (memberSet[mpEid]) continue;
+
+          var state = mp.state;
+          if (state !== "playing" && state !== "paused") {
+            var isIdleTooLong = true;
+            if (mp.last_changed) {
+              var lastChanged = new Date(mp.last_changed);
+              var elapsedMs = Date.now() - lastChanged.getTime();
+              if (elapsedMs < 24 * 60 * 60 * 1000) {
+                isIdleTooLong = false;
+              }
+            }
+            if (isIdleTooLong) continue;
+          }
+
+          if (virtualGroups[mpEid]) {
+            var gArray = [mp];
+            var members = virtualGroups[mpEid];
+            for (var m = 0; m < members.length; m++) {
+              var memberEnt = entities[members[m]];
+              if (memberEnt) gArray.push(memberEnt);
+            }
+            mediaGroups.push(gArray);
+          } else {
+            mediaGroups.push([mp]);
+          }
+        }
+        return mediaGroups;
+      }
+
       // ======== RENDER ========
       function renderDashboard(allStates) {
         var isNight = false;
@@ -1898,40 +1965,9 @@
             html += '</div></div>';
           }
 
-          // 2. MEDIA (compact media player tiles, grouped dynamically when linked)
+          // 2. MEDIA (compact media player tiles, grouped by virtual dashboard groups)
           if (mediaPlayers.length > 0) {
-            var mediaGroups = [];
-            var songGroups = {};
-            for (i = 0; i < mediaPlayers.length; i++) {
-              var mp = mediaPlayers[i];
-              var state = mp.state;
-              if (state !== "playing" && state !== "paused") {
-                var isIdleTooLong = true;
-                if (mp.last_changed) {
-                  var lastChanged = new Date(mp.last_changed);
-                  var elapsedMs = Date.now() - lastChanged.getTime();
-                  if (elapsedMs < 24 * 60 * 60 * 1000) {
-                    isIdleTooLong = false;
-                  }
-                }
-                if (isIdleTooLong) continue;
-              }
-
-              var attrs = mp.attributes || {};
-              var title = attrs.media_title;
-              var artist = attrs.media_artist;
-
-              if (title && artist) {
-                var key = (title.trim() + "|||" + artist.trim()).toLowerCase();
-                if (!songGroups[key]) {
-                  songGroups[key] = [];
-                  mediaGroups.push(songGroups[key]);
-                }
-                songGroups[key].push(mp);
-              } else {
-                mediaGroups.push([mp]);
-              }
-            }
+            var mediaGroups = buildMediaGroups(mediaPlayers);
 
             html += '<div class="section"><div class="section-title">Media</div>';
             html += '<div class="tile-grid">';
@@ -1960,40 +1996,9 @@
 
           html += '</div></div>';
         } else if (activeTab === "controls") {
-          // MEDIA PLAYERS (Moved to the very top of controls, grouped dynamically)
+          // MEDIA PLAYERS (Moved to the very top of controls, grouped by virtual dashboard groups)
           if (mediaPlayers.length > 0) {
-            var mediaGroups = [];
-            var songGroups = {};
-            for (i = 0; i < mediaPlayers.length; i++) {
-              var mp = mediaPlayers[i];
-              var state = mp.state;
-              if (state !== "playing" && state !== "paused") {
-                var isIdleTooLong = true;
-                if (mp.last_changed) {
-                  var lastChanged = new Date(mp.last_changed);
-                  var elapsedMs = Date.now() - lastChanged.getTime();
-                  if (elapsedMs < 24 * 60 * 60 * 1000) {
-                    isIdleTooLong = false;
-                  }
-                }
-                if (isIdleTooLong) continue;
-              }
-
-              var attrs = mp.attributes || {};
-              var title = attrs.media_title;
-              var artist = attrs.media_artist;
-
-              if (title && artist) {
-                var key = (title.trim() + "|||" + artist.trim()).toLowerCase();
-                if (!songGroups[key]) {
-                  songGroups[key] = [];
-                  mediaGroups.push(songGroups[key]);
-                }
-                songGroups[key].push(mp);
-              } else {
-                mediaGroups.push([mp]);
-              }
-            }
+            var mediaGroups = buildMediaGroups(mediaPlayers);
 
             html += '<div class="section"><div class="section-title">Media Players</div>';
             html += '<div class="tile-grid">';
@@ -3319,69 +3324,95 @@
       };
 
       window.mediaPlayPause = function (entityId) {
+        var virtualGroups = {};
+        try {
+          var stored = localStorage.getItem("ha_virtual_media_groups");
+          if (stored) virtualGroups = JSON.parse(stored);
+        } catch (e) {}
+
+        var targets = [entityId];
+        if (virtualGroups[entityId]) {
+          targets = targets.concat(virtualGroups[entityId]);
+        }
+
         var curState = "";
         for (var i = 0; i < lastStatesCache.length; i++) {
           if (lastStatesCache[i].entity_id === entityId) {
             curState = lastStatesCache[i].state;
-            lastStatesCache[i].state = (curState === "playing") ? "paused" : "playing";
             break;
           }
         }
+
+        for (var t = 0; t < targets.length; t++) {
+          for (var i = 0; i < lastStatesCache.length; i++) {
+            if (lastStatesCache[i].entity_id === targets[t]) {
+              lastStatesCache[i].state = (curState === "playing") ? "paused" : "playing";
+              break;
+            }
+          }
+        }
+
         if (lastStatesCache.length > 0) {
           renderDashboard(lastStatesCache);
         }
 
         var isNotActive = curState !== "playing" && curState !== "paused";
 
-        if (isNotActive) {
-          // If the player is off or standby, we need to turn it on first
-          if (curState === "off" || curState === "standby") {
-            haRequest("POST", "/api/services/media_player/turn_on", {
-              entity_id: entityId
-            }, function (err) {
-              if (err) {
-                showToast("Error: " + err, true);
+        for (var t = 0; t < targets.length; t++) {
+          var tgtId = targets[t];
+          (function(tId) {
+            if (isNotActive) {
+              if (curState === "off" || curState === "standby") {
+                haRequest("POST", "/api/services/media_player/turn_on", {
+                  entity_id: tId
+                }, function (err) {
+                  if (!err) {
+                    setTimeout(function () {
+                      haRequest("POST", "/api/services/media_player/media_play", {
+                        entity_id: tId
+                      }, function (err) {
+                        setTimeout(refreshAll, 1000);
+                      });
+                    }, 800);
+                  }
+                });
               } else {
-                // Wait 800ms for hardware connection, then start playing
-                setTimeout(function () {
-                  haRequest("POST", "/api/services/media_player/media_play", {
-                    entity_id: entityId
-                  }, function (err) {
-                    if (err) showToast("Error starting playback: " + err, true);
-                    setTimeout(refreshAll, 1000);
-                  });
-                }, 800);
+                haRequest("POST", "/api/services/media_player/media_play", {
+                  entity_id: tId
+                }, function (err) {
+                  setTimeout(refreshAll, 1000);
+                });
               }
-            });
-          } else {
-            // Player is already on but idle, start playing directly
-            haRequest("POST", "/api/services/media_player/media_play", {
-              entity_id: entityId
-            }, function (err) {
-              if (err) showToast("Error starting playback: " + err, true);
-              setTimeout(refreshAll, 1000);
-            });
-          }
-        } else {
-          // Player is playing or paused, toggle normal play/pause
-          haRequest("POST", "/api/services/media_player/media_play_pause", {
-            entity_id: entityId
-          }, function (err) {
-            if (err) showToast("Error: " + err, true);
-            setTimeout(refreshAll, 1000);
-            setTimeout(refreshAll, 3000);
-          });
+            } else {
+              haRequest("POST", "/api/services/media_player/media_play_pause", {
+                entity_id: tId
+              }, function (err) {
+                setTimeout(refreshAll, 1000);
+              });
+            }
+          })(tgtId);
         }
       };
 
       window.mediaNext = function (entityId) {
-        haRequest("POST", "/api/services/media_player/media_next_track", {
-          entity_id: entityId
-        }, function (err) {
-          if (err) showToast("Error: " + err, true);
-          setTimeout(refreshAll, 1000);
-          setTimeout(refreshAll, 3000);
-        });
+        var virtualGroups = {};
+        try {
+          var stored = localStorage.getItem("ha_virtual_media_groups");
+          if (stored) virtualGroups = JSON.parse(stored);
+        } catch (e) {}
+
+        var targets = [entityId];
+        if (virtualGroups[entityId]) {
+          targets = targets.concat(virtualGroups[entityId]);
+        }
+
+        for (var t = 0; t < targets.length; t++) {
+          haRequest("POST", "/api/services/media_player/media_next_track", {
+            entity_id: targets[t]
+          }, function (err) {
+            setTimeout(refreshAll, 1000);
+          });
+        }
       };
 
       window.mediaSetVolume = function (entityId, value) {
