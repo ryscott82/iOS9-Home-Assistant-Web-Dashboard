@@ -2777,6 +2777,29 @@
           }
         }
 
+        // Combined Chlorine Calculations
+        if (totClVal !== null && clVal !== null) {
+          var combinedCl = totClVal - clVal;
+          if (combinedCl >= 0.5) {
+            var clGood = (volumeType === "pool" ? clVal >= 1.0 : clVal >= 3.0);
+            if (clGood) {
+              if (volumeType === "pool") {
+                recList.push({
+                  severity: "yellow",
+                  text: "Combined chlorine is high (" + combinedCl.toFixed(2) + " ppm). Turn on superchlorinate on the Pentair Salt Cell (IC40) for <strong>4 hours</strong> to burn off chloramines."
+                });
+              } else { // Hot Tub
+                if (!isTimerActive) {
+                  recList.push({
+                    severity: "yellow",
+                    text: "Combined chlorine is high (" + combinedCl.toFixed(2) + " ppm). Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>45 minutes</strong> to burn off chloramines."
+                  });
+                }
+              }
+            }
+          }
+        }
+
         // Chlorine Calculations (Free Chlorine)
         if (clVal !== null) {
           if (volumeType === "pool") {
@@ -3564,13 +3587,22 @@
             showToast("Error: " + err, true);
           } else {
             showToast("Updated value");
-            // Delete history cache for this input so it refreshes with the new point
             delete sensorHistory[entityId];
 
             // Optimistically turn on chemicals checked today helper switch
             haRequest("POST", "/api/services/input_boolean/turn_on", {
               entity_id: "input_boolean.chemicals_checked_today"
             }, function () { });
+
+            // Turn on chlorine_logged_since_changing if updating hot tub free chlorine
+            var lowerEid = entityId.toLowerCase();
+            var isTub = (lowerEid.indexOf("hot_tub") !== -1 || lowerEid.indexOf("hottub") !== -1 || lowerEid.indexOf("spa") !== -1 || lowerEid.indexOf("tub") !== -1);
+            var isFC = (lowerEid.indexOf("free_chlorine") !== -1 || lowerEid.indexOf("fc") !== -1 || (lowerEid.indexOf("chlorine") !== -1 && lowerEid.indexOf("total") === -1));
+            if (isTub && isFC) {
+              haRequest("POST", "/api/services/input_boolean/turn_on", {
+                entity_id: "input_boolean.chlorine_logged_since_changing"
+              }, function () { });
+            }
           }
           setTimeout(refreshAll, 500);
         });
@@ -3762,6 +3794,7 @@
         }
 
         var clVal = null;
+        var totClVal = null;
         if (lastStatesCache && lastStatesCache.length > 0) {
           for (var i = 0; i < lastStatesCache.length; i++) {
             var s = lastStatesCache[i];
@@ -3775,13 +3808,17 @@
             if (isNaN(val)) continue;
             if (eid.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && lowerName.indexOf("total") === -1)) {
               clVal = val;
-              break;
+            } else if (eid.indexOf("total_chlorine") !== -1 || lowerName.indexOf("total chlorine") !== -1 || lowerName.indexOf("tc") !== -1) {
+              totClVal = val;
             }
           }
         }
 
         var minutesToRun = 45; // Default conservative estimate
-        if (clVal !== null && !isNaN(clVal)) {
+        var isCombinedHigh = (totClVal !== null && clVal !== null && (totClVal - clVal >= 0.5));
+        if (isCombinedHigh) {
+          minutesToRun = 45; // 45 minutes to burn off chloramines
+        } else if (clVal !== null && !isNaN(clVal)) {
           var targetFC = clVal < 2.0 ? 3.0 : 4.0;
           var diff = targetFC - clVal;
           if (diff > 0) {
