@@ -1368,37 +1368,6 @@
     body.dark-theme #keypadDisplay {
       background: rgba(255, 255, 255, 0.05) !important;
     }
-
-    /* ======== MEDIA GROUP MANAGER ======== */
-    .media-group-manager {
-      margin-top: 16px;
-      border-top: 1px solid rgba(0, 0, 0, 0.05);
-      padding-top: 12px;
-      text-align: left;
-      background: rgba(0, 0, 0, 0.02);
-      border-radius: 12px;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-    .media-group-manager-divider {
-      border-top: 1px solid rgba(0, 0, 0, 0.05);
-      margin-top: 8px;
-      padding-top: 8px;
-    }
-    .media-group-member-name {
-      font-weight: 600;
-      color: #1c1c1e;
-    }
-    body.dark-theme .media-group-manager {
-      background: rgba(255, 255, 255, 0.03);
-      border-top-color: rgba(255, 255, 255, 0.08);
-    }
-    body.dark-theme .media-group-manager-divider {
-      border-top-color: rgba(255, 255, 255, 0.08);
-    }
-    body.dark-theme .media-group-member-name {
-      color: #ffffff;
-    }
   </style>
 </head>
 
@@ -1440,6 +1409,20 @@
       <div style="display:-webkit-flex; display:flex; gap:10px;">
         <button class="media-control-btn" style="margin:0; padding:12px; border-radius:12px; -webkit-flex:1; flex:1; font-size:14px;" onclick="closeKeypad()">Cancel</button>
         <button class="confirm-btn" style="margin:0; padding:12px; border-radius:12px; -webkit-flex:1; flex:1; font-size:14px; background:#007aff;" onclick="saveKeypadValue()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GROUP SPEAKERS OVERLAY -->
+  <div id="mediaGroupOverlay" class="setup-overlay hidden">
+    <div class="setup-card" style="max-width:320px; width:100%; border-radius:20px; padding:20px; box-sizing:border-box;">
+      <div style="font-weight:700; font-size:16px; margin-bottom:12px; text-align:center;">Group Speakers</div>
+      <div id="mediaGroupList" style="margin-bottom:16px; max-height:200px; overflow-y:auto; text-align:left; display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; gap:8px;">
+        <!-- List of other media players with checkboxes -->
+      </div>
+      <div style="display:-webkit-flex; display:flex; gap:10px;">
+        <button class="media-control-btn" style="margin:0; padding:12px; border-radius:12px; -webkit-flex:1; flex:1; font-size:14px;" onclick="closeMediaGroup()">Cancel</button>
+        <button class="confirm-btn" style="margin:0; padding:12px; border-radius:12px; -webkit-flex:1; flex:1; font-size:14px; background:#007aff;" onclick="saveMediaGroup()">Apply</button>
       </div>
     </div>
   </div>
@@ -1495,6 +1478,7 @@
       var bannerDismissed = false;
       var selectedRecVolume = "hottub";
       var lastStatesCache = [];
+      var allMediaPlayers = [];
       var activeTab = "overview";
       var activeChemTab = "inputs";
       var lastActivatedScene = "";
@@ -1781,6 +1765,8 @@
           else if (domain === "input_number") inputNumbers.push(allStates[i]);
           else if (domain === "media_player") mediaPlayers.push(allStates[i]);
         }
+
+        allMediaPlayers = mediaPlayers;
 
         // Save states to cache for dynamic toggle changes
         lastStatesCache = allStates;
@@ -2692,7 +2678,7 @@
             if (tbsp > 8) {
               return oz.toFixed(1) + (isLiquid ? " fl oz" : " oz");
             }
-            return Math.round(tbsp) + " tbsp";
+            return tbsp.toFixed(1) + " tbsp";
           }
         }
 
@@ -2753,8 +2739,8 @@
             var severity = "yellow";
             var doseText = "";
             if (volumeType === "hottub") {
-              var cups = Math.max(1, Math.round(doseOz / 9.6));
-              doseText = cups + " cup" + (cups !== 1 ? "s" : "");
+              var cups = doseOz / 9.6;
+              doseText = cups.toFixed(1) + " cup" + (cups.toFixed(1) !== "1.0" ? "s" : "");
             } else {
               var bags = (doseOz / 16) / 40;
               doseText = bags.toFixed(1) + " bag" + (bags.toFixed(1) !== "1.0" ? "s" : "") + " (40 lb)";
@@ -3846,30 +3832,114 @@
         });
       };
 
-      window.joinSpeaker = function (masterId, childId) {
-        showToast("Grouping speakers...");
-        haRequest("POST", "/api/services/media_player/join", {
-          entity_id: masterId,
-          group_members: [childId]
-        }, function (err) {
-          if (err) {
-            showToast("Failed to group: " + err, true);
-          } else {
-            showToast("Speakers grouped successfully!");
+      var groupSourceEntityId = "";
+      window.openMediaGroup = function (masterEid) {
+        groupSourceEntityId = masterEid;
+        var masterEntity = entities[masterEid];
+        if (!masterEntity) return;
+
+        var listEl = document.getElementById("mediaGroupList");
+        if (!listEl) return;
+        listEl.innerHTML = "";
+
+        var masterAttrs = masterEntity.attributes || {};
+        var masterTitle = masterAttrs.media_title;
+        var masterArtist = masterAttrs.media_artist;
+
+        for (var i = 0; i < allMediaPlayers.length; i++) {
+          var mp = allMediaPlayers[i];
+          var mpEid = mp.entity_id;
+          if (mpEid === masterEid) continue;
+
+          var mpAttrs = mp.attributes || {};
+          var mpName = friendlyName(mp);
+          
+          var isCurrentlyGrouped = false;
+          if (masterTitle && masterArtist && mpAttrs.media_title === masterTitle && mpAttrs.media_artist === masterArtist) {
+            isCurrentlyGrouped = true;
           }
-          setTimeout(refreshAll, 1000);
-        });
+
+          var checkedStr = isCurrentlyGrouped ? "checked" : "";
+          
+          var itemHtml = '<label style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:10px; font-size:13.5px; font-weight:600; cursor:pointer; padding:6px 0;">';
+          itemHtml += '<input type="checkbox" class="media-group-chk" data-eid="' + escapeHtml(mpEid) + '" ' + checkedStr + ' style="width:18px; height:18px; cursor:pointer;">';
+          itemHtml += '<span>' + escapeHtml(mpName) + '</span>';
+          itemHtml += '</label>';
+          
+          listEl.innerHTML += itemHtml;
+        }
+
+        var overlay = document.getElementById("mediaGroupOverlay");
+        if (overlay) overlay.className = "setup-overlay";
       };
 
-      window.unjoinSpeaker = function (entityId) {
-        showToast("Separating speaker...");
+      window.closeMediaGroup = function () {
+        var overlay = document.getElementById("mediaGroupOverlay");
+        if (overlay) overlay.className = "setup-overlay hidden";
+      };
+
+      window.saveMediaGroup = function () {
+        if (!groupSourceEntityId) return;
+
+        var checkboxes = document.getElementsByClassName("media-group-chk");
+        var joinList = [];
+        var unjoinList = [];
+
+        for (var i = 0; i < checkboxes.length; i++) {
+          var chk = checkboxes[i];
+          var targetEid = chk.getAttribute("data-eid");
+          var targetEntity = entities[targetEid];
+          if (!targetEntity) continue;
+
+          var targetAttrs = targetEntity.attributes || {};
+          var masterAttrs = entities[groupSourceEntityId].attributes || {};
+          var wasGrouped = masterAttrs.media_title && masterAttrs.media_artist && 
+                            targetAttrs.media_title === masterAttrs.media_title && 
+                            targetAttrs.media_artist === masterAttrs.media_artist;
+
+          if (chk.checked && !wasGrouped) {
+            joinList.push(targetEid);
+          } else if (!chk.checked && wasGrouped) {
+            unjoinList.push(targetEid);
+          }
+        }
+
+        var unjoinedCount = 0;
+        for (var j = 0; j < unjoinList.length; j++) {
+          unjoinedCount++;
+          haRequest("POST", "/api/services/media_player/unjoin", {
+            entity_id: unjoinList[j]
+          });
+        }
+
+        if (joinList.length > 0) {
+          haRequest("POST", "/api/services/media_player/join", {
+            entity_id: groupSourceEntityId,
+            group_members: joinList
+          }, function (err) {
+            if (err) {
+              showToast("Failed to join speakers: " + err, true);
+            } else {
+              showToast("Speakers grouped successfully!");
+            }
+            setTimeout(refreshAll, 1000);
+          });
+        } else if (unjoinedCount > 0) {
+          showToast("Speakers ungrouped successfully!");
+          setTimeout(refreshAll, 1000);
+        }
+
+        closeMediaGroup();
+      };
+
+      window.mediaUnjoinSpeaker = function (speakerEid) {
         haRequest("POST", "/api/services/media_player/unjoin", {
-          entity_id: entityId
+          entity_id: speakerEid
         }, function (err) {
           if (err) {
-            showToast("Failed to separate: " + err, true);
+            showToast("Failed to ungroup speaker: " + err, true);
           } else {
-            showToast("Speaker separated successfully!");
+            showToast("Speaker separated from group!");
           }
           setTimeout(refreshAll, 1000);
         });
@@ -4023,18 +4093,22 @@
         var volume = typeof attrs.volume_level !== "undefined" ? attrs.volume_level : 0;
         var isPlaying = state === "playing";
         var unavailable = state === "unavailable";
+        var isIdle = state !== "playing" && state !== "paused";
 
-        var isIdle = (state !== "playing" && state !== "paused");
-        if (isIdle) {
-          artist = "";
-        }
-        var artUrl = (isIdle || !attrs.entity_picture) ? "" : HA_URL + attrs.entity_picture;
+        // Don't show album art for idle players
+        var artUrl = (!isIdle && attrs.entity_picture) ? HA_URL + attrs.entity_picture : "";
 
         var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="background:#ffffff; border-radius:24px; padding:20px; display:block; text-align:center; box-sizing:border-box;">';
 
         // Header
         h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:14px;">';
         h += '<div style="font-weight:700; font-size:13.5px; color:#1c1c1e; letter-spacing:-0.2px; text-align:left; -webkit-flex:1; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-right:8px;">' + name + '</div>';
+        
+        // Dynamic Group Link button
+        if (!unavailable) {
+          h += '<button class="media-control-btn" style="margin:0 8px 0 0; padding:4px 8px; border-radius:6px; font-size:11px; font-weight:700; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:4px;" onclick="openMediaGroup(\'' + eid + '\')" title="Group Speakers">🔗 Group</button>';
+        }
+
         h += '<div style="font-size:10px; font-weight:700; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px;">' + state + '</div>';
         h += '</div>';
 
@@ -4042,16 +4116,21 @@
         h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; margin-bottom:14px;">';
         if (artUrl) {
           h += '<img src="' + artUrl + '" style="width:140px; height:140px; border-radius:18px; object-fit:cover; box-shadow: 0 8px 20px rgba(0,0,0,0.12); background:#f2f2f7;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
-          h += '<div style="display:none; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:48px; color:#8e8e93;">🎵</div>';
+          h += '<div style="display:none; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
         } else {
-          h += '<div style="display:-webkit-flex; display:flex; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:48px; color:#8e8e93;">🎵</div>';
+          // Show 🎵 musical note icon for idle players instead of NO ART
+          var placeholderText = isIdle ? '<span style="font-size:36px;">🎵</span>' : 'NO ART';
+          h += '<div style="display:-webkit-flex; display:flex; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">' + placeholderText + '</div>';
         }
         h += '</div>';
 
-        // Title & Artist Info
+        // Title & Artist Info (Don't show artist name for idle players)
+        var displayArtist = isIdle ? "" : artist;
         h += '<div style="margin-bottom:14px; text-align:left; padding:0 4px;">';
         h += '<div style="font-weight:700; font-size:17px; color:#1c1c1e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + escapeHtml(title) + '</div>';
-        h += '<div style="font-size:13.5px; color:#8e8e93; font-weight:500; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(artist) + '</div>';
+        if (displayArtist) {
+          h += '<div style="font-size:13.5px; color:#8e8e93; font-weight:500; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(displayArtist) + '</div>';
+        }
         h += '</div>';
 
         if (!unavailable) {
@@ -4122,54 +4201,16 @@
               h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
               h += '</span>';
             } else {
-              h += '<span style="font-size:11px; margin-right:8px; color:#8e8e93; font-weight:700; -webkit-flex:0 0 95px; flex:0 0 95px; width:95px; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(mName) + '</span>';
+              // Grouped volume rows: display name and a small Unjoin (x) button next to it
+              h += '<span style="font-size:11px; margin-right:8px; color:#8e8e93; font-weight:700; -webkit-flex:0 0 110px; flex:0 0 110px; width:110px; text-align:left; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; box-sizing:border-box; overflow:hidden;">';
+              h += '<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; -webkit-flex:1; flex:1;">' + escapeHtml(mName) + '</span>';
+              h += '<button style="background:none; border:none; color:#ff3b30; font-size:12px; font-weight:700; padding:0 4px; cursor:pointer;" onclick="mediaUnjoinSpeaker(\'' + mEid + '\')" title="Separate from Group">&times;</button>';
+              h += '</span>';
             }
             h += '<input type="range" id="vol_' + mCleanEid + '" style="-webkit-flex:1; flex:1;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
             h += '<span style="font-size:11px; margin-left:8px; font-weight:700; min-width:32px; text-align:right; color:#8e8e93;">' + Math.round(mVolume * 100) + '%</span>';
             h += '</div>';
           }
-        }
-
-        if (!unavailable) {
-          // Group Management panel
-          var memberHtml = "";
-          // 1. Grouped speakers (can separate if group.length > 1)
-          for (var g = 0; g < group.length; g++) {
-            var member = group[g];
-            memberHtml += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:6px; font-size:12.5px;">';
-            memberHtml += '<span class="media-group-member-name">🔊 ' + escapeHtml(friendlyName(member)) + '</span>';
-            if (group.length > 1) {
-              memberHtml += '<button style="background:rgba(255,59,48,0.1); color:#ff3b30; border:none; border-radius:50%; width:22px; height:22px; font-weight:700; font-size:14px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; padding:0; line-height:1;" onclick="unjoinSpeaker(\'' + member.entity_id + '\')" title="Separate Speaker">&minus;</button>';
-            }
-            memberHtml += '</div>';
-          }
-          
-          // 2. Other speakers (can join)
-          var otherHtml = "";
-          for (var m = 0; m < mediaPlayers.length; m++) {
-            var otherMp = mediaPlayers[m];
-            var alreadyInGroup = false;
-            for (var g = 0; g < group.length; g++) {
-              if (group[g].entity_id === otherMp.entity_id) {
-                alreadyInGroup = true;
-                break;
-              }
-            }
-            if (!alreadyInGroup) {
-              otherHtml += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:6px; font-size:12.5px;">';
-              otherHtml += '<span style="color:#8e8e93; font-weight:500;">' + escapeHtml(friendlyName(otherMp)) + '</span>';
-              otherHtml += '<button style="background:rgba(0,122,255,0.1); color:#007aff; border:none; border-radius:50%; width:22px; height:22px; font-weight:700; font-size:14px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; padding:0; line-height:1;" onclick="joinSpeaker(\'' + primary.entity_id + '\', \'' + otherMp.entity_id + '\')" title="Join Speaker">+</button>';
-              otherHtml += '</div>';
-            }
-          }
-          
-          h += '<div class="media-group-manager">';
-          h += '<div style="font-size:11px; font-weight:700; color:#8e8e93; text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">Group Management</div>';
-          h += memberHtml;
-          if (otherHtml) {
-            h += '<div class="media-group-manager-divider">' + otherHtml + '</div>';
-          }
-          h += '</div>';
         }
 
         h += '</div>';
