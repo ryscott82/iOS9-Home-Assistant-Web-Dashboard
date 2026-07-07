@@ -2658,34 +2658,87 @@
         var volRatio = volGallons / 10000;
         var recList = [];
 
-        // Helper to format doses nicely based on pool vs hot tub
-        function formatDose(oz, isLiquid) {
-          if (selectedRecVolume === "pool") {
-            if (isLiquid) {
-              var gal = oz / 128;
-              if (gal >= 1) return gal.toFixed(1) + " gal";
-              var qt = oz / 32;
-              if (qt >= 1) return qt.toFixed(1) + " quarts";
-              return oz.toFixed(0) + " fl oz";
-            } else {
-              var lbs = oz / 16;
-              if (lbs >= 1) return lbs.toFixed(1) + " lbs";
-              return oz.toFixed(0) + " oz";
+        // Helper to format doses nicely in terms of tbsp, cups, and fractions of 40lb salt bags
+        function formatDose(oz, isLiquid, isSalt) {
+          if (isSalt) {
+            var lbs = oz / 16;
+            var bags = lbs / 40;
+            if (bags <= 0.125) {
+              return lbs.toFixed(0) + " lbs";
             }
-          } else {
-            var tbsp = oz * 2;
-            if (tbsp < 1) {
-              var tsp = tbsp * 3;
-              if (tsp < 0.25) return "1/4 tsp";
-              if (tsp >= 0.25 && tsp < 0.4) return "1/3 tsp";
-              if (tsp >= 0.4 && tsp < 0.7) return "1/2 tsp";
-              return tsp.toFixed(0) + " tsp";
+            var roundedBags = Math.round(bags * 4) / 4;
+            if (roundedBags === 0.25) return "1/4 bag of salt (10 lbs)";
+            if (roundedBags === 0.5) return "1/2 bag of salt (20 lbs)";
+            if (roundedBags === 0.75) return "3/4 bag of salt (30 lbs)";
+            if (roundedBags === 1) return "1 bag of salt (40 lbs)";
+            if (roundedBags === 1.25) return "1.25 bags of salt (50 lbs)";
+            if (roundedBags === 1.5) return "1.5 bags of salt (60 lbs)";
+            if (roundedBags === 1.75) return "1.75 bags of salt (70 lbs)";
+            if (roundedBags >= 2) {
+              return roundedBags.toFixed(2) + " bags of salt (" + lbs.toFixed(0) + " lbs)";
             }
-            if (tbsp > 8) {
-              return oz.toFixed(1) + (isLiquid ? " fl oz" : " oz");
+            return bags.toFixed(1) + " bags of salt (" + lbs.toFixed(0) + " lbs)";
+          }
+
+          // General chemicals: format in terms of cups, tbsp, tsp
+          if (oz <= 0) return "0 tbsp";
+
+          if (oz >= 4) { // 1/2 cup or more
+            var cups = oz / 8;
+            var roundedCups = Math.round(cups * 4) / 4;
+            if (Math.abs(cups - roundedCups) < 0.05) {
+              if (roundedCups === 0.5) return "1/2 cup";
+              if (roundedCups === 0.75) return "3/4 cup";
+              if (roundedCups === 1.0) return "1 cup";
+              if (roundedCups === 1.25) return "1 1/4 cups";
+              if (roundedCups === 1.5) return "1 1/2 cups";
+              if (roundedCups === 1.75) return "1 3/4 cups";
+              if (roundedCups === 2.0) return "2 cups";
+              if (roundedCups > 2.0) {
+                var whole = Math.floor(roundedCups);
+                var frac = roundedCups - whole;
+                var fracStr = "";
+                if (frac === 0.25) fracStr = " 1/4";
+                else if (frac === 0.5) fracStr = " 1/2";
+                else if (frac === 0.75) fracStr = " 3/4";
+                return whole + fracStr + " cups";
+              }
+            }
+            return cups.toFixed(1) + " cups";
+          }
+
+          var tbsp = oz / 0.5; // 2 tbsp per oz
+          if (tbsp >= 1) {
+            var roundedTbsp = Math.round(tbsp * 2) / 2;
+            if (Math.abs(tbsp - roundedTbsp) < 0.1) {
+              if (roundedTbsp === 1) return "1 tbsp";
+              if (roundedTbsp === 1.5) return "1 1/2 tbsp";
+              if (roundedTbsp === 2) return "2 tbsp";
+              if (roundedTbsp === 2.5) return "2 1/2 tbsp";
+              if (roundedTbsp === 3) return "3 tbsp";
+              if (roundedTbsp === 3.5) return "3 1/2 tbsp";
+              if (roundedTbsp === 4) return "4 tbsp";
+              return roundedTbsp.toFixed(1) + " tbsp";
             }
             return tbsp.toFixed(1) + " tbsp";
           }
+
+          var tsp = oz / 0.1667; // 6 tsp per oz
+          var roundedTsp = Math.round(tsp * 4) / 4;
+          if (roundedTsp === 0.25) return "1/4 tsp";
+          if (roundedTsp === 0.5) return "1/2 tsp";
+          if (roundedTsp === 0.75) return "3/4 tsp";
+          if (roundedTsp === 1) return "1 tsp";
+          if (roundedTsp > 1) {
+            var whole = Math.floor(roundedTsp);
+            var frac = roundedTsp - whole;
+            var fracStr = "";
+            if (frac === 0.25) fracStr = " 1/4";
+            else if (frac === 0.5) fracStr = " 1/2";
+            else if (frac === 0.75) fracStr = " 3/4";
+            return whole + fracStr + " tsp";
+          }
+          return tsp.toFixed(1) + " tsp";
         }
 
         // pH Calculations
@@ -2745,7 +2798,7 @@
             var severity = "yellow";
             recList.push({
               severity: severity,
-              text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of pool salt to increase salt from " + saltVal + " ppm to 3500 ppm."
+              text: "Add <strong>" + formatDose(doseOz, false, true) + "</strong> of pool salt to increase salt from " + saltVal + " ppm to 3500 ppm."
             });
           } else if (saltVal > 3600) {
             var severity = "yellow";
@@ -4035,6 +4088,7 @@
         var unavailable = state === "unavailable";
 
         var artUrl = attrs.entity_picture ? HA_URL + attrs.entity_picture : "";
+        var isIdle = (state !== "playing" && state !== "paused" && !unavailable);
 
         var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="background:#ffffff; border-radius:24px; padding:20px; display:block; text-align:center; box-sizing:border-box;">';
 
@@ -4044,56 +4098,64 @@
         h += '<div style="font-size:10px; font-weight:700; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px;">' + state + '</div>';
         h += '</div>';
 
-        // Album Art Container (centered, smaller 140px square to keep card extremely concise)
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; margin-bottom:14px;">';
-        if (artUrl) {
-          h += '<img src="' + artUrl + '" style="width:140px; height:140px; border-radius:18px; object-fit:cover; box-shadow: 0 8px 20px rgba(0,0,0,0.12); background:#f2f2f7;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
-          h += '<div style="display:none; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
-        } else {
-          h += '<div style="display:-webkit-flex; display:flex; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
+        // Album Art Container (only shown when not idle)
+        if (!isIdle) {
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; margin-bottom:14px;">';
+          if (artUrl) {
+            h += '<img src="' + artUrl + '" style="width:140px; height:140px; border-radius:18px; object-fit:cover; box-shadow: 0 8px 20px rgba(0,0,0,0.12); background:#f2f2f7;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
+            h += '<div style="display:none; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
+          } else {
+            h += '<div style="display:-webkit-flex; display:flex; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
+          }
+          h += '</div>';
         }
-        h += '</div>';
 
-        // Title & Artist Info
-        h += '<div style="margin-bottom:14px; text-align:left; padding:0 4px;">';
-        h += '<div style="font-weight:700; font-size:17px; color:#1c1c1e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + escapeHtml(title) + '</div>';
-        h += '<div style="font-size:13.5px; color:#8e8e93; font-weight:500; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(artist) + '</div>';
-        h += '</div>';
+        // Title & Artist Info (only shown when not idle)
+        if (!isIdle) {
+          h += '<div style="margin-bottom:14px; text-align:left; padding:0 4px;">';
+          h += '<div style="font-weight:700; font-size:17px; color:#1c1c1e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + escapeHtml(title) + '</div>';
+          h += '<div style="font-size:13.5px; color:#8e8e93; font-weight:500; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(artist) + '</div>';
+          h += '</div>';
+        }
 
         if (!unavailable) {
-          var duration = attrs.media_duration || 0;
-          var position = attrs.media_position || 0;
-          var curPos = position;
-          if (state === "playing" && attrs.media_position_updated_at) {
-            var updatedAt = new Date(attrs.media_position_updated_at).getTime();
-            var elapsed = (Date.now() - updatedAt) / 1000;
-            curPos = position + elapsed;
-            if (curPos > duration) curPos = duration;
-          }
-          var pct = duration ? (curPos / duration) * 100 : 0;
+          // Progress timeline (only shown when not idle)
+          if (!isIdle) {
+            var duration = attrs.media_duration || 0;
+            var position = attrs.media_position || 0;
+            var curPos = position;
+            if (state === "playing" && attrs.media_position_updated_at) {
+              var updatedAt = new Date(attrs.media_position_updated_at).getTime();
+              var elapsed = (Date.now() - updatedAt) / 1000;
+              curPos = position + elapsed;
+              if (curPos > duration) curPos = duration;
+            }
+            var pct = duration ? (curPos / duration) * 100 : 0;
 
-          // Progress timeline (Dynamic view representing track progress)
-          if (duration > 0) {
-            h += '<div style="margin-bottom:18px; padding:0 4px;">';
-            h += '<div style="height:3px; background:rgba(0,0,0,0.06); border-radius:2px; position:relative; overflow:hidden;">';
-            h += '<div id="prog_fill_ctrl_' + cleanEid + '" style="width:' + pct + '%; height:100%; background:#007aff; border-radius:2px; transition: width 0.3s linear;"></div>';
-            h += '</div>';
-            h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; font-size:10px; color:#8e8e93; font-weight:600; margin-top:6px;">';
-            h += '<span id="prog_cur_ctrl_' + cleanEid + '">' + formatTime(curPos) + '</span>';
-            h += '<span id="prog_dur_ctrl_' + cleanEid + '">' + formatTime(duration) + '</span>';
-            h += '</div>';
-            h += '</div>';
-          } else {
-            h += '<div style="margin-bottom:18px; height:19px;"></div>'; // spacer fallback
+            if (duration > 0) {
+              h += '<div style="margin-bottom:18px; padding:0 4px;">';
+              h += '<div style="height:3px; background:rgba(0,0,0,0.06); border-radius:2px; position:relative; overflow:hidden;">';
+              h += '<div id="prog_fill_ctrl_' + cleanEid + '" style="width:' + pct + '%; height:100%; background:#007aff; border-radius:2px; transition: width 0.3s linear;"></div>';
+              h += '</div>';
+              h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; font-size:10px; color:#8e8e93; font-weight:600; margin-top:6px;">';
+              h += '<span id="prog_cur_ctrl_' + cleanEid + '">' + formatTime(curPos) + '</span>';
+              h += '<span id="prog_dur_ctrl_' + cleanEid + '">' + formatTime(duration) + '</span>';
+              h += '</div>';
+              h += '</div>';
+            } else {
+              h += '<div style="margin-bottom:18px; height:19px;"></div>';
+            }
           }
 
-          // Control Buttons (Textless SVG Icons - Back, Play/Pause, Next)
+          // Control Buttons (Back, Play/Pause, Next)
           h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin-bottom:18px; gap: 20px;">';
 
-          // Back (Previous track - placeholder button style)
-          h += '<button class="footer-btn" style="color:#1c1c1e; font-size:16px; padding:8px 12px; margin:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
-          h += '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
-          h += '</button>';
+          if (!isIdle) {
+            // Back (Previous track)
+            h += '<button class="footer-btn" style="color:#1c1c1e; font-size:16px; padding:8px 12px; margin:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+            h += '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+            h += '</button>';
+          }
 
           // Play/Pause
           var activeBg = isPlaying ? '#e1f5fe' : '#f2f2f7';
@@ -4106,10 +4168,12 @@
           }
           h += '</button>';
 
-          // Next (Skip track)
-          h += '<button class="footer-btn" style="color:#1c1c1e; font-size:16px; padding:8px 12px; margin:0;" onclick="mediaNext(\'' + eid + '\')">';
-          h += '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
-          h += '</button>';
+          if (!isIdle) {
+            // Next (Skip track)
+            h += '<button class="footer-btn" style="color:#1c1c1e; font-size:16px; padding:8px 12px; margin:0;" onclick="mediaNext(\'' + eid + '\')">';
+            h += '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+            h += '</button>';
+          }
 
           h += '</div>';
 
