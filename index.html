@@ -1368,6 +1368,37 @@
     body.dark-theme #keypadDisplay {
       background: rgba(255, 255, 255, 0.05) !important;
     }
+
+    /* ======== MEDIA GROUP MANAGER ======== */
+    .media-group-manager {
+      margin-top: 16px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      padding-top: 12px;
+      text-align: left;
+      background: rgba(0, 0, 0, 0.02);
+      border-radius: 12px;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    .media-group-manager-divider {
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      margin-top: 8px;
+      padding-top: 8px;
+    }
+    .media-group-member-name {
+      font-weight: 600;
+      color: #1c1c1e;
+    }
+    body.dark-theme .media-group-manager {
+      background: rgba(255, 255, 255, 0.03);
+      border-top-color: rgba(255, 255, 255, 0.08);
+    }
+    body.dark-theme .media-group-manager-divider {
+      border-top-color: rgba(255, 255, 255, 0.08);
+    }
+    body.dark-theme .media-group-member-name {
+      color: #ffffff;
+    }
   </style>
 </head>
 
@@ -2661,7 +2692,7 @@
             if (tbsp > 8) {
               return oz.toFixed(1) + (isLiquid ? " fl oz" : " oz");
             }
-            return tbsp.toFixed(1) + " tbsp";
+            return Math.round(tbsp) + " tbsp";
           }
         }
 
@@ -2722,8 +2753,8 @@
             var severity = "yellow";
             var doseText = "";
             if (volumeType === "hottub") {
-              var cups = doseOz / 9.6;
-              doseText = cups.toFixed(1) + " cup" + (cups.toFixed(1) !== "1.0" ? "s" : "");
+              var cups = Math.max(1, Math.round(doseOz / 9.6));
+              doseText = cups + " cup" + (cups !== 1 ? "s" : "");
             } else {
               var bags = (doseOz / 16) / 40;
               doseText = bags.toFixed(1) + " bag" + (bags.toFixed(1) !== "1.0" ? "s" : "") + " (40 lb)";
@@ -3815,6 +3846,35 @@
         });
       };
 
+      window.joinSpeaker = function (masterId, childId) {
+        showToast("Grouping speakers...");
+        haRequest("POST", "/api/services/media_player/join", {
+          entity_id: masterId,
+          group_members: [childId]
+        }, function (err) {
+          if (err) {
+            showToast("Failed to group: " + err, true);
+          } else {
+            showToast("Speakers grouped successfully!");
+          }
+          setTimeout(refreshAll, 1000);
+        });
+      };
+
+      window.unjoinSpeaker = function (entityId) {
+        showToast("Separating speaker...");
+        haRequest("POST", "/api/services/media_player/unjoin", {
+          entity_id: entityId
+        }, function (err) {
+          if (err) {
+            showToast("Failed to separate: " + err, true);
+          } else {
+            showToast("Speaker separated successfully!");
+          }
+          setTimeout(refreshAll, 1000);
+        });
+      };
+
       function renderHistoryCard(entity) {
         var name = escapeHtml(friendlyName(entity));
         var attrs = entity.attributes || {};
@@ -3964,7 +4024,11 @@
         var isPlaying = state === "playing";
         var unavailable = state === "unavailable";
 
-        var artUrl = attrs.entity_picture ? HA_URL + attrs.entity_picture : "";
+        var isIdle = (state !== "playing" && state !== "paused");
+        if (isIdle) {
+          artist = "";
+        }
+        var artUrl = (isIdle || !attrs.entity_picture) ? "" : HA_URL + attrs.entity_picture;
 
         var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="background:#ffffff; border-radius:24px; padding:20px; display:block; text-align:center; box-sizing:border-box;">';
 
@@ -3978,9 +4042,9 @@
         h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; margin-bottom:14px;">';
         if (artUrl) {
           h += '<img src="' + artUrl + '" style="width:140px; height:140px; border-radius:18px; object-fit:cover; box-shadow: 0 8px 20px rgba(0,0,0,0.12); background:#f2f2f7;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
-          h += '<div style="display:none; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
+          h += '<div style="display:none; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:48px; color:#8e8e93;">🎵</div>';
         } else {
-          h += '<div style="display:-webkit-flex; display:flex; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
+          h += '<div style="display:-webkit-flex; display:flex; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:48px; color:#8e8e93;">🎵</div>';
         }
         h += '</div>';
 
@@ -4064,6 +4128,48 @@
             h += '<span style="font-size:11px; margin-left:8px; font-weight:700; min-width:32px; text-align:right; color:#8e8e93;">' + Math.round(mVolume * 100) + '%</span>';
             h += '</div>';
           }
+        }
+
+        if (!unavailable) {
+          // Group Management panel
+          var memberHtml = "";
+          // 1. Grouped speakers (can separate if group.length > 1)
+          for (var g = 0; g < group.length; g++) {
+            var member = group[g];
+            memberHtml += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:6px; font-size:12.5px;">';
+            memberHtml += '<span class="media-group-member-name">🔊 ' + escapeHtml(friendlyName(member)) + '</span>';
+            if (group.length > 1) {
+              memberHtml += '<button style="background:rgba(255,59,48,0.1); color:#ff3b30; border:none; border-radius:50%; width:22px; height:22px; font-weight:700; font-size:14px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; padding:0; line-height:1;" onclick="unjoinSpeaker(\'' + member.entity_id + '\')" title="Separate Speaker">&minus;</button>';
+            }
+            memberHtml += '</div>';
+          }
+          
+          // 2. Other speakers (can join)
+          var otherHtml = "";
+          for (var m = 0; m < mediaPlayers.length; m++) {
+            var otherMp = mediaPlayers[m];
+            var alreadyInGroup = false;
+            for (var g = 0; g < group.length; g++) {
+              if (group[g].entity_id === otherMp.entity_id) {
+                alreadyInGroup = true;
+                break;
+              }
+            }
+            if (!alreadyInGroup) {
+              otherHtml += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:6px; font-size:12.5px;">';
+              otherHtml += '<span style="color:#8e8e93; font-weight:500;">' + escapeHtml(friendlyName(otherMp)) + '</span>';
+              otherHtml += '<button style="background:rgba(0,122,255,0.1); color:#007aff; border:none; border-radius:50%; width:22px; height:22px; font-weight:700; font-size:14px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; padding:0; line-height:1;" onclick="joinSpeaker(\'' + primary.entity_id + '\', \'' + otherMp.entity_id + '\')" title="Join Speaker">+</button>';
+              otherHtml += '</div>';
+            }
+          }
+          
+          h += '<div class="media-group-manager">';
+          h += '<div style="font-size:11px; font-weight:700; color:#8e8e93; text-transform:uppercase; margin-bottom:8px; letter-spacing:0.5px;">Group Management</div>';
+          h += memberHtml;
+          if (otherHtml) {
+            h += '<div class="media-group-manager-divider">' + otherHtml + '</div>';
+          }
+          h += '</div>';
         }
 
         h += '</div>';
