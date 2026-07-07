@@ -2701,7 +2701,7 @@
           var suppressOrp = (volumeType === "hottub" && phVal !== null && (phVal < 7.0 || phVal > 7.8));
           if (suppressOrp) {
             recList.push({
-              severity: "red",
+              severity: "yellow",
               text: "Do not treat for ORP; hot tub pH is out of range (" + phVal + "), which makes ORP sensor readings inaccurate."
             });
           } else {
@@ -3753,6 +3753,14 @@
       };
 
       window.fixHotTubChlorine = function () {
+        var loggedBoolean = entities["input_boolean.chlorine_logged_since_changing"];
+        if (loggedBoolean && loggedBoolean.state === "off") {
+          var proceed = confirm("Chlorine levels have been altered since last logging them. Continuing could greatly overdose chlorine. Are you sure you want to continue?");
+          if (!proceed) {
+            return;
+          }
+        }
+
         var clVal = null;
         if (lastStatesCache && lastStatesCache.length > 0) {
           for (var i = 0; i < lastStatesCache.length; i++) {
