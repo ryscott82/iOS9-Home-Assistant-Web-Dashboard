@@ -2515,15 +2515,15 @@
               else valueStyle = "color: #34c759; font-weight: 700;";
             }
           } else if (isCalcium) { // Hardness
-            if (currentVal < 150 || currentVal > 700) alertClass = " alert-red";
+            if (currentVal < 150 || currentVal > 700) alertClass = " alert-yellow";
             else if (currentVal < 250 || currentVal > 500) alertClass = " alert-yellow";
             else valueStyle = "color: #34c759; font-weight: 700;";
           } else if (isTubCYA) {
-            if (currentVal > 50) alertClass = " alert-red";
+            if (currentVal > 50) alertClass = " alert-yellow";
             else if (currentVal > 30) alertClass = " alert-yellow";
             else valueStyle = "color: #34c759; font-weight: 700;";
           } else if (isPoolCYA) {
-            if (currentVal < 10 || currentVal > 150) alertClass = " alert-red";
+            if (currentVal < 10 || currentVal > 150) alertClass = " alert-yellow";
             else if (currentVal < 15 || currentVal > 100) alertClass = " alert-yellow";
             else valueStyle = "color: #34c759; font-weight: 700;";
           }
@@ -2707,7 +2707,8 @@
           } else {
             if (orpVal < 650) {
               var severity = (orpVal < 500) ? "red" : "yellow";
-              if (volumeType !== "hottub" || !isTimerActive) {
+              var clGood = (volumeType === "pool" ? (clVal !== null && clVal >= 1.0) : (clVal !== null && clVal >= 3.0));
+              if (!clGood && (volumeType !== "hottub" || !isTimerActive)) {
                 recList.push({
                   severity: severity,
                   text: "Add sanitizer to increase ORP from " + orpVal + " mV to 650 mV."
@@ -2728,13 +2729,13 @@
           if (saltVal < 3500) {
             var diff = 3500 - saltVal; // Target bottom limit (3500)
             var doseOz = (diff / 10) * 13 * volRatio;
-            var severity = (saltVal < 3000) ? "red" : "yellow";
+            var severity = "yellow";
             recList.push({
               severity: severity,
               text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of pool salt to increase salt from " + saltVal + " ppm to 3500 ppm."
             });
           } else if (saltVal > 3600) {
-            var severity = (saltVal > 4500) ? "red" : "yellow";
+            var severity = "yellow";
             recList.push({
               severity: severity,
               text: "Dilute water to decrease salt from " + saltVal + " ppm to 3600 ppm."
@@ -2780,17 +2781,20 @@
         if (clVal !== null) {
           if (volumeType === "pool") {
             if (clVal < 1.0) {
-              var diff = 2.0 - clVal; // Target mid-range (2.0)
-              var severity = (clVal < 0.5) ? "red" : "yellow";
-              // IC40 Super Chlorinate Math: scale diff (usually 2-6 hrs)
-              var hrs = diff * 2;
-              if (hrs < 2) hrs = 2;
-              if (hrs > 6) hrs = 6;
-              var displayHrs = Math.round(hrs);
-              recList.push({
-                severity: severity,
-                text: "Turn on superchlorinate on the Pentair Salt Cell (IC40) for <strong>" + displayHrs + " hours</strong> to increase free chlorine from " + clVal + " ppm to 2.0 ppm."
-              });
+              var orpGood = (orpVal !== null && orpVal >= 650);
+              if (!orpGood) {
+                var diff = 2.0 - clVal; // Target mid-range (2.0)
+                var severity = (clVal < 0.5) ? "red" : "yellow";
+                // IC40 Super Chlorinate Math: scale diff (usually 2-6 hrs)
+                var hrs = diff * 2;
+                if (hrs < 2) hrs = 2;
+                if (hrs > 6) hrs = 6;
+                var displayHrs = Math.round(hrs);
+                recList.push({
+                  severity: severity,
+                  text: "Turn on superchlorinate on the Pentair Salt Cell (IC40) for <strong>" + displayHrs + " hours</strong> to increase free chlorine from " + clVal + " ppm to 2.0 ppm."
+                });
+              }
             } else if (clVal > 3.0) {
               var diff = clVal - 3.0; // Target top limit (3.0)
               var doseOz = diff * 10.66 * volRatio;
@@ -2803,16 +2807,19 @@
           } else { // Hot Tub
             if (clVal < 3.0) {
               if (!isTimerActive) {
-                var targetFC = clVal < 2.0 ? 3.0 : 4.0;
-                var diff = targetFC - clVal;
-                var severity = (clVal < 1.0) ? "red" : "yellow";
-                // IC20 Super Chlorinate Math: produces 0.467 oz/hr, raises hot tub (600 gal) FC by 5.84 ppm/hr
-                var mins = (diff / 5.84) * 60;
-                var displayMins = Math.max(15, Math.min(90, Math.round(mins)));
-                recList.push({
-                  severity: severity,
-                  text: "Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine from " + clVal + " ppm to " + targetFC.toFixed(1) + " ppm."
-                });
+                var orpGood = (orpVal !== null && orpVal >= 650);
+                if (!orpGood) {
+                  var targetFC = clVal < 2.0 ? 3.0 : 4.0;
+                  var diff = targetFC - clVal;
+                  var severity = (clVal < 1.0) ? "red" : "yellow";
+                  // IC20 Super Chlorinate Math: produces 0.467 oz/hr, raises hot tub (600 gal) FC by 5.84 ppm/hr
+                  var mins = (diff / 5.84) * 60;
+                  var displayMins = Math.max(15, Math.min(90, Math.round(mins)));
+                  recList.push({
+                    severity: severity,
+                    text: "Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine from " + clVal + " ppm to " + targetFC.toFixed(1) + " ppm."
+                  });
+                }
               }
             } else if (clVal > 5.0) {
               var diff = clVal - 5.0; // Target top limit (5.0)
@@ -2831,13 +2838,13 @@
           if (calVal < 250) {
             var diff = 375 - calVal; // Target mid-range (375)
             var doseOz = (diff / 10) * 19.2 * volRatio;
-            var severity = (calVal < 150) ? "red" : "yellow";
+            var severity = "yellow";
             recList.push({
               severity: severity,
               text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Calcium Chloride to increase hardness from " + calVal + " ppm to 375 ppm."
             });
           } else if (calVal > 500) {
-            var severity = (calVal > 700) ? "red" : "yellow";
+            var severity = "yellow";
             recList.push({
               severity: severity,
               text: "Hardness is high (" + calVal + " ppm). Dilute water to decrease to 500 ppm."
@@ -2849,7 +2856,7 @@
         if (cyaVal !== null) {
           if (volumeType === "hottub") {
             if (cyaVal > 30) {
-              var severity = (cyaVal > 50) ? "red" : "yellow";
+              var severity = "yellow";
               recList.push({
                 severity: severity,
                 text: "Partially drain and refill water to decrease CYA from " + cyaVal + " ppm to 30 ppm."
@@ -2859,13 +2866,13 @@
             if (cyaVal < 15) {
               var diff = 50 - cyaVal; // Target mid-range (50)
               var doseOz = (diff / 10) * 13 * volRatio;
-              var severity = (cyaVal < 10) ? "red" : "yellow";
+              var severity = "yellow";
               recList.push({
                 severity: severity,
                 text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Cyanuric Acid to increase CYA from " + cyaVal + " ppm to 50 ppm."
               });
             } else if (cyaVal > 100) {
-              var severity = (cyaVal > 150) ? "red" : "yellow";
+              var severity = "yellow";
               recList.push({
                 severity: severity,
                 text: "Partially drain and refill water to decrease CYA from " + cyaVal + " ppm to 100 ppm."
@@ -2892,41 +2899,20 @@
           h += '</ul>';
         }
 
-        // Add "Fix Hot Tub Chlorine Levels" button if Hot Tub is active and Free Chlorine is low and timer is not active
+        // Add "Fix Hot Tub Chlorine Levels" button if Hot Tub is active and superchlorinate recommendation is active
         if (selectedRecVolume === "hottub") {
-          var isTimerActive = false;
-          var tState = entities["timer.superchlorinate_time"];
-          if (tState && tState.state === "active") {
-            isTimerActive = true;
+          var hasSuperchlorinateRec = false;
+          for (var r = 0; r < recs.length; r++) {
+            if (recs[r].text.indexOf("Turn on superchlorinate") !== -1) {
+              hasSuperchlorinateRec = true;
+              break;
+            }
           }
 
-          if (!isTimerActive) {
-            var clVal = null;
-            for (var i = 0; i < allStates.length; i++) {
-              var s = allStates[i];
-              var eid = s.entity_id;
-              var name = (s.attributes && s.attributes.friendly_name) || eid;
-              var lowerName = name.toLowerCase();
-              
-              var isTub = (eid.indexOf("hot_tub") !== -1 || eid.indexOf("hottub") !== -1 || eid.indexOf("spa") !== -1 || eid.indexOf("tub") !== -1 ||
-                lowerName.indexOf("hot tub") !== -1 || lowerName.indexOf("hottub") !== -1 || lowerName.indexOf("spa") !== -1 || lowerName.indexOf("tub") !== -1);
-              
-              if (!isTub) continue;
-              
-              var val = parseFloat(s.state);
-              if (isNaN(val)) continue;
-              
-              if (eid.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && lowerName.indexOf("total") === -1)) {
-                clVal = val;
-                break;
-              }
-            }
-            
-            if (clVal !== null && clVal < 3.0) {
-              h += '<div style="margin-top: 14px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;">';
-              h += '<button class="confirm-btn" style="background:#007aff; color:#ffffff; font-size:13px; font-weight:700; padding:10px 16px; border-radius:10px; margin:0;" onclick="fixHotTubChlorine()">Fix Hot Tub Chlorine Levels</button>';
-              h += '</div>';
-            }
+          if (hasSuperchlorinateRec) {
+            h += '<div style="margin-top: 14px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;">';
+            h += '<button class="confirm-btn" style="background:#007aff; color:#ffffff; font-size:13px; font-weight:700; padding:10px 16px; border-radius:10px; margin:0;" onclick="fixHotTubChlorine()">Fix Hot Tub Chlorine Levels</button>';
+            h += '</div>';
           }
         }
 
