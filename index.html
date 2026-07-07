@@ -2803,16 +2803,15 @@
           } else { // Hot Tub
             if (clVal < 3.0) {
               if (!isTimerActive) {
-                var diff = 4.0 - clVal; // Target mid-range (4.0)
+                var targetFC = clVal < 2.0 ? 3.0 : 4.0;
+                var diff = targetFC - clVal;
                 var severity = (clVal < 1.0) ? "red" : "yellow";
                 // IC20 Super Chlorinate Math: produces 0.467 oz/hr, raises hot tub (600 gal) FC by 5.84 ppm/hr
                 var mins = (diff / 5.84) * 60;
-                if (mins < 30) mins = 30;
-                if (mins > 60) mins = 60;
-                var displayMins = Math.round(mins);
+                var displayMins = Math.max(15, Math.min(90, Math.round(mins)));
                 recList.push({
                   severity: severity,
-                  text: "Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine from " + clVal + " ppm to 4.0 ppm."
+                  text: "Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine from " + clVal + " ppm to " + targetFC.toFixed(1) + " ppm."
                 });
               }
             } else if (clVal > 5.0) {
@@ -3789,11 +3788,11 @@
 
         var minutesToRun = 45; // Default conservative estimate
         if (clVal !== null && !isNaN(clVal)) {
-          var diff = 4.0 - clVal;
+          var targetFC = clVal < 2.0 ? 3.0 : 4.0;
+          var diff = targetFC - clVal;
           if (diff > 0) {
             var mins = (diff / 5.84) * 60;
-            // Floor at 30, ceiling at 90 minutes for a very conservative estimate
-            minutesToRun = Math.max(30, Math.min(90, Math.round(mins)));
+            minutesToRun = Math.max(15, Math.min(90, Math.round(mins)));
           }
         }
 
