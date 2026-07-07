@@ -1835,7 +1835,17 @@
             for (i = 0; i < mediaPlayers.length; i++) {
               var mp = mediaPlayers[i];
               var state = mp.state;
-              if (state !== "playing" && state !== "paused") continue;
+              if (state !== "playing" && state !== "paused") {
+                var isIdleTooLong = true;
+                if (mp.last_changed) {
+                  var lastChanged = new Date(mp.last_changed);
+                  var elapsedMs = Date.now() - lastChanged.getTime();
+                  if (elapsedMs < 24 * 60 * 60 * 1000) {
+                    isIdleTooLong = false;
+                  }
+                }
+                if (isIdleTooLong) continue;
+              }
 
               var attrs = mp.attributes || {};
               var title = attrs.media_title;
@@ -1887,7 +1897,17 @@
             for (i = 0; i < mediaPlayers.length; i++) {
               var mp = mediaPlayers[i];
               var state = mp.state;
-              if (state !== "playing" && state !== "paused") continue;
+              if (state !== "playing" && state !== "paused") {
+                var isIdleTooLong = true;
+                if (mp.last_changed) {
+                  var lastChanged = new Date(mp.last_changed);
+                  var elapsedMs = Date.now() - lastChanged.getTime();
+                  if (elapsedMs < 24 * 60 * 60 * 1000) {
+                    isIdleTooLong = false;
+                  }
+                }
+                if (isIdleTooLong) continue;
+              }
 
               var attrs = mp.attributes || {};
               var title = attrs.media_title;
