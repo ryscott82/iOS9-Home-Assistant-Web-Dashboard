@@ -1340,7 +1340,7 @@
     body.dark-theme .setup-card h1 {
       color: #ffffff;
     }
-    
+
     /* ======== KEYPAD MODAL ======== */
     .keypad-btn {
       background: rgba(0, 0, 0, 0.05);
@@ -1352,19 +1352,23 @@
       color: #1c1c1e;
       cursor: pointer;
       text-align: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
       -webkit-tap-highlight-color: transparent;
     }
+
     .keypad-btn:active {
       background: rgba(0, 0, 0, 0.12);
     }
+
     body.dark-theme .keypad-btn {
       background: rgba(255, 255, 255, 0.08);
       color: #e6edf3;
     }
+
     body.dark-theme .keypad-btn:active {
       background: rgba(255, 255, 255, 0.15);
     }
+
     body.dark-theme #keypadDisplay {
       background: rgba(255, 255, 255, 0.05) !important;
     }
@@ -1395,15 +1399,20 @@
 
   <!-- CUSTOM KEYPAD MODAL -->
   <div id="keypadOverlay" class="setup-overlay hidden">
-    <div class="setup-card" style="max-width:320px; width:100%; border-radius:20px; padding:20px; box-sizing:border-box;">
-      <div id="keypadTitle" style="font-weight:700; font-size:16px; margin-bottom:4px; text-align:center;">Enter Value</div>
-      <div id="keypadIdeal" style="font-size:11.5px; color:#8e8e93; font-weight:500; text-align:center; margin-bottom:12px;"></div>
-      
+    <div class="setup-card"
+      style="max-width:320px; width:100%; border-radius:20px; padding:20px; box-sizing:border-box;">
+      <div id="keypadTitle" style="font-weight:700; font-size:16px; margin-bottom:4px; text-align:center;">Enter Value
+      </div>
+      <div id="keypadIdeal"
+        style="font-size:11.5px; color:#8e8e93; font-weight:500; text-align:center; margin-bottom:12px;"></div>
+
       <!-- Display area inside keypad -->
-      <div style="background:rgba(0,0,0,0.05); border-radius:12px; padding:12px; font-size:24px; font-weight:700; text-align:center; margin-bottom:16px; letter-spacing:0.5px; min-height:36px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;" id="keypadDisplay">
+      <div
+        style="background:rgba(0,0,0,0.05); border-radius:12px; padding:12px; font-size:24px; font-weight:700; text-align:center; margin-bottom:16px; letter-spacing:0.5px; min-height:36px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;"
+        id="keypadDisplay">
         0
       </div>
-      
+
       <!-- Keypad Grid (3x4) -->
       <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-bottom:16px;">
         <button class="keypad-btn" onclick="pressKeypad('1')">1</button>
@@ -1417,13 +1426,18 @@
         <button class="keypad-btn" onclick="pressKeypad('9')">9</button>
         <button class="keypad-btn" onclick="pressKeypad('.')">.</button>
         <button class="keypad-btn" onclick="pressKeypad('0')">0</button>
-        <button class="keypad-btn" style="background:#ff3b30; color:#ffffff;" onclick="pressKeypad('backspace')">⌫</button>
+        <button class="keypad-btn" style="background:#ff3b30; color:#ffffff;"
+          onclick="pressKeypad('backspace')">⌫</button>
       </div>
-      
+
       <!-- Bottom buttons (Cancel / Save) -->
       <div style="display:-webkit-flex; display:flex; gap:10px;">
-        <button class="media-control-btn" style="margin:0; padding:12px; border-radius:12px; -webkit-flex:1; flex:1; font-size:14px;" onclick="closeKeypad()">Cancel</button>
-        <button class="confirm-btn" style="margin:0; padding:12px; border-radius:12px; -webkit-flex:1; flex:1; font-size:14px; background:#007aff;" onclick="saveKeypadValue()">Save</button>
+        <button class="media-control-btn"
+          style="margin:0; padding:12px; border-radius:12px; -webkit-flex:1; flex:1; font-size:14px;"
+          onclick="closeKeypad()">Cancel</button>
+        <button class="confirm-btn"
+          style="margin:0; padding:12px; border-radius:12px; -webkit-flex:1; flex:1; font-size:14px; background:#007aff;"
+          onclick="saveKeypadValue()">Save</button>
       </div>
     </div>
   </div>
@@ -2782,17 +2796,24 @@
           var combinedCl = totClVal - clVal;
           if (combinedCl >= 0.5) {
             var clGood = (volumeType === "pool" ? clVal >= 1.0 : clVal >= 3.0);
-            if (clGood) {
+            var isOrpTooHigh = (orpVal !== null && orpVal > 800);
+            if (clGood && !isOrpTooHigh) {
               if (volumeType === "pool") {
+                var diff = totClVal - clVal;
+                var hrs = diff * 2;
+                var displayHrs = Math.max(2, Math.min(8, Math.round(hrs)));
                 recList.push({
                   severity: "yellow",
-                  text: "Combined chlorine is high (" + combinedCl.toFixed(2) + " ppm). Turn on superchlorinate on the Pentair Salt Cell (IC40) for <strong>4 hours</strong> to burn off chloramines."
+                  text: "Combined chlorine is high (" + combinedCl.toFixed(2) + " ppm). Turn on superchlorinate on the Pentair Salt Cell (IC40) for <strong>" + displayHrs + " hours</strong> to increase free chlorine by " + diff.toFixed(2) + " ppm to match total chlorine and burn off chloramines."
                 });
               } else { // Hot Tub
                 if (!isTimerActive) {
+                  var diff = totClVal - clVal;
+                  var mins = (diff / 5.84) * 60;
+                  var displayMins = Math.max(15, Math.min(90, Math.round(mins)));
                   recList.push({
                     severity: "yellow",
-                    text: "Combined chlorine is high (" + combinedCl.toFixed(2) + " ppm). Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>45 minutes</strong> to burn off chloramines."
+                    text: "Combined chlorine is high (" + combinedCl.toFixed(2) + " ppm). Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine by " + diff.toFixed(2) + " ppm to match total chlorine and burn off chloramines."
                   });
                 }
               }
@@ -2802,10 +2823,11 @@
 
         // Chlorine Calculations (Free Chlorine)
         if (clVal !== null) {
+          var isOrpTooHigh = (orpVal !== null && orpVal > 800);
           if (volumeType === "pool") {
             if (clVal < 1.0) {
               var orpGood = (orpVal !== null && orpVal >= 650);
-              if (!orpGood) {
+              if (!orpGood && !isOrpTooHigh) {
                 var diff = 2.0 - clVal; // Target mid-range (2.0)
                 var severity = (clVal < 0.5) ? "red" : "yellow";
                 // IC40 Super Chlorinate Math: scale diff (usually 2-6 hrs)
@@ -2831,7 +2853,7 @@
             if (clVal < 3.0) {
               if (!isTimerActive) {
                 var orpGood = (orpVal !== null && orpVal >= 650);
-                if (!orpGood) {
+                if (!orpGood && !isOrpTooHigh) {
                   var targetFC = clVal < 2.0 ? 3.0 : 4.0;
                   var diff = targetFC - clVal;
                   var severity = (clVal < 1.0) ? "red" : "yellow";
@@ -3692,20 +3714,20 @@
       window.openKeypad = function (entityId) {
         var entity = entities[entityId];
         if (!entity) return;
-        
+
         keypadEntityId = entityId;
         var attrs = entity.attributes || {};
         keypadUnit = attrs.unit_of_measurement || "";
         keypadStep = typeof attrs.step !== "undefined" ? attrs.step : 1;
-        
+
         var name = friendlyName(entity);
         var currentVal = parseFloat(entity.state);
-        
+
         keypadCurrentInput = isNaN(currentVal) ? "" : String(currentVal);
-        
+
         var titleEl = document.getElementById("keypadTitle");
         if (titleEl) titleEl.textContent = "Log " + name;
-        
+
         // Detect ideal range text
         var idealText = "";
         var lowerName = name.toLowerCase();
@@ -3717,7 +3739,7 @@
         var isTubCYA = isStabilizer && (entityId.indexOf("hot_tub") !== -1 || entityId.indexOf("hottub") !== -1 || entityId.indexOf("spa") !== -1 || lowerName.indexOf("hot tub") !== -1);
         var isPoolCYA = isStabilizer && !isTubCYA;
         var isPool = (entityId.indexOf("pool") !== -1 || lowerName.indexOf("pool") !== -1);
-        
+
         if (isAlkalinity) idealText = "Ideal: 80 - 120";
         else if (isTotalChlorine) idealText = "Ideal: 1.0 - 5.0";
         else if (isFreeChlorine) {
@@ -3727,13 +3749,13 @@
         else if (isCalcium) idealText = "Ideal: 250 - 500";
         else if (isTubCYA) idealText = "Ideal: 0 - 30";
         else if (isPoolCYA) idealText = "Ideal: 15 - 100";
-        
+
         var idealEl = document.getElementById("keypadIdeal");
         if (idealEl) idealEl.textContent = idealText;
-        
+
         var dispEl = document.getElementById("keypadDisplay");
         if (dispEl) dispEl.textContent = (keypadCurrentInput || "0") + " " + keypadUnit;
-        
+
         var overlay = document.getElementById("keypadOverlay");
         if (overlay) overlay.className = "setup-overlay";
       };
@@ -3741,7 +3763,7 @@
       window.pressKeypad = function (key) {
         var dispEl = document.getElementById("keypadDisplay");
         if (!dispEl) return;
-        
+
         if (key === "backspace") {
           if (keypadCurrentInput.length > 0) {
             keypadCurrentInput = keypadCurrentInput.substring(0, keypadCurrentInput.length - 1);
@@ -3760,7 +3782,7 @@
           if (keypadCurrentInput === "0") keypadCurrentInput = "";
           keypadCurrentInput += key;
         }
-        
+
         dispEl.textContent = (keypadCurrentInput || "0") + " " + keypadUnit;
       };
 
@@ -3779,7 +3801,7 @@
           showToast("Invalid number entered", true);
           return;
         }
-        
+
         setInputNumber(keypadEntityId, value);
         closeKeypad();
       };
@@ -3795,29 +3817,45 @@
 
         var clVal = null;
         var totClVal = null;
-        if (lastStatesCache && lastStatesCache.length > 0) {
-          for (var i = 0; i < lastStatesCache.length; i++) {
-            var s = lastStatesCache[i];
+        var orpVal = null;
+
+        for (var k in entities) {
+          if (entities.hasOwnProperty(k)) {
+            var s = entities[k];
             var eid = s.entity_id;
             var name = (s.attributes && s.attributes.friendly_name) || eid;
             var lowerName = name.toLowerCase();
+
             var isTub = (eid.indexOf("hot_tub") !== -1 || eid.indexOf("hottub") !== -1 || eid.indexOf("spa") !== -1 || eid.indexOf("tub") !== -1 ||
               lowerName.indexOf("hot tub") !== -1 || lowerName.indexOf("hottub") !== -1 || lowerName.indexOf("spa") !== -1 || lowerName.indexOf("tub") !== -1);
             if (!isTub) continue;
+
             var val = parseFloat(s.state);
             if (isNaN(val)) continue;
+
             if (eid.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && lowerName.indexOf("total") === -1)) {
               clVal = val;
             } else if (eid.indexOf("total_chlorine") !== -1 || lowerName.indexOf("total chlorine") !== -1 || lowerName.indexOf("tc") !== -1) {
               totClVal = val;
+            } else if (eid.indexOf("orp") !== -1 || lowerName.indexOf("orp") !== -1) {
+              orpVal = val;
             }
           }
         }
 
-        var minutesToRun = 45; // Default conservative estimate
+        // Safety check: Do not allow superchlorination above 800 ORP
+        if (orpVal !== null && orpVal > 800) {
+          showToast("Superchlorination blocked: ORP is already above 800 mV.", true);
+          return;
+        }
+
+        var minutesToRun = 45; // Default fallback
         var isCombinedHigh = (totClVal !== null && clVal !== null && (totClVal - clVal >= 0.5));
         if (isCombinedHigh) {
-          minutesToRun = 45; // 45 minutes to burn off chloramines
+          // Calculate time to increase Free Chlorine to match Total Chlorine using salt cell rate
+          var diff = totClVal - clVal;
+          var mins = (diff / 5.84) * 60;
+          minutesToRun = Math.max(15, Math.min(90, Math.round(mins)));
         } else if (clVal !== null && !isNaN(clVal)) {
           var targetFC = clVal < 2.0 ? 3.0 : 4.0;
           var diff = targetFC - clVal;
@@ -4126,18 +4164,18 @@
         if (isIdle && !unavailable) {
           // Compact layout for idle media players
           var h = '<div class="tile media-tile" style="background:#ffffff; border-radius:18px; padding:10px 14px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; box-sizing:border-box; min-height:54px;">';
-          
+
           // Left: Music icon + Speaker name
           h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; min-width:0; -webkit-flex:1; flex:1; margin-right:12px;">';
           h += '<div style="display:-webkit-flex; display:flex; width:34px; height:34px; border-radius:8px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:16px; margin-right:10px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
           h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
           h += '</div>';
-          
+
           // Right: Compact Play button
           h += '<button class="footer-btn" style="background:#f2f2f7; color:#007aff; width:34px; height:34px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
           h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
           h += '</button>';
-          
+
           h += '</div>';
           return h;
         }
