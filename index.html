@@ -1285,134 +1285,6 @@
       stroke: #30363d;
     }
 
-    /* ======== CALENDAR AGENDA ======== */
-    .calendar-container {
-      display: -webkit-flex;
-      display: flex;
-      -webkit-flex-direction: column;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .calendar-header-row {
-      display: -webkit-flex;
-      display: flex;
-      -webkit-justify-content: space-between;
-      justify-content: space-between;
-      -webkit-align-items: center;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-    .calendar-select {
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 13px;
-      font-weight: 600;
-      color: #1c1c1e;
-      cursor: pointer;
-      -webkit-appearance: none;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-    body.dark-theme .calendar-select {
-      background: #161b22;
-      border-color: #30363d;
-      color: #e6edf3;
-    }
-    .agenda-day-group {
-      margin-bottom: 18px;
-    }
-    .agenda-day-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: #8e8e93;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-      padding-left: 4px;
-    }
-    body.dark-theme .agenda-day-title {
-      color: #8b949e;
-    }
-    .event-card {
-      background: #ffffff;
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 8px;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-align-items: center;
-      align-items: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-    }
-    body.dark-theme .event-card {
-      background: #161b22;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.25);
-    }
-    .event-date-badge {
-      display: -webkit-flex;
-      display: flex;
-      -webkit-flex-direction: column;
-      flex-direction: column;
-      -webkit-align-items: center;
-      align-items: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      width: 44px;
-      height: 44px;
-      background: #e1f5fe;
-      border-radius: 10px;
-      margin-right: 12px;
-      -webkit-flex-shrink: 0;
-      flex-shrink: 0;
-    }
-    body.dark-theme .event-date-badge {
-      background: rgba(0, 122, 255, 0.15);
-    }
-    .event-date-weekday {
-      font-size: 9px;
-      font-weight: 700;
-      color: #007aff;
-      text-transform: uppercase;
-      line-height: 1;
-      margin-bottom: 2px;
-    }
-    .event-date-day {
-      font-size: 17px;
-      font-weight: 700;
-      color: #007aff;
-      line-height: 1;
-    }
-    .event-info {
-      -webkit-flex: 1;
-      flex: 1;
-      min-width: 0;
-      text-align: left;
-    }
-    .event-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1c1c1e;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    body.dark-theme .event-title {
-      color: #e6edf3;
-    }
-    .event-time-location {
-      font-size: 12px;
-      color: #8e8e93;
-      font-weight: 500;
-      margin-top: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    body.dark-theme .event-time-location {
-      color: #8b949e;
-    }
-
     /* ======== ALERT BANNER ======== */
     .alert-banner {
       background: #ff3b30;
@@ -1550,9 +1422,6 @@
       var checkedTodayAlertDismissed = false;
       var themeOverride = null;
       var themeTimeout = null;
-      var calendarEvents = [];
-      var calendarLoading = false;
-      var calendarEntityId = "";
 
       // Load volume and tab choices from cache if available
       try {
@@ -1564,8 +1433,6 @@
         if (cachedChemTab) activeChemTab = cachedChemTab;
         var cachedScene = localStorage.getItem("ha_last_scene");
         if (cachedScene) lastActivatedScene = cachedScene;
-        var cachedCalendar = localStorage.getItem("ha_calendar_entity_id");
-        if (cachedCalendar) calendarEntityId = cachedCalendar;
       } catch (e) { }
 
       // ======== INIT ========
@@ -2125,161 +1992,6 @@
             }
             html += '</div></div>';
           }
-        } else if (activeTab === "calendar") {
-          // TAB: CALENDAR
-          
-          var calendarEntities = [];
-          for (var eid in entities) {
-            if (entities.hasOwnProperty(eid) && eid.indexOf("calendar.") === 0) {
-              calendarEntities.push(eid);
-            }
-          }
-
-          html += '<div class="calendar-container">';
-          
-          // Header with reload button and calendar select
-          html += '<div class="calendar-header-row">';
-          if (calendarEntities.length > 1) {
-            html += '<select class="calendar-select" onchange="selectCalendarTarget(this.value)">';
-            for (var c = 0; c < calendarEntities.length; c++) {
-              var cEid = calendarEntities[c];
-              var cState = entities[cEid];
-              var cName = (cState && cState.attributes && cState.attributes.friendly_name) || cEid;
-              var cSelected = calendarEntityId === cEid ? ' selected' : '';
-              html += '<option value="' + cEid + '"' + cSelected + '>' + escapeHtml(cName) + '</option>';
-            }
-            html += '</select>';
-          } else if (calendarEntities.length === 1) {
-            var cState = entities[calendarEntities[0]];
-            var cName = (cState && cState.attributes && cState.attributes.friendly_name) || calendarEntities[0];
-            html += '<div class="section-title" style="margin-bottom:0;">' + escapeHtml(cName) + '</div>';
-          } else {
-            html += '<div class="section-title" style="margin-bottom:0;">Calendar</div>';
-          }
-          
-          html += '<button class="footer-btn" style="font-size:12px; font-weight:700; padding:6px 12px; margin:0;" onclick="fetchCalendarEvents()">&#8635; Reload</button>';
-          html += '</div>'; // end calendar-header-row
-
-          if (calendarLoading) {
-            html += '<div style="text-align:center; padding:40px;">';
-            html += '<div class="spinner" style="margin:0 auto 12px auto; width:28px; height:28px;"></div>';
-            html += '<div style="font-size:13.5px; color:#8e8e93; font-weight:600;">Loading events...</div>';
-            html += '</div>';
-          } else if (calendarEntities.length === 0) {
-            html += '<div class="tile" style="text-align:center; padding:30px;">';
-            html += '<div style="font-size:32px; margin-bottom:8px;">📅</div>';
-            html += '<div class="tile-name" style="font-size:14px; font-weight:700;">No Calendar Found</div>';
-            html += '<div style="font-size:12px; color:#8e8e93; margin-top:4px;">Please make sure a calendar is configured in Home Assistant.</div>';
-            html += '</div>';
-          } else if (calendarEvents.length === 0) {
-            html += '<div class="tile" style="text-align:center; padding:30px;">';
-            html += '<div style="font-size:32px; margin-bottom:8px;">📅</div>';
-            html += '<div class="tile-name" style="font-size:14px; font-weight:700;">No Upcoming Events</div>';
-            html += '<div style="font-size:12px; color:#8e8e93; margin-top:4px;">No events scheduled for the next 7 days.</div>';
-            html += '</div>';
-          } else {
-            // Group events by local date
-            var eventsByDay = {};
-            var daysOrder = [];
-            
-            for (var e = 0; e < calendarEvents.length; e++) {
-              var ev = calendarEvents[e];
-              var startVal = ev.start.dateTime || ev.start.date;
-              var startDate = new Date(startVal);
-              
-              // Get date string in local format (YYYY-MM-DD)
-              var yyyy = startDate.getFullYear();
-              var mm = padZero(startDate.getMonth() + 1);
-              var dd = padZero(startDate.getDate());
-              var dayKey = yyyy + '-' + mm + '-' + dd;
-              
-              if (!eventsByDay[dayKey]) {
-                eventsByDay[dayKey] = [];
-                daysOrder.push(dayKey);
-              }
-              eventsByDay[dayKey].push(ev);
-            }
-            
-            // Sort days
-            daysOrder.sort();
-            
-            var weekdaysLong = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            var monthsShort = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            
-            for (var d = 0; d < daysOrder.length; d++) {
-              var dayKey = daysOrder[d];
-              var dayEvents = eventsByDay[dayKey];
-              
-              // Create local Date from YYYY, MM (0-indexed), DD
-              var parts = dayKey.split('-');
-              var dayDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-              
-              // Format day title: "Today", "Tomorrow", or "Tuesday, July 7"
-              var today = new Date();
-              var todayKey = today.getFullYear() + '-' + padZero(today.getMonth() + 1) + '-' + padZero(today.getDate());
-              
-              var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-              var tomorrowKey = tomorrow.getFullYear() + '-' + padZero(tomorrow.getMonth() + 1) + '-' + padZero(tomorrow.getDate());
-              
-              var titleLabel = "";
-              if (dayKey === todayKey) {
-                titleLabel = "Today";
-              } else if (dayKey === tomorrowKey) {
-                titleLabel = "Tomorrow";
-              } else {
-                titleLabel = weekdaysLong[dayDate.getDay()] + ', ' + monthsShort[dayDate.getMonth()] + ' ' + dayDate.getDate();
-              }
-              
-              html += '<div class="agenda-day-group">';
-              html += '<div class="agenda-day-title">' + escapeHtml(titleLabel) + '</div>';
-              
-              for (var j = 0; j < dayEvents.length; j++) {
-                var ev = dayEvents[j];
-                var evTitle = ev.summary || "Untitled Event";
-                var evStart = ev.start.dateTime || ev.start.date;
-                var evEnd = ev.end.dateTime || ev.end.date;
-                var evLocation = ev.location || "";
-                
-                var isAllDay = !ev.start.dateTime;
-                var timeLabel = "";
-                
-                if (isAllDay) {
-                  timeLabel = "All Day";
-                } else {
-                  var startD = new Date(evStart);
-                  var endD = new Date(evEnd);
-                  timeLabel = formatClockTime(startD) + ' - ' + formatClockTime(endD);
-                }
-                
-                var subtitle = timeLabel;
-                if (evLocation) {
-                  subtitle += ' • ' + evLocation;
-                }
-                
-                // Date badge parts (for the left side of the row)
-                var badgeD = new Date(evStart);
-                var weekdaysShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-                var badgeWk = weekdaysShort[badgeD.getDay()];
-                var badgeDay = badgeD.getDate();
-                
-                html += '<div class="event-card">';
-                html += '<div class="event-date-badge">';
-                html += '<span class="event-date-weekday">' + badgeWk + '</span>';
-                html += '<span class="event-date-day">' + badgeDay + '</span>';
-                html += '</div>'; // date-badge
-                
-                html += '<div class="event-info">';
-                html += '<div class="event-title">' + escapeHtml(evTitle) + '</div>';
-                html += '<div class="event-time-location">' + escapeHtml(subtitle) + '</div>';
-                html += '</div>'; // event-info
-                html += '</div>'; // event-card
-              }
-              
-              html += '</div>'; // agenda-day-group
-            }
-          }
-          
-          html += '</div>'; // calendar-container
         } else {
           // TAB: CHEMICALS & SENSORS
 
@@ -2372,19 +2084,6 @@
       }
 
       // ======== ENTITY RENDERERS ========
-      function padZero(num) {
-        return num < 10 ? '0' + num : num;
-      }
-
-      function formatClockTime(d) {
-        var hrs = d.getHours();
-        var mins = d.getMinutes();
-        var ampm = hrs >= 12 ? 'PM' : 'AM';
-        hrs = hrs % 12;
-        hrs = hrs ? hrs : 12;
-        return hrs + ':' + (mins < 10 ? '0' + mins : mins) + ' ' + ampm;
-      }
-
       function friendlyName(entity) {
         return (entity.attributes && entity.attributes.friendly_name) || entity.entity_id;
       }
@@ -3776,62 +3475,9 @@
       window.switchTab = function (tabName) {
         activeTab = tabName;
         try { localStorage.setItem("ha_active_tab", tabName); } catch (e) { }
-        if (tabName === "calendar" && calendarEvents.length === 0) {
-          fetchCalendarEvents();
-        }
         if (lastStatesCache.length > 0) {
           renderDashboard(lastStatesCache);
         }
-      };
-
-      window.fetchCalendarEvents = function () {
-        if (calendarLoading) return;
-
-        var calendarEntities = [];
-        for (var eid in entities) {
-          if (entities.hasOwnProperty(eid) && eid.indexOf("calendar.") === 0) {
-            calendarEntities.push(eid);
-          }
-        }
-
-        if (calendarEntities.length === 0) {
-          calendarLoading = false;
-          renderDashboard(lastStatesCache);
-          return;
-        }
-
-        if (!calendarEntityId || calendarEntities.indexOf(calendarEntityId) === -1) {
-          calendarEntityId = calendarEntities[0];
-          try { localStorage.setItem("ha_calendar_entity_id", calendarEntityId); } catch (e) { }
-        }
-
-        calendarLoading = true;
-        renderDashboard(lastStatesCache);
-
-        var now = new Date();
-        var start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        var end = new Date(start.getTime() + 7 * 24 * 60 * 60 * 1000);
-
-        var startStr = start.toISOString();
-        var endStr = end.toISOString();
-
-        haRequest("GET", "/api/calendars/" + calendarEntityId + "?start=" + startStr + "&end=" + endStr, null, function (err, data) {
-          calendarLoading = false;
-          if (err) {
-            showToast("Failed to fetch calendar events: " + err, true);
-            calendarEvents = [];
-          } else {
-            calendarEvents = data || [];
-          }
-          renderDashboard(lastStatesCache);
-        });
-      };
-
-      window.selectCalendarTarget = function (entityId) {
-        calendarEntityId = entityId;
-        try { localStorage.setItem("ha_calendar_entity_id", entityId); } catch (e) { }
-        calendarEvents = [];
-        fetchCalendarEvents();
       };
 
       window.dismissCheckedToday = function (goToTab) {
