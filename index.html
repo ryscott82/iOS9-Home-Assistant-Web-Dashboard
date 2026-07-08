@@ -1414,19 +1414,44 @@
       </div>
 
       <!-- Keypad Grid (3x4) (Flexbox for iOS 9 support) -->
-      <div style="display:-webkit-flex; display:flex; -webkit-flex-wrap:wrap; flex-wrap:wrap; margin: -5px -5px 11px -5px;">
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('1')">1</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('2')">2</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('3')">3</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('4')">4</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('5')">5</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('6')">6</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('7')">7</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('8')">8</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('9')">9</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('.')">.</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;" onclick="pressKeypad('0')">0</button>
-        <button class="keypad-btn" style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box; background:#ff3b30; color:#ffffff;" onclick="pressKeypad('backspace')">⌫</button>
+      <div
+        style="display:-webkit-flex; display:flex; -webkit-flex-wrap:wrap; flex-wrap:wrap; margin: -5px -5px 11px -5px;">
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('1')">1</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('2')">2</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('3')">3</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('4')">4</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('5')">5</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('6')">6</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('7')">7</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('8')">8</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('9')">9</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('.')">.</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box;"
+          onclick="pressKeypad('0')">0</button>
+        <button class="keypad-btn"
+          style="width:-webkit-calc(33.333% - 10px); width:calc(33.333% - 10px); margin:5px; box-sizing:border-box; background:#ff3b30; color:#ffffff;"
+          onclick="pressKeypad('backspace')">⌫</button>
       </div>
 
       <!-- Bottom buttons (Cancel / Save) -->
@@ -1810,11 +1835,7 @@
 
         var checkedTodayOverlay = document.getElementById("checkedTodayOverlay");
         if (checkedTodayOverlay) {
-          if (!chemicalsCheckedToday && !checkedTodayAlertDismissed) {
-            checkedTodayOverlay.className = "setup-overlay";
-          } else {
-            checkedTodayOverlay.className = "setup-overlay hidden";
-          }
+          checkedTodayOverlay.className = "setup-overlay hidden";
         }
 
         // Generate recommendations lists separately by volume context
@@ -1894,7 +1915,7 @@
             // Log chemicals warning reminder scene card
             if (!chemicalsCheckedToday) {
               html += '<div class="tile overview-tile alert-yellow" onclick="switchTab(\'chemicals\')" style="cursor:pointer; min-height:48px; padding:8px 12px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; box-sizing:border-box;">';
-              html += '<div class="alert-text-yellow" style="font-weight:700; font-size:12.5px; text-align:center;">⚠️ Log Chemicals</div>';
+              html += '<div class="alert-text-yellow" style="font-weight:700; font-size:12.5px; text-align:center;">⚠️ Check Chemicals</div>';
               html += '</div>';
             }
 
@@ -1916,7 +1937,7 @@
                 if (mp.last_changed) {
                   var lastChanged = new Date(mp.last_changed);
                   var elapsedMs = Date.now() - lastChanged.getTime();
-                  if (elapsedMs < 24 * 60 * 60 * 1000) {
+                  if (elapsedMs < 4 * 60 * 60 * 1000) {
                     isIdleTooLong = false;
                   }
                 }
@@ -1978,7 +1999,7 @@
                 if (mp.last_changed) {
                   var lastChanged = new Date(mp.last_changed);
                   var elapsedMs = Date.now() - lastChanged.getTime();
-                  if (elapsedMs < 24 * 60 * 60 * 1000) {
+                  if (elapsedMs < 4 * 60 * 60 * 1000) {
                     isIdleTooLong = false;
                   }
                 }
@@ -2693,7 +2714,7 @@
             var whole = Math.floor(cups);
             var frac = cups - whole;
             var fracStr = "";
-            
+
             if (frac < 0.125) {
               fracStr = "";
             } else if (frac < 0.2917) {
