@@ -2683,6 +2683,11 @@
           // General chemicals: format in terms of cups, tbsp, tsp
           if (oz <= 0) return "0 tbsp";
 
+          if (oz > 32.0) { // Over 4 cups (32 oz) -> measure in lbs
+            var lbs = oz / 16;
+            return lbs.toFixed(1) + " lbs";
+          }
+
           if (oz >= 2.0) { // 1/4 cup (2 oz) or more
             var cups = oz / 8;
             var whole = Math.floor(cups);
