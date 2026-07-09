@@ -3484,8 +3484,61 @@
         }
       };
 
+      function optimisticSkipUpdate(entityId) {
+        var clickedEntity = null;
+        for (var i = 0; i < lastStatesCache.length; i++) {
+          if (lastStatesCache[i].entity_id === entityId) {
+            clickedEntity = lastStatesCache[i];
+            break;
+          }
+        }
+        if (!clickedEntity) return;
+
+        var attrs = clickedEntity.attributes || {};
+        var clickedTitle = attrs.media_title;
+        var clickedArtist = attrs.media_artist;
+
+        for (var i = 0; i < lastStatesCache.length; i++) {
+          var ent = lastStatesCache[i];
+          var eAttrs = ent.attributes || {};
+          
+          var match = false;
+          if (ent.entity_id === entityId) {
+            match = true;
+          } else if (clickedTitle && clickedArtist && eAttrs.media_title === clickedTitle && eAttrs.media_artist === clickedArtist) {
+            match = true;
+          }
+
+          if (match) {
+            if (!ent.attributes) ent.attributes = {};
+            ent.attributes.media_title = "Skipping...";
+            ent.attributes.media_artist = "";
+            ent.attributes.media_duration = 0;
+            ent.attributes.media_position = 0;
+            ent.attributes.media_position_updated_at = new Date().toISOString();
+            ent.state = "playing";
+          }
+        }
+
+        if (lastStatesCache.length > 0) {
+          renderDashboard(lastStatesCache);
+        }
+      }
+
       window.mediaNext = function (entityId) {
+        optimisticSkipUpdate(entityId);
         haRequest("POST", "/api/services/media_player/media_next_track", {
+          entity_id: entityId
+        }, function (err) {
+          if (err) showToast("Error: " + err, true);
+          setTimeout(refreshAll, 1000);
+          setTimeout(refreshAll, 3000);
+        });
+      };
+
+      window.mediaPrevious = function (entityId) {
+        optimisticSkipUpdate(entityId);
+        haRequest("POST", "/api/services/media_player/media_previous_track", {
           entity_id: entityId
         }, function (err) {
           if (err) showToast("Error: " + err, true);
@@ -4187,7 +4240,7 @@
 
           if (!isIdle) {
             // Back (Previous track)
-            h += '<button class="footer-btn" style="color:#1c1c1e; font-size:16px; padding:8px 12px; margin:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+            h += '<button class="footer-btn" style="color:#1c1c1e; font-size:16px; padding:8px 12px; margin:0;" onclick="mediaPrevious(\'' + eid + '\')">';
             h += '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
             h += '</button>';
           }
@@ -4212,7 +4265,7 @@
 
           h += '</div>';
 
-          // Volume Bars (Icon for single, stacked text labels for grouped)
+          // Volume Bars (Device Name stacked above slider for maximum length)
           for (var g = 0; g < group.length; g++) {
             var m = group[g];
             var mEid = escapeHtml(m.entity_id);
@@ -4221,16 +4274,22 @@
             var mVolume = typeof mAttrs.volume_level !== "undefined" ? mAttrs.volume_level : 0;
             var mName = friendlyName(m);
 
-            h += '<div class="slider-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin-top:12px;' + (g === 0 ? ' border-top:1px solid rgba(0,0,0,0.05); padding-top:12px;' : '') + '">';
-            if (group.length === 1) {
-              h += '<span style="font-size:14px; margin-right:8px; color:#8e8e93;">';
-              h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
-              h += '</span>';
-            } else {
-              h += '<span style="font-size:11px; margin-right:8px; color:#8e8e93; font-weight:700; -webkit-flex:0 0 95px; flex:0 0 95px; width:95px; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(mName) + '</span>';
-            }
+            h += '<div style="margin-top:14px;' + (g === 0 ? ' border-top:1px solid rgba(0,0,0,0.05); padding-top:14px;' : '') + '">';
+            
+            // Label row (Name left, % right)
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; font-size:11px; font-weight:700; color:#8e8e93; margin-bottom:6px; padding:0 2px;">';
+            h += '<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:75%;">' + escapeHtml(mName) + '</span>';
+            h += '<span>' + Math.round(mVolume * 100) + '%</span>';
+            h += '</div>';
+
+            // Slider row (Icon left, full length range input right)
+            h += '<div class="slider-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin:0;">';
+            h += '<span style="font-size:14px; margin-right:8px; color:#8e8e93; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
+            h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+            h += '</span>';
             h += '<input type="range" id="vol_' + mCleanEid + '" style="-webkit-flex:1; flex:1;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
-            h += '<span style="font-size:11px; margin-left:8px; font-weight:700; min-width:32px; text-align:right; color:#8e8e93;">' + Math.round(mVolume * 100) + '%</span>';
+            h += '</div>';
+            
             h += '</div>';
           }
         }
