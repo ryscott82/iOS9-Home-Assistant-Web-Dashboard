@@ -1490,7 +1490,7 @@
       <div class="footer-status-group" onclick="showDebug()">
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
-        <span style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.17.14</span>
+        <span style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.18.14</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1519,6 +1519,7 @@
       var selectedRecVolume = "hottub";
       var lastStatesCache = [];
       var activeStickyGroups = [];
+      var recentlySkippedTracks = [];
       var activeTab = "overview";
       var activeChemTab = "inputs";
       var lastActivatedScene = "";
@@ -3478,6 +3479,85 @@
         }
       };
 
+      function getGroupTrackInfo(group) {
+        var primary = group[0];
+        var now = Date.now();
+        recentlySkippedTracks = recentlySkippedTracks.filter(function (t) {
+          return (now - t.timestamp) < 15000;
+        });
+
+        var title = "Not Playing";
+        var artist = "Unknown Artist";
+        var artUrl = "";
+        var isPlaying = primary.state === "playing";
+
+        var candidates = [];
+        for (var g = 0; g < group.length; g++) {
+          var mp = group[g];
+          var mAttrs = mp.attributes || {};
+          var mTitle = mAttrs.media_title;
+          var mArtist = mAttrs.media_artist;
+          if (mTitle) {
+            var duplicate = false;
+            for (var c = 0; c < candidates.length; c++) {
+              if (candidates[c].title === mTitle && candidates[c].artist === mArtist) {
+                duplicate = true;
+                break;
+              }
+            }
+            if (!duplicate) {
+              candidates.push({
+                title: mTitle,
+                artist: mArtist || "",
+                entity_picture: mAttrs.entity_picture || "",
+                state: mp.state
+              });
+            }
+          }
+        }
+
+        if (candidates.length > 0) {
+          var freshCandidates = [];
+          for (var c = 0; c < candidates.length; c++) {
+            var cand = candidates[c];
+            var isSkipped = false;
+            for (var s = 0; s < recentlySkippedTracks.length; s++) {
+              var st = recentlySkippedTracks[s];
+              if (st.title === cand.title && st.artist === cand.artist) {
+                isSkipped = true;
+                break;
+              }
+            }
+            if (!isSkipped) {
+              freshCandidates.push(cand);
+            }
+          }
+
+          var chosen = null;
+          if (freshCandidates.length > 0) {
+            chosen = freshCandidates[0];
+          } else {
+            title = "Skipping...";
+            artist = "";
+            artUrl = "";
+          }
+
+          if (chosen) {
+            title = chosen.title;
+            artist = chosen.artist || "Unknown Artist";
+            artUrl = chosen.entity_picture ? HA_URL + chosen.entity_picture : "";
+            isPlaying = chosen.state === "playing";
+          }
+        }
+
+        return {
+          title: title,
+          artist: artist,
+          artUrl: artUrl,
+          isPlaying: isPlaying
+        };
+      }
+
       function getMediaGroupKey(mp) {
         // Clean up expired sticky groups (older than 10 seconds)
         var now = Date.now();
@@ -3516,6 +3596,15 @@
         var attrs = clickedEntity.attributes || {};
         var clickedTitle = attrs.media_title;
         var clickedArtist = attrs.media_artist;
+
+        // Log the skipped track metadata so we can filter it out during dynamic grouping updates
+        if (clickedTitle) {
+          recentlySkippedTracks.push({
+            title: clickedTitle,
+            artist: clickedArtist || "",
+            timestamp: Date.now()
+          });
+        }
 
         var groupedIds = [];
         for (var i = 0; i < lastStatesCache.length; i++) {
@@ -4198,14 +4287,16 @@
         var cleanEid = eid.replace(/\./g, "_");
         var state = primary.state;
         var attrs = primary.attributes || {};
-        var title = attrs.media_title || "Not Playing";
-        var artist = attrs.media_artist || "Unknown Artist";
         var volume = typeof attrs.volume_level !== "undefined" ? attrs.volume_level : 0;
-        var isPlaying = state === "playing";
         var unavailable = state === "unavailable";
 
-        var artUrl = attrs.entity_picture ? HA_URL + attrs.entity_picture : "";
-        var isIdle = (state !== "playing" && state !== "paused" && !unavailable);
+        var trackInfo = getGroupTrackInfo(group);
+        var title = trackInfo.title;
+        var artist = trackInfo.artist;
+        var artUrl = trackInfo.artUrl;
+        var isPlaying = trackInfo.isPlaying;
+
+        var isIdle = (state !== "playing" && state !== "paused" && !unavailable && title !== "Skipping...");
 
         var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="background:#ffffff; border-radius:24px; padding:20px; display:block; text-align:center; box-sizing:border-box;">';
 
@@ -4341,12 +4432,15 @@
         var cleanEid = eid.replace(/\./g, "_");
         var state = primary.state;
         var attrs = primary.attributes || {};
-        var title = attrs.media_title || "Not Playing";
-        var artist = attrs.media_artist || "Unknown Artist";
-        var isPlaying = state === "playing";
         var unavailable = state === "unavailable";
 
-        var isIdle = state !== "playing" && state !== "paused";
+        var trackInfo = getGroupTrackInfo(group);
+        var title = trackInfo.title;
+        var artist = trackInfo.artist;
+        var artUrl = trackInfo.artUrl;
+        var isPlaying = trackInfo.isPlaying;
+
+        var isIdle = (state !== "playing" && state !== "paused" && title !== "Skipping...");
         if (isIdle && !unavailable) {
           // Compact layout for idle media players
           var h = '<div class="tile media-tile" style="background:#ffffff; border-radius:18px; padding:10px 14px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; box-sizing:border-box; min-height:54px;">';
@@ -4365,8 +4459,6 @@
           h += '</div>';
           return h;
         }
-
-        var artUrl = attrs.entity_picture ? HA_URL + attrs.entity_picture : "";
 
         var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="background:#ffffff; border-radius:18px; padding:10px 14px; display:block; box-sizing:border-box; text-align:left; min-height: 0;">';
 
