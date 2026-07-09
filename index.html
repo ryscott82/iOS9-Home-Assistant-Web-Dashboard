@@ -1517,6 +1517,7 @@
       var bannerDismissed = false;
       var selectedRecVolume = "hottub";
       var lastStatesCache = [];
+      var activeStickyGroups = [];
       var activeTab = "overview";
       var activeChemTab = "inputs";
       var lastActivatedScene = "";
@@ -1944,12 +1945,8 @@
                 if (isIdleTooLong) continue;
               }
 
-              var attrs = mp.attributes || {};
-              var title = attrs.media_title;
-              var artist = attrs.media_artist;
-
-              if (title && artist) {
-                var key = (title.trim() + "|||" + artist.trim()).toLowerCase();
+              var key = getMediaGroupKey(mp);
+              if (key) {
                 if (!songGroups[key]) {
                   songGroups[key] = [];
                   mediaGroups.push(songGroups[key]);
@@ -2006,12 +2003,8 @@
                 if (isIdleTooLong) continue;
               }
 
-              var attrs = mp.attributes || {};
-              var title = attrs.media_title;
-              var artist = attrs.media_artist;
-
-              if (title && artist) {
-                var key = (title.trim() + "|||" + artist.trim()).toLowerCase();
+              var key = getMediaGroupKey(mp);
+              if (key) {
                 if (!songGroups[key]) {
                   songGroups[key] = [];
                   mediaGroups.push(songGroups[key]);
@@ -3484,6 +3477,31 @@
         }
       };
 
+      function getMediaGroupKey(mp) {
+        // Clean up expired sticky groups (older than 10 seconds)
+        var now = Date.now();
+        activeStickyGroups = activeStickyGroups.filter(function (g) {
+          return (now - g.timestamp) < 10000;
+        });
+
+        // Find if this entity is in any active sticky group
+        for (var i = 0; i < activeStickyGroups.length; i++) {
+          var g = activeStickyGroups[i];
+          if (g.entities.indexOf(mp.entity_id) !== -1) {
+            return "sticky_" + g.entities.join("_");
+          }
+        }
+
+        // Fallback to title/artist grouping
+        var attrs = mp.attributes || {};
+        var title = attrs.media_title;
+        var artist = attrs.media_artist;
+        if (title && artist) {
+          return (title.trim() + "|||" + artist.trim()).toLowerCase();
+        }
+        return null;
+      }
+
       function optimisticSkipUpdate(entityId) {
         var clickedEntity = null;
         for (var i = 0; i < lastStatesCache.length; i++) {
@@ -3498,10 +3516,11 @@
         var clickedTitle = attrs.media_title;
         var clickedArtist = attrs.media_artist;
 
+        var groupedIds = [];
         for (var i = 0; i < lastStatesCache.length; i++) {
           var ent = lastStatesCache[i];
           var eAttrs = ent.attributes || {};
-          
+
           var match = false;
           if (ent.entity_id === entityId) {
             match = true;
@@ -3510,6 +3529,7 @@
           }
 
           if (match) {
+            groupedIds.push(ent.entity_id);
             if (!ent.attributes) ent.attributes = {};
             ent.attributes.media_title = "Skipping...";
             ent.attributes.media_artist = "";
@@ -3518,6 +3538,14 @@
             ent.attributes.media_position_updated_at = new Date().toISOString();
             ent.state = "playing";
           }
+        }
+
+        // Save this group as a sticky group for 10 seconds to cover Home Assistant update time
+        if (groupedIds.length > 1) {
+          activeStickyGroups.push({
+            timestamp: Date.now(),
+            entities: groupedIds
+          });
         }
 
         if (lastStatesCache.length > 0) {
@@ -4275,7 +4303,7 @@
             var mName = friendlyName(m);
 
             h += '<div style="margin-top:14px;' + (g === 0 ? ' border-top:1px solid rgba(0,0,0,0.05); padding-top:14px;' : '') + '">';
-            
+
             // Label row (Name left, % right)
             h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; font-size:11px; font-weight:700; color:#8e8e93; margin-bottom:6px; padding:0 2px;">';
             h += '<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:75%;">' + escapeHtml(mName) + '</span>';
@@ -4289,7 +4317,7 @@
             h += '</span>';
             h += '<input type="range" id="vol_' + mCleanEid + '" style="-webkit-flex:1; flex:1;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
             h += '</div>';
-            
+
             h += '</div>';
           }
         }
