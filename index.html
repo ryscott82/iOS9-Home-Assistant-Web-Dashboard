@@ -1490,7 +1490,7 @@
       <div class="footer-status-group" onclick="showDebug()">
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
-        <span style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.19.14</span>
+        <span style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.20.14</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2017,10 +2017,45 @@
               }
             }
 
+            var activeList = [];
+            var idleList = [];
+            for (i = 0; i < mediaGroups.length; i++) {
+              if (isGroupIdle(mediaGroups[i])) {
+                idleList.push(mediaGroups[i]);
+              } else {
+                activeList.push(mediaGroups[i]);
+              }
+            }
+
+            var idleStacks = [];
+            var currentStack = [];
+            for (i = 0; i < idleList.length; i++) {
+              currentStack.push(idleList[i]);
+              if (currentStack.length === 3) {
+                idleStacks.push(currentStack);
+                currentStack = [];
+              }
+            }
+            if (currentStack.length > 0) {
+              idleStacks.push(currentStack);
+            }
+
             html += '<div class="section"><div class="section-title">Media Players</div>';
             html += '<div class="tile-grid">';
-            for (i = 0; i < mediaGroups.length; i++) {
-              html += renderMediaPlayer(mediaGroups[i]);
+            
+            // 1. Render active cards
+            for (i = 0; i < activeList.length; i++) {
+              html += renderMediaPlayer(activeList[i], false);
+            }
+
+            // 2. Render stacked idle columns (up to 3 stacked per column)
+            for (i = 0; i < idleStacks.length; i++) {
+              var stack = idleStacks[i];
+              html += '<div class="tile media-tile" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; gap:10px; background:transparent; padding:0; box-shadow:none; border:none; min-height:0; height:auto;">';
+              for (var j = 0; j < stack.length; j++) {
+                html += renderMediaPlayer(stack[j], true);
+              }
+              html += '</div>';
             }
             html += '</div></div>';
           }
@@ -4273,7 +4308,16 @@
         }, 1000);
       }
 
-      function renderMediaPlayer(group) {
+      function isGroupIdle(group) {
+        var primary = group[0];
+        var state = primary.state;
+        var unavailable = state === "unavailable";
+        var trackInfo = getGroupTrackInfo(group);
+        var title = trackInfo.title;
+        return (state !== "playing" && state !== "paused" && !unavailable && title !== "Skipping...");
+      }
+
+      function renderMediaPlayer(group, isNested) {
         var primary = group[0];
 
         // Combine speaker names for grouped display
@@ -4298,7 +4342,13 @@
         var isIdle = (state !== "playing" && state !== "paused" && !unavailable && title !== "Skipping...");
 
         var cardPadding = isIdle ? 'padding: 12px 14px;' : 'padding: 14px 16px;';
-        var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="background:#ffffff; border-radius:24px; ' + cardPadding + ' display:block; text-align:center; box-sizing:border-box;">';
+        
+        var inlineStyle = 'background:#ffffff; border-radius:24px; ' + cardPadding + ' display:block; text-align:center; box-sizing:border-box;';
+        if (isNested) {
+          inlineStyle += ' -webkit-flex:none; flex:none; margin:0; width:100%;';
+        }
+
+        var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="' + inlineStyle + '">';
 
         // Header
         h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:10px;">';
