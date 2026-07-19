@@ -1558,7 +1558,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.24.15</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.25.15</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2627,7 +2627,7 @@
         var isAlkalinity = (eid.indexOf("alkalinity") !== -1 || lowerName.indexOf("alkalinity") !== -1);
         var isTotalChlorine = (eid.indexOf("total_chlorine") !== -1 || lowerName.indexOf("total chlorine") !== -1 || lowerName.indexOf("tc") !== -1);
         var isFreeChlorine = (eid.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && !isTotalChlorine));
-        var isCalcium = (eid.indexOf("calcium") !== -1 || lowerName.indexOf("hardness") !== -1 || lowerName.indexOf("ch") !== -1);
+        var isCalcium = (eid.indexOf("calcium") !== -1 || lowerName.indexOf("hardness") !== -1 || (lowerName.indexOf("ch") !== -1 && lowerName.indexOf("chlorine") === -1 && eid.indexOf("chlorine") === -1));
         var isStabilizer = (eid.indexOf("stabilizer") !== -1 || lowerName.indexOf("cyanuric") !== -1 || lowerName.indexOf("cya") !== -1);
         var isTubCYA = isStabilizer && (eid.indexOf("hot_tub") !== -1 || eid.indexOf("hottub") !== -1 || eid.indexOf("spa") !== -1 || lowerName.indexOf("hot tub") !== -1);
         var isPoolCYA = isStabilizer && !isTubCYA;
@@ -2708,7 +2708,8 @@
             h += '<div style="display:-webkit-flex; display:flex; -webkit-flex-wrap:wrap; flex-wrap:wrap; margin:0 -3px 10px -3px;">';
             for (var p = 0; p < presets.length; p++) {
               var pVal = presets[p];
-              h += '<button class="preset-btn" data-val="' + pVal + '" onclick="selectPresetValue(\'' + eid + '\', ' + pVal + ', \'' + escapeHtml(unit) + '\')">' + pVal + '</button>';
+              var displayVal = (pVal === 0.5) ? ".5" : pVal;
+              h += '<button class="preset-btn" data-val="' + pVal + '" onclick="selectPresetValue(\'' + eid + '\', ' + pVal + ', \'' + escapeHtml(unit) + '\')">' + displayVal + '</button>';
             }
             h += '</div>';
           }
@@ -4125,7 +4126,7 @@
           var isAlkalinity = (id.indexOf("alkalinity") !== -1);
           var isTotalChlorine = (id.indexOf("total_chlorine") !== -1 || id.indexOf("tc") !== -1);
           var isFreeChlorine = (id.indexOf("free_chlorine") !== -1 || id.indexOf("fc") !== -1 || (id.indexOf("chlorine") !== -1 && !isTotalChlorine));
-          var isCalcium = (id.indexOf("calcium") !== -1 || id.indexOf("hardness") !== -1 || id.indexOf("ch") !== -1);
+          var isCalcium = (id.indexOf("calcium") !== -1 || id.indexOf("hardness") !== -1 || (id.indexOf("ch") !== -1 && id.indexOf("chlorine") === -1));
           var isStabilizer = (id.indexOf("stabilizer") !== -1 || id.indexOf("cyanuric") !== -1 || id.indexOf("cya") !== -1);
           var isTubCYA = isStabilizer && (id.indexOf("hot_tub") !== -1 || id.indexOf("hottub") !== -1 || id.indexOf("spa") !== -1);
           var isPoolCYA = isStabilizer && !isTubCYA;
@@ -4293,7 +4294,7 @@
         var isAlkalinity = (entityId.indexOf("alkalinity") !== -1 || lowerName.indexOf("alkalinity") !== -1);
         var isTotalChlorine = (entityId.indexOf("total_chlorine") !== -1 || lowerName.indexOf("total chlorine") !== -1 || lowerName.indexOf("tc") !== -1);
         var isFreeChlorine = (entityId.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && !isTotalChlorine));
-        var isCalcium = (entityId.indexOf("calcium") !== -1 || lowerName.indexOf("hardness") !== -1 || lowerName.indexOf("ch") !== -1);
+        var isCalcium = (entityId.indexOf("calcium") !== -1 || lowerName.indexOf("hardness") !== -1 || (lowerName.indexOf("ch") !== -1 && lowerName.indexOf("chlorine") === -1 && entityId.indexOf("chlorine") === -1));
         var isStabilizer = (entityId.indexOf("stabilizer") !== -1 || lowerName.indexOf("cyanuric") !== -1 || lowerName.indexOf("cya") !== -1);
         var isTubCYA = isStabilizer && (entityId.indexOf("hot_tub") !== -1 || entityId.indexOf("hottub") !== -1 || entityId.indexOf("spa") !== -1 || lowerName.indexOf("hot tub") !== -1);
         var isPoolCYA = isStabilizer && !isTubCYA;
