@@ -1490,7 +1490,7 @@
       <div class="footer-status-group" onclick="showDebug()">
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
-        <span style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.18.14</span>
+        <span style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.19.14</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -4287,7 +4287,6 @@
         var cleanEid = eid.replace(/\./g, "_");
         var state = primary.state;
         var attrs = primary.attributes || {};
-        var volume = typeof attrs.volume_level !== "undefined" ? attrs.volume_level : 0;
         var unavailable = state === "unavailable";
 
         var trackInfo = getGroupTrackInfo(group);
@@ -4298,37 +4297,84 @@
 
         var isIdle = (state !== "playing" && state !== "paused" && !unavailable && title !== "Skipping...");
 
-        var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="background:#ffffff; border-radius:24px; padding:20px; display:block; text-align:center; box-sizing:border-box;">';
+        var cardPadding = isIdle ? 'padding: 12px 14px;' : 'padding: 14px 16px;';
+        var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="background:#ffffff; border-radius:24px; ' + cardPadding + ' display:block; text-align:center; box-sizing:border-box;">';
 
         // Header
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:14px;">';
+        h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:10px;">';
         h += '<div style="font-weight:700; font-size:13.5px; color:#1c1c1e; letter-spacing:-0.2px; text-align:left; -webkit-flex:1; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-right:8px;">' + name + '</div>';
         h += '<div style="font-size:10px; font-weight:700; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px;">' + state + '</div>';
         h += '</div>';
 
-        // Album Art Container (only shown when not idle)
-        if (!isIdle) {
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; margin-bottom:14px;">';
+        if (isIdle) {
+          // Compact 1/3 height layout for idle media players
+          if (!unavailable) {
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; margin-top:8px;">';
+            
+            // Play Button
+            var activeBg = isPlaying ? '#e1f5fe' : '#f2f2f7';
+            var activeColor = '#007aff';
+            h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:36px; height:36px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); -webkit-flex-shrink:0; flex-shrink:0; padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+            h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+            h += '</button>';
+
+            // Volume Sliders Container
+            h += '<div style="-webkit-flex:1; flex:1; min-width:0; display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; gap:8px;">';
+            for (var g = 0; g < group.length; g++) {
+              var m = group[g];
+              var mEid = escapeHtml(m.entity_id);
+              var mCleanEid = mEid.replace(/\./g, "_");
+              var mAttrs = m.attributes || {};
+              var mVolume = typeof mAttrs.volume_level !== "undefined" ? mAttrs.volume_level : 0;
+              var mName = friendlyName(m);
+
+              if (group.length === 1) {
+                // No name title, inline percentage on the right of the slider
+                h += '<div class="slider-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin:0;">';
+                h += '<span style="font-size:14px; margin-right:6px; color:#8e8e93; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
+                h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+                h += '</span>';
+                h += '<input type="range" id="vol_' + mCleanEid + '" style="-webkit-flex:1; flex:1;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
+                h += '<span style="font-size:10px; margin-left:6px; font-weight:700; color:#8e8e93; min-width:28px; text-align:right;">' + Math.round(mVolume * 100) + '%</span>';
+                h += '</div>';
+              } else {
+                // Stacked labels inside the group container
+                h += '<div>';
+                h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; font-size:10px; font-weight:700; color:#8e8e93; margin-bottom:2px; padding:0 2px;">';
+                h += '<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70%;">' + escapeHtml(mName) + '</span>';
+                h += '<span>' + Math.round(mVolume * 100) + '%</span>';
+                h += '</div>';
+                h += '<div class="slider-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin:0;">';
+                h += '<span style="font-size:12px; margin-right:6px; color:#8e8e93; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
+                h += '<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+                h += '</span>';
+                h += '<input type="range" id="vol_' + mCleanEid + '" style="-webkit-flex:1; flex:1;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
+                h += '</div>';
+                h += '</div>';
+              }
+            }
+            h += '</div>'; // End Volume Sliders
+            h += '</div>';
+          }
+        } else {
+          // Album Art Container (only shown when not idle)
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; margin-bottom:10px;">';
           if (artUrl) {
-            h += '<img src="' + artUrl + '" style="width:140px; height:140px; border-radius:18px; object-fit:cover; box-shadow: 0 8px 20px rgba(0,0,0,0.12); background:#f2f2f7;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
-            h += '<div style="display:none; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
+            h += '<img src="' + artUrl + '" style="width:100px; height:100px; border-radius:12px; object-fit:cover; box-shadow: 0 6px 14px rgba(0,0,0,0.1); background:#f2f2f7;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
+            h += '<div style="display:none; width:100px; height:100px; border-radius:12px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:11px; color:#8e8e93; font-weight:600;">NO ART</div>';
           } else {
-            h += '<div style="display:-webkit-flex; display:flex; width:140px; height:140px; border-radius:18px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:12px; color:#8e8e93; font-weight:600;">NO ART</div>';
+            h += '<div style="display:-webkit-flex; display:flex; width:100px; height:100px; border-radius:12px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:11px; color:#8e8e93; font-weight:600;">NO ART</div>';
           }
           h += '</div>';
-        }
 
-        // Title & Artist Info (only shown when not idle)
-        if (!isIdle) {
-          h += '<div style="margin-bottom:14px; text-align:left; padding:0 4px;">';
-          h += '<div style="font-weight:700; font-size:17px; color:#1c1c1e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + escapeHtml(title) + '</div>';
-          h += '<div style="font-size:13.5px; color:#8e8e93; font-weight:500; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(artist) + '</div>';
+          // Title & Artist Info (only shown when not idle)
+          h += '<div style="margin-bottom:10px; text-align:left; padding:0 4px;">';
+          h += '<div style="font-weight:700; font-size:15px; color:#1c1c1e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + escapeHtml(title) + '</div>';
+          h += '<div style="font-size:12.5px; color:#8e8e93; font-weight:500; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(artist) + '</div>';
           h += '</div>';
-        }
 
-        if (!unavailable) {
-          // Progress timeline (only shown when not idle)
-          if (!isIdle) {
+          if (!unavailable) {
+            // Progress timeline (only shown when not idle)
             var duration = attrs.media_duration || 0;
             var position = attrs.media_position || 0;
             var curPos = position;
@@ -4341,7 +4387,7 @@
             var pct = duration ? (curPos / duration) * 100 : 0;
 
             if (duration > 0) {
-              h += '<div style="margin-bottom:18px; padding:0 4px;">';
+              h += '<div style="margin-bottom:12px; padding:0 4px;">';
               h += '<div style="height:3px; background:rgba(0,0,0,0.06); border-radius:2px; position:relative; overflow:hidden;">';
               h += '<div id="prog_fill_ctrl_' + cleanEid + '" style="width:' + pct + '%; height:100%; background:#007aff; border-radius:2px; transition: width 0.3s linear;"></div>';
               h += '</div>';
@@ -4351,66 +4397,71 @@
               h += '</div>';
               h += '</div>';
             } else {
-              h += '<div style="margin-bottom:18px; height:19px;"></div>';
+              h += '<div style="margin-bottom:12px; height:19px;"></div>';
             }
-          }
 
-          // Control Buttons (Back, Play/Pause, Next)
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin-bottom:18px; gap: 20px;">';
+            // Control Buttons (Back, Play/Pause, Next)
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin-bottom:12px; gap: 20px;">';
 
-          if (!isIdle) {
             // Back (Previous track)
-            h += '<button class="footer-btn" style="color:#1c1c1e; font-size:16px; padding:8px 12px; margin:0;" onclick="mediaPrevious(\'' + eid + '\')">';
-            h += '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+            h += '<button class="footer-btn" style="color:#1c1c1e; font-size:15px; padding:6px 10px; margin:0;" onclick="mediaPrevious(\'' + eid + '\')">';
+            h += '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
             h += '</button>';
-          }
 
-          // Play/Pause
-          var activeBg = isPlaying ? '#e1f5fe' : '#f2f2f7';
-          var activeColor = '#007aff';
-          h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:50px; height:50px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 2px 6px rgba(0,0,0,0.05);" onclick="mediaPlayPause(\'' + eid + '\')">';
-          if (isPlaying) {
-            h += '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-          } else {
-            h += '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-          }
-          h += '</button>';
+            // Play/Pause
+            var activeBg = isPlaying ? '#e1f5fe' : '#f2f2f7';
+            var activeColor = '#007aff';
+            h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:44px; height:44px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 2px 6px rgba(0,0,0,0.05); padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+            if (isPlaying) {
+              h += '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+            } else {
+              h += '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+            }
+            h += '</button>';
 
-          if (!isIdle) {
             // Next (Skip track)
-            h += '<button class="footer-btn" style="color:#1c1c1e; font-size:16px; padding:8px 12px; margin:0;" onclick="mediaNext(\'' + eid + '\')">';
-            h += '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+            h += '<button class="footer-btn" style="color:#1c1c1e; font-size:15px; padding:6px 10px; margin:0;" onclick="mediaNext(\'' + eid + '\')">';
+            h += '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
             h += '</button>';
-          }
-
-          h += '</div>';
-
-          // Volume Bars (Device Name stacked above slider for maximum length)
-          for (var g = 0; g < group.length; g++) {
-            var m = group[g];
-            var mEid = escapeHtml(m.entity_id);
-            var mCleanEid = mEid.replace(/\./g, "_");
-            var mAttrs = m.attributes || {};
-            var mVolume = typeof mAttrs.volume_level !== "undefined" ? mAttrs.volume_level : 0;
-            var mName = friendlyName(m);
-
-            h += '<div style="margin-top:14px;' + (g === 0 ? ' border-top:1px solid rgba(0,0,0,0.05); padding-top:14px;' : '') + '">';
-
-            // Label row (Name left, % right)
-            h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; font-size:11px; font-weight:700; color:#8e8e93; margin-bottom:6px; padding:0 2px;">';
-            h += '<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:75%;">' + escapeHtml(mName) + '</span>';
-            h += '<span>' + Math.round(mVolume * 100) + '%</span>';
-            h += '</div>';
-
-            // Slider row (Icon left, full length range input right)
-            h += '<div class="slider-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin:0;">';
-            h += '<span style="font-size:14px; margin-right:8px; color:#8e8e93; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
-            h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
-            h += '</span>';
-            h += '<input type="range" id="vol_' + mCleanEid + '" style="-webkit-flex:1; flex:1;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
-            h += '</div>';
 
             h += '</div>';
+
+            // Volume Bars
+            for (var g = 0; g < group.length; g++) {
+              var m = group[g];
+              var mEid = escapeHtml(m.entity_id);
+              var mCleanEid = mEid.replace(/\./g, "_");
+              var mAttrs = m.attributes || {};
+              var mVolume = typeof mAttrs.volume_level !== "undefined" ? mAttrs.volume_level : 0;
+              var mName = friendlyName(m);
+
+              h += '<div style="margin-top:10px;' + (g === 0 ? ' border-top:1px solid rgba(0,0,0,0.05); padding-top:10px;' : '') + '">';
+
+              if (group.length === 1) {
+                // No name title, inline percentage
+                h += '<div class="slider-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin:0;">';
+                h += '<span style="font-size:14px; margin-right:8px; color:#8e8e93; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
+                h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+                h += '</span>';
+                h += '<input type="range" id="vol_' + mCleanEid + '" style="-webkit-flex:1; flex:1;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
+                h += '<span style="font-size:11px; margin-left:8px; font-weight:700; color:#8e8e93; min-width:32px; text-align:right;">' + Math.round(mVolume * 100) + '%</span>';
+                h += '</div>';
+              } else {
+                // Stacked layout
+                h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; font-size:11px; font-weight:700; color:#8e8e93; margin-bottom:4px; padding:0 2px;">';
+                h += '<span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:75%;">' + escapeHtml(mName) + '</span>';
+                h += '<span>' + Math.round(mVolume * 100) + '%</span>';
+                h += '</div>';
+
+                h += '<div class="slider-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin:0;">';
+                h += '<span style="font-size:14px; margin-right:8px; color:#8e8e93; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
+                h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>';
+                h += '</span>';
+                h += '<input type="range" id="vol_' + mCleanEid + '" style="-webkit-flex:1; flex:1;" min="0" max="1" step="0.05" value="' + mVolume + '" onchange="mediaSetVolume(\'' + mEid + '\', this.value)">';
+                h += '</div>';
+              }
+              h += '</div>';
+            }
           }
         }
 
