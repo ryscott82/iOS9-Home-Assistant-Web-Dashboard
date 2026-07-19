@@ -1490,7 +1490,7 @@
       <div class="footer-status-group" onclick="showDebug()">
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
-        <span style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.20.14</span>
+        <span style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.21.14</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -4364,9 +4364,10 @@
             // Play Button
             var activeBg = isPlaying ? '#e1f5fe' : '#f2f2f7';
             var activeColor = '#007aff';
-            h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:36px; height:36px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); -webkit-flex-shrink:0; flex-shrink:0; padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+            h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:36px; height:36px; border-radius:50%; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); -webkit-flex-shrink:0; flex-shrink:0; padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%;">';
             h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-            h += '</button>';
+            h += '</div></button>';
 
             // Volume Sliders Container
             h += '<div style="-webkit-flex:1; flex:1; min-width:0; display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; gap:8px;">';
@@ -4461,13 +4462,14 @@
             // Play/Pause
             var activeBg = isPlaying ? '#e1f5fe' : '#f2f2f7';
             var activeColor = '#007aff';
-            h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:44px; height:44px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 2px 6px rgba(0,0,0,0.05); padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+            h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:44px; height:44px; border-radius:50%; margin:0; border:none; box-shadow:0 2px 6px rgba(0,0,0,0.05); padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%;">';
             if (isPlaying) {
               h += '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
             } else {
               h += '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
             }
-            h += '</button>';
+            h += '</div></button>';
 
             // Next (Skip track)
             h += '<button class="footer-btn" style="color:#1c1c1e; font-size:15px; padding:6px 10px; margin:0;" onclick="mediaNext(\'' + eid + '\')">';
@@ -4553,9 +4555,10 @@
           h += '</div>';
 
           // Right: Compact Play button
-          h += '<button class="footer-btn" style="background:#f2f2f7; color:#007aff; width:34px; height:34px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+          h += '<button class="footer-btn" style="background:#f2f2f7; color:#007aff; width:34px; height:34px; border-radius:50%; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%;">';
           h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-          h += '</button>';
+          h += '</div></button>';
 
           h += '</div>';
           return h;
@@ -4587,13 +4590,14 @@
           // Play/Pause Button
           var activeBgComp = isPlaying ? '#e1f5fe' : '#f2f2f7';
           var activeColorComp = '#007aff';
-          h += '<button class="footer-btn" style="background:' + activeBgComp + '; color:' + activeColorComp + '; width:36px; height:36px; border-radius:50%; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05);" onclick="mediaPlayPause(\'' + eid + '\')">';
+          h += '<button class="footer-btn" style="background:' + activeBgComp + '; color:' + activeColorComp + '; width:36px; height:36px; border-radius:50%; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%;">';
           if (isPlaying) {
             h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
           } else {
             h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
           }
-          h += '</button>';
+          h += '</div></button>';
 
           // Skip Button
           h += '<button class="footer-btn" style="color:#1c1c1e; padding:6px; margin:0;" onclick="mediaNext(\'' + eid + '\')">';
