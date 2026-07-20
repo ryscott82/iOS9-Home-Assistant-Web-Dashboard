@@ -1556,7 +1556,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.29.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.30.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1592,6 +1592,10 @@
       var checkedTodayAlertDismissed = false;
       var themeOverride = null;
       var themeTimeout = null;
+
+      // Chemical Inputs pending selection and 3-minute auto-expiry timers
+      var selectedPresetValues = {};
+      var unconfirmedTimers = {};
 
 
       // Load volume and tab choices from cache if available
@@ -1972,7 +1976,11 @@
         var chActive = activeTab === "chemicals" ? " active" : "";
         html += '<button class="tab-btn' + ovActive + '" onclick="switchTab(\'overview\')">Overview</button>';
         html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">Controls</button>';
-        html += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals & Sensors</button>';
+        if (!chemicalsCheckedToday) {
+          html += '<button class="tab-btn' + chActive + '" style="background:#ff3b30; color:#ffffff; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">🚨 Check Chemicals</button>';
+        } else {
+          html += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals & Sensors</button>';
+        }
         html += '</div>';
 
         // RENDER BASED ON ACTIVE TAB
@@ -1981,13 +1989,6 @@
           if (scenes.length > 0) {
             html += '<div class="section"><div class="section-title">Scenes</div>';
             html += '<div class="tile-grid">';
-
-            // Log chemicals warning reminder scene card
-            if (!chemicalsCheckedToday) {
-              html += '<div class="tile overview-tile alert-yellow" onclick="switchTab(\'chemicals\')" style="cursor:pointer; min-height:48px; padding:8px 12px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; box-sizing:border-box;">';
-              html += '<div class="alert-text-yellow" style="font-weight:700; font-size:12.5px; text-align:center;">⚠️ Check Chemicals</div>';
-              html += '</div>';
-            }
 
             for (i = 0; i < scenes.length; i++) {
               html += renderOverviewScene(scenes[i]);
@@ -2258,7 +2259,25 @@
 
             // MANUAL LOGS / INPUTS (no sparklines)
             if (volInputs.length > 0) {
-              html += '<div class="section"><div class="section-title">Chemical Inputs & Logs</div>';
+              var hasPendingSelection = false;
+              for (var pk in selectedPresetValues) {
+                if (selectedPresetValues.hasOwnProperty(pk) && selectedPresetValues[pk] !== null && selectedPresetValues[pk] !== "") {
+                  hasPendingSelection = true;
+                  break;
+                }
+              }
+
+              html += '<div class="section">';
+              html += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:10px;">';
+              html += '  <div class="section-title" style="margin-bottom:0;">Chemical Inputs & Logs</div>';
+              
+              if (hasPendingSelection) {
+                html += '  <button class="confirm-all-btn" style="background:#30d158; color:#ffffff; font-weight:700; border:none; padding:7px 14px; border-radius:9px; font-size:13px; cursor:pointer;" onclick="confirmAllLogs()">Confirm All</button>';
+              } else {
+                html += '  <button class="confirm-all-btn" style="background:#30d158; color:#ffffff; font-weight:700; border:none; padding:7px 14px; border-radius:9px; font-size:13px; opacity:0.4; cursor:not-allowed;" disabled onclick="confirmAllLogs()">Confirm All</button>';
+              }
+              html += '</div>';
+
               html += '<div class="tile-grid">';
               for (i = 0; i < volInputs.length; i++) {
                 html += renderInputNumber(volInputs[i], false);
@@ -2698,24 +2717,32 @@
           else if (isAlkalinity) presets = [0, 40, 80, 120, 180, 240];
           else if (isStabilizer) presets = [0, 30, 50, 100, 150, 300];
 
+          var currentSel = (typeof selectedPresetValues[eid] !== "undefined" && selectedPresetValues[eid] !== null) ? selectedPresetValues[eid] : "";
+
           h += '<div style="margin-top:12px;">';
           if (presets.length > 0) {
             h += '<div style="display:-webkit-flex; display:flex; -webkit-flex-wrap:nowrap; flex-wrap:nowrap; margin:0 -3px 10px -3px;">';
             for (var p = 0; p < presets.length; p++) {
               var pVal = presets[p];
               var displayVal = (pVal === 0.5) ? ".5" : pVal;
-              h += '<button class="preset-btn" data-val="' + pVal + '" onclick="selectPresetValue(\'' + eid + '\', ' + pVal + ', \'' + escapeHtml(unit) + '\')">' + displayVal + '</button>';
+              var btnActiveClass = (currentSel !== "" && parseFloat(currentSel) === parseFloat(pVal)) ? " active" : "";
+              h += '<button class="preset-btn' + btnActiveClass + '" data-val="' + pVal + '" onclick="selectPresetValue(\'' + eid + '\', ' + pVal + ', \'' + escapeHtml(unit) + '\')">' + displayVal + '</button>';
             }
             h += '</div>';
           }
 
           // Hidden input to hold current selected value so confirmInputNumber works out of the box
-          h += '<input type="hidden" id="slider_' + cleanEid + '" value="">';
+          h += '<input type="hidden" id="slider_' + cleanEid + '" value="' + escapeHtml(currentSel) + '">';
 
           // Keypad & Confirm Buttons Row
           h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
           h += '<button class="footer-btn" style="background:#f2f2f7; color:#007aff; border:none; padding:8px 12px; border-radius:10px; font-weight:700; font-size:13px; cursor:pointer; -webkit-flex:1; flex:1; margin-right:4px;" onclick="openKeypad(\'' + eid + '\')">⌨️ Enter Value</button>';
-          h += '<button id="confirm_btn_' + cleanEid + '" class="confirm-btn" style="background:#007aff; color:#ffffff; border:none; padding:8px 12px; border-radius:10px; font-weight:700; font-size:13px; margin:0 0 0 4px; -webkit-flex:1; flex:1; opacity:0.4; cursor:not-allowed;" disabled onclick="confirmInputNumber(\'' + eid + '\')">Confirm</button>';
+          
+          if (currentSel !== "") {
+            h += '<button id="confirm_btn_' + cleanEid + '" class="confirm-btn" style="background:#007aff; color:#ffffff; border:none; padding:8px 12px; border-radius:10px; font-weight:700; font-size:13px; margin:0 0 0 4px; -webkit-flex:1; flex:1; cursor:pointer;" onclick="confirmInputNumber(\'' + eid + '\')">Confirm</button>';
+          } else {
+            h += '<button id="confirm_btn_' + cleanEid + '" class="confirm-btn" style="background:#007aff; color:#ffffff; border:none; padding:8px 12px; border-radius:10px; font-weight:700; font-size:13px; margin:0 0 0 4px; -webkit-flex:1; flex:1; opacity:0.4; cursor:not-allowed;" disabled onclick="confirmInputNumber(\'' + eid + '\')">Confirm</button>';
+          }
           h += '</div>';
 
           h += '</div>';
@@ -3972,12 +3999,35 @@
         }
         updateInputNumberDisplay(entityId, val, unit);
 
-        // Enable the confirm button
+        // Track pending selection
+        selectedPresetValues[entityId] = val;
+
+        // Reset & schedule 3-minute auto-expiry timer (180,000 ms)
+        if (unconfirmedTimers[entityId]) {
+          clearTimeout(unconfirmedTimers[entityId]);
+        }
+        unconfirmedTimers[entityId] = setTimeout(function () {
+          delete selectedPresetValues[entityId];
+          delete unconfirmedTimers[entityId];
+          if (lastStatesCache.length > 0) {
+            renderDashboard(lastStatesCache);
+          }
+        }, 180000);
+
+        // Enable the individual card confirm button
         var confirmBtn = document.getElementById("confirm_btn_" + cleanEid);
         if (confirmBtn) {
           confirmBtn.disabled = false;
-          confirmBtn.style.opacity = "";
+          confirmBtn.style.opacity = "1";
           confirmBtn.style.cursor = "pointer";
+        }
+
+        // Enable top "Confirm All" button if present
+        var confirmAllBtn = document.querySelector(".confirm-all-btn");
+        if (confirmAllBtn) {
+          confirmAllBtn.disabled = false;
+          confirmAllBtn.style.opacity = "1";
+          confirmAllBtn.style.cursor = "pointer";
         }
 
         // Update active states visually
@@ -4196,14 +4246,83 @@
       window.confirmInputNumber = function (entityId) {
         var cleanEid = entityId.replace(/\./g, "_");
         var slider = document.getElementById("slider_" + cleanEid);
-        if (slider) {
+        if (slider && slider.value !== "") {
           confirmInputNumberAction(entityId, slider.value);
         }
       };
 
       function confirmInputNumberAction(entityId, val) {
+        if (unconfirmedTimers[entityId]) {
+          clearTimeout(unconfirmedTimers[entityId]);
+          delete unconfirmedTimers[entityId];
+        }
+        delete selectedPresetValues[entityId];
         setInputNumber(entityId, val);
       }
+
+      window.confirmAllLogs = function () {
+        var keysToConfirm = [];
+        for (var k in selectedPresetValues) {
+          if (selectedPresetValues.hasOwnProperty(k) && selectedPresetValues[k] !== null && selectedPresetValues[k] !== "") {
+            keysToConfirm.push(k);
+          }
+        }
+
+        if (keysToConfirm.length === 0) {
+          showToast("No chemical values selected to confirm", true);
+          return;
+        }
+
+        showToast("Logging " + keysToConfirm.length + " chemical values...");
+
+        var completedCount = 0;
+        var totalCount = keysToConfirm.length;
+
+        for (var i = 0; i < keysToConfirm.length; i++) {
+          (function (cardEntity) {
+            var val = selectedPresetValues[cardEntity];
+            
+            if (unconfirmedTimers[cardEntity]) {
+              clearTimeout(unconfirmedTimers[cardEntity]);
+              delete unconfirmedTimers[cardEntity];
+            }
+            delete selectedPresetValues[cardEntity];
+
+            haRequest("POST", "/api/services/input_number/set_value", {
+              entity_id: cardEntity,
+              value: parseFloat(val)
+            }, function (err) {
+              completedCount++;
+              delete sensorHistory[cardEntity];
+
+              // Optimistically turn on chemicals checked today helper switch
+              haRequest("POST", "/api/services/input_boolean/turn_on", {
+                entity_id: "input_boolean.chemicals_checked_today"
+              }, function () { });
+
+              // Turn on chlorine_logged_since_changing if updating hot tub free chlorine
+              var lowerEid = cardEntity.toLowerCase();
+              var isTub = (lowerEid.indexOf("hot_tub") !== -1 || lowerEid.indexOf("hottub") !== -1 || lowerEid.indexOf("spa") !== -1 || lowerEid.indexOf("tub") !== -1);
+              var isFC = (lowerEid.indexOf("free_chlorine") !== -1 || lowerEid.indexOf("fc") !== -1 || (lowerEid.indexOf("chlorine") !== -1 && lowerEid.indexOf("total") === -1));
+              if (isTub && isFC) {
+                haRequest("POST", "/api/services/input_boolean/turn_on", {
+                  entity_id: "input_boolean.chlorine_logged_since_changing"
+                }, function () { });
+              }
+
+              if (completedCount === totalCount) {
+                showToast("Logged " + completedCount + " chemical values successfully!");
+                chemicalsCheckedToday = true;
+                try {
+                  var todayStr = new Date().toISOString().split('T')[0];
+                  localStorage.setItem("ha_chem_checked_date", todayStr);
+                } catch (e) { }
+                setTimeout(refreshAll, 500);
+              }
+            });
+          })(keysToConfirm[i]);
+        }
+      };
 
       window.toggleTheme = function () {
         var isCurrentlyDark = document.body.classList.contains("dark-theme");
