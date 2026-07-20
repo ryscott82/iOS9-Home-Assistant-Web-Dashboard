@@ -5139,96 +5139,109 @@
           }
         }
 
-        if (!targetEid) {
-          maPlaylistsLoading = false;
-          maPlaylistsError = "No speaker selected or available to browse media.";
-          if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
-          return;
+        // Direct Music Assistant WebSocket commands
+        var massCommands = [
+          { type: "mass/music/playlists", favorite: true },
+          { type: "mass/playlists" },
+          { type: "mass/api", command: "music/playlists" },
+          { type: "mass/favorites", media_type: "playlist" },
+          { type: "mass/get_playlists" }
+        ];
+
+        function tryMassCommand(index) {
+          if (index >= massCommands.length) {
+            browseHaMediaRoot();
+            return;
+          }
+
+          var cmd = massCommands[index];
+          queryHAWebSocket(cmd.type, cmd, function (err, res) {
+            if (!err && res) {
+              var rawList = Array.isArray(res) ? res : (res.items || res.result || res.children || res.playlists || []);
+              if (rawList && rawList.length > 0) {
+                maPlaylistsLoading = false;
+                maPlaylists = rawList.map(function (item) {
+                  var pTitle = item.name || item.title || "Playlist";
+                  var pId = item.uri || item.item_id || item.media_content_id || item.playlist_id || pTitle;
+                  var pImg = item.image_url || item.image || item.thumbnail || (item.metadata && item.metadata.images ? item.metadata.images[0] : "");
+                  return {
+                    title: pTitle,
+                    media_content_id: pId,
+                    thumbnail: pImg
+                  };
+                });
+                if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
+                return;
+              }
+            }
+            tryMassCommand(index + 1);
+          });
         }
 
-        // Helper to fetch playlists from a specific browse path
-        function fetchPlaylistsFromPath(browsePath, depth) {
-          depth = depth || 0;
+        function browseHaMediaRoot() {
+          if (!targetEid) {
+            maPlaylistsLoading = false;
+            maPlaylistsError = "No speaker selected to browse media.";
+            if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
+            return;
+          }
+
           queryHAWebSocket("media_player/browse_media", {
-            entity_id: targetEid,
-            media_content_id: browsePath,
-            media_content_type: "library"
-          }, function (err, res) {
+            entity_id: targetEid
+          }, function (err, rootResult) {
             if (err) {
               maPlaylistsLoading = false;
-              maPlaylistsError = "Failed browsing media: " + err;
+              maPlaylistsError = "Could not load Music Assistant playlists: " + err;
               if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
               return;
             }
 
-            var items = (res && res.children) ? res.children : [];
-            
-            // If items contains subfolders like "Playlists" or "Favorites", navigate into them (max depth 2)
-            var playlistSubfolder = null;
-            if (depth < 2) {
-              for (var k = 0; k < items.length; k++) {
-                var itTitle = (items[k].title || "").toLowerCase();
-                if (itTitle.indexOf("playlist") !== -1 || itTitle.indexOf("favorite") !== -1) {
-                  playlistSubfolder = items[k].media_content_id;
-                  break;
-                }
+            var rootChildren = (rootResult && rootResult.children) ? rootResult.children : [];
+            var maSourceId = "";
+            var fallbackPath = "";
+
+            for (var c = 0; c < rootChildren.length; c++) {
+              var rItem = rootChildren[c];
+              var rCid = (rItem.media_content_id || "").toLowerCase();
+              var rTitle = (rItem.title || "").toLowerCase();
+
+              if (rCid.indexOf("mass") !== -1 || rCid.indexOf("music_assistant") !== -1 || rTitle.indexOf("music assistant") !== -1) {
+                maSourceId = rItem.media_content_id;
+                break;
+              }
+              if (rTitle.indexOf("playlist") !== -1 || rTitle.indexOf("favorite") !== -1) {
+                if (!fallbackPath) fallbackPath = rItem.media_content_id;
               }
             }
 
-            if (playlistSubfolder && playlistSubfolder !== browsePath) {
-              fetchPlaylistsFromPath(playlistSubfolder, depth + 1);
+            var targetPath = maSourceId || fallbackPath;
+            if (targetPath) {
+              queryHAWebSocket("media_player/browse_media", {
+                entity_id: targetEid,
+                media_content_id: targetPath,
+                media_content_type: "library"
+              }, function (err2, res2) {
+                maPlaylistsLoading = false;
+                if (err2) {
+                  maPlaylistsError = err2;
+                } else {
+                  maPlaylists = (res2 && res2.children) ? res2.children : [];
+                }
+                if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
+              });
+            } else if (rootChildren.length > 0) {
+              maPlaylistsLoading = false;
+              maPlaylists = rootChildren;
+              if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
             } else {
               maPlaylistsLoading = false;
-              maPlaylists = items;
+              maPlaylistsError = "Music Assistant media source not found on Home Assistant.";
               if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
             }
           });
         }
 
-        // Step 1: Browse Root Media Browser for target speaker (omitting media_content_id)
-        queryHAWebSocket("media_player/browse_media", {
-          entity_id: targetEid
-        }, function (err, rootResult) {
-          if (err) {
-            maPlaylistsLoading = false;
-            maPlaylistsError = "Media Browser error on " + targetEid + ": " + err;
-            if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
-            return;
-          }
-
-          var rootChildren = (rootResult && rootResult.children) ? rootResult.children : [];
-          var maSourceId = "";
-          var fallbackPath = "";
-
-          for (var c = 0; c < rootChildren.length; c++) {
-            var rItem = rootChildren[c];
-            var rCid = (rItem.media_content_id || "").toLowerCase();
-            var rTitle = (rItem.title || "").toLowerCase();
-
-            if (rCid.indexOf("mass") !== -1 || rCid.indexOf("music_assistant") !== -1 || rTitle.indexOf("music assistant") !== -1) {
-              maSourceId = rItem.media_content_id;
-              break;
-            }
-            if (rTitle.indexOf("playlist") !== -1 || rTitle.indexOf("favorite") !== -1) {
-              if (!fallbackPath) fallbackPath = rItem.media_content_id;
-            }
-          }
-
-          if (maSourceId) {
-            fetchPlaylistsFromPath(maSourceId, 1);
-          } else if (fallbackPath) {
-            fetchPlaylistsFromPath(fallbackPath, 1);
-          } else if (rootChildren.length > 0) {
-            // Display top-level media sources directly if no specific playlist folder matched
-            maPlaylistsLoading = false;
-            maPlaylists = rootChildren;
-            if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
-          } else {
-            maPlaylistsLoading = false;
-            maPlaylistsError = "No media content found on " + friendlyName(entities[targetEid] || { entity_id: targetEid });
-            if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
-          }
-        });
+        tryMassCommand(0);
       };
 
       window.selectMaSpeaker = function (entityId) {
@@ -5247,21 +5260,32 @@
         var sName = speakerObj ? friendlyName(speakerObj) : "Speaker";
         showToast("Starting shuffled playback on " + sName + "...");
 
-        // 1. Shuffle Set
+        // 1. Enable Shuffle
         haRequest("POST", "/api/services/media_player/shuffle_set", {
           entity_id: selectedMaSpeaker,
           shuffle: true
-        }, function (err) {
-          if (err) console.error("Shuffle set error:", err);
-          
-          // 2. Play Media
-          haRequest("POST", "/api/services/media_player/play_media", {
+        }, function () {
+          // 2. Try Music Assistant service (mass.play_media) first
+          haRequest("POST", "/api/services/mass/play_media", {
             entity_id: selectedMaSpeaker,
-            media_content_id: playlistContentId,
-            media_content_type: "playlist"
-          }, function (err2) {
-            if (err2) {
-              showToast("Playback error: " + err2, true);
+            media_id: playlistContentId,
+            media_type: "playlist",
+            enqueue: "replace"
+          }, function (massErr) {
+            if (massErr) {
+              // Fallback to media_player.play_media
+              haRequest("POST", "/api/services/media_player/play_media", {
+                entity_id: selectedMaSpeaker,
+                media_content_id: playlistContentId,
+                media_content_type: "playlist"
+              }, function (err2) {
+                if (err2) {
+                  showToast("Playback error: " + err2, true);
+                } else {
+                  showToast("Playing playlist on " + sName);
+                  setTimeout(refreshAll, 1000);
+                }
+              });
             } else {
               showToast("Playing playlist on " + sName);
               setTimeout(refreshAll, 1000);
@@ -5370,8 +5394,11 @@
         
         // Playlist Header Row
         h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:15px; -webkit-flex-shrink:0; flex-shrink:0; width:100%;">';
-        h += '  <div class="music-title">Music Assistant Favorited Playlists</div>';
-        h += '  <button class="footer-btn" style="background:#f2f2f7; color:#007aff; border:none; padding:6px 12px; border-radius:8px; font-weight:700; font-size:11px; cursor:pointer; margin:0;" onclick="loadMaPlaylists()">🔄 Refresh</button>';
+        h += '  <div class="music-title">Music Assistant Playlists</div>';
+        h += '  <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
+        h += '    <button class="footer-btn" style="background:#f2f2f7; color:#007aff; border:none; padding:6px 12px; border-radius:8px; font-weight:700; font-size:11px; cursor:pointer; margin:0;" onclick="loadMaPlaylists()">🔄 Refresh</button>';
+        h += '    <a href="http://192.168.40.88:8095" target="_blank" class="footer-btn" style="background:#f2f2f7; color:#007aff; border:none; padding:6px 12px; border-radius:8px; font-weight:700; font-size:11px; text-decoration:none; display:inline-block; margin-left:8px;">↗️ Open Music Assistant App</a>';
+        h += '  </div>';
         h += '</div>';
 
         h += '<div style="-webkit-flex:1; flex:1; overflow-y:auto; box-sizing:border-box; width:100%;">';
