@@ -1689,7 +1689,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.1.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.1.1</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1976,6 +1976,16 @@
         var entityRequestId = -1;
         var areaRequestId = -1;
         var floorRequestId = -1;
+        var responsesReceived = 0;
+
+        // 1.5 second fallback timeout to bypass blocking spinner if requests hang
+        var fallbackTimeout = setTimeout(function () {
+          if (!registryLoaded) {
+            registryLoaded = true;
+            try { ws.close(); } catch (e) {}
+            refreshAll();
+          }
+        }, 1500);
 
         ws.onmessage = function (event) {
           var msg;
@@ -2005,62 +2015,69 @@
             }));
           }
           else if (msg.type === "auth_invalid") {
+            clearTimeout(fallbackTimeout);
             showToast("Auth failed", true);
             ws.close();
           }
-          else if (msg.type === "result" && msg.success) {
-            var res = msg.result || [];
-            if (msg.id === entityRequestId) {
-              allowedEntityIds = {};
-              entityAreaMap = {};
-              for (var i = 0; i < res.length; i++) {
-                var entry = res[i];
-                if (entry.area_id) {
-                  entityAreaMap[entry.entity_id] = entry.area_id;
-                }
-                var labels = entry.labels || [];
-                for (var j = 0; j < labels.length; j++) {
-                  if (labels[j] === "ipaddashboard") {
-                    allowedEntityIds[entry.entity_id] = true;
-                    break;
+          else if (msg.type === "result") {
+            if (msg.id === entityRequestId || msg.id === areaRequestId || msg.id === floorRequestId) {
+              responsesReceived++;
+              var res = msg.result || [];
+
+              if (msg.id === entityRequestId && msg.success) {
+                allowedEntityIds = {};
+                entityAreaMap = {};
+                for (var i = 0; i < res.length; i++) {
+                  var entry = res[i];
+                  if (entry.area_id) {
+                    entityAreaMap[entry.entity_id] = entry.area_id;
+                  }
+                  var labels = entry.labels || [];
+                  for (var j = 0; j < labels.length; j++) {
+                    if (labels[j] === "ipaddashboard") {
+                      allowedEntityIds[entry.entity_id] = true;
+                      break;
+                    }
                   }
                 }
-              }
-              entityRegistryDone = true;
-            } else if (msg.id === areaRequestId) {
-              areaFloorMap = {};
-              for (var i = 0; i < res.length; i++) {
-                var entry = res[i];
-                if (entry.area_id && entry.floor_id) {
-                  areaFloorMap[entry.area_id] = entry.floor_id;
+                entityRegistryDone = true;
+              } else if (msg.id === areaRequestId && msg.success) {
+                areaFloorMap = {};
+                for (var i = 0; i < res.length; i++) {
+                  var entry = res[i];
+                  if (entry.area_id && entry.floor_id) {
+                    areaFloorMap[entry.area_id] = entry.floor_id;
+                  }
                 }
-              }
-              areaRegistryDone = true;
-            } else if (msg.id === floorRequestId) {
-              floorNameMap = {};
-              for (var i = 0; i < res.length; i++) {
-                var entry = res[i];
-                if (entry.floor_id && entry.name) {
-                  floorNameMap[entry.floor_id] = entry.name;
+                areaRegistryDone = true;
+              } else if (msg.id === floorRequestId && msg.success) {
+                floorNameMap = {};
+                for (var i = 0; i < res.length; i++) {
+                  var entry = res[i];
+                  if (entry.floor_id && entry.name) {
+                    floorNameMap[entry.floor_id] = entry.name;
+                  }
                 }
+                floorRegistryDone = true;
               }
-              floorRegistryDone = true;
-            }
 
-            if (entityRegistryDone && areaRegistryDone && floorRegistryDone) {
-              registryLoaded = true;
-              var debugList = [];
-              for (var k in allowedEntityIds) {
-                if (allowedEntityIds.hasOwnProperty(k)) debugList.push(k);
+              if (responsesReceived === 3 || (msg.id === entityRequestId && !msg.success)) {
+                clearTimeout(fallbackTimeout);
+                registryLoaded = true;
+                var debugList = [];
+                for (var k in allowedEntityIds) {
+                  if (allowedEntityIds.hasOwnProperty(k)) debugList.push(k);
+                }
+                window._debugEntities = debugList;
+                ws.close();
+                refreshAll();
               }
-              window._debugEntities = debugList;
-              ws.close();
-              refreshAll();
             }
           }
         };
 
         ws.onerror = function () {
+          clearTimeout(fallbackTimeout);
           showToast("WebSocket connection failed", true);
         };
       }
@@ -2565,22 +2582,40 @@
           }
 
           // Sort non-media controls by floor
-          var floorGroups = {
-            "Upstairs": [],
-            "Main Floor": [],
-            "Basement": [],
-            "Outdoor": [],
-            "Other": []
-          };
+          var floorGroups = {};
 
           var allControls = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
           for (i = 0; i < allControls.length; i++) {
             var ctrl = allControls[i];
             var fl = getFloor(ctrl);
+            if (!floorGroups[fl]) {
+              floorGroups[fl] = [];
+            }
             floorGroups[fl].push(ctrl);
           }
 
-          var floorKeys = ["Upstairs", "Main Floor", "Basement", "Outdoor", "Other"];
+          var floorOrder = { "upstairs": 1, "second": 1, "2nd": 1, "loft": 1, "main": 2, "1st": 2, "first": 2, "basement": 3, "outdoor": 4, "patio": 4, "pool": 4, "other": 5 };
+          var floorKeys = [];
+          for (var k in floorGroups) {
+            if (floorGroups.hasOwnProperty(k)) {
+              floorKeys.push(k);
+            }
+          }
+          floorKeys.sort(function (a, b) {
+            var la = a.toLowerCase();
+            var lb = b.toLowerCase();
+            var valA = 99;
+            var valB = 99;
+            for (var prefix in floorOrder) {
+              if (la.indexOf(prefix) !== -1) { valA = floorOrder[prefix]; break; }
+            }
+            for (var prefix in floorOrder) {
+              if (lb.indexOf(prefix) !== -1) { valB = floorOrder[prefix]; break; }
+            }
+            if (valA !== valB) return valA - valB;
+            return a.localeCompare(b);
+          });
+
           for (var f = 0; f < floorKeys.length; f++) {
             var floorName = floorKeys[f];
             var floorEntities = floorGroups[floorName];
