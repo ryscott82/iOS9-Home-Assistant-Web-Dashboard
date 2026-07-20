@@ -1591,7 +1591,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.0.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.0.1</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1680,11 +1680,22 @@
         }
       }
 
+      var initialRefreshDone = false;
+
       // ======== INIT ========
       function init() {
         hideSetup();
         updateClock();
         setInterval(updateClock, 1000);
+        
+        // Schedule 2.5s fallback so initial load NEVER hangs on spinner even if WebSocket fails
+        setTimeout(function () {
+          if (!initialRefreshDone) {
+            initialRefreshDone = true;
+            refreshAll();
+          }
+        }, 2500);
+
         loadEntityRegistry();
         startMediaTickers();
       }
@@ -1697,6 +1708,10 @@
           ws = new WebSocket(wsUrl);
         } catch (e) {
           showToast("WebSocket failed: " + e, true);
+          if (!initialRefreshDone) {
+            initialRefreshDone = true;
+            refreshAll();
+          }
           return;
         }
         var msgId = 1;
@@ -1720,6 +1735,10 @@
           else if (msg.type === "auth_invalid") {
             showToast("Auth failed", true);
             ws.close();
+            if (!initialRefreshDone) {
+              initialRefreshDone = true;
+              refreshAll();
+            }
           }
           else if (msg.type === "result" && msg.success) {
             var entries = msg.result || [];
@@ -1740,12 +1759,21 @@
             }
             window._debugEntities = debugList;
             ws.close();
-            refreshAll();
+            if (!initialRefreshDone) {
+              initialRefreshDone = true;
+              refreshAll();
+            } else {
+              refreshAll();
+            }
           }
         };
 
         ws.onerror = function () {
           showToast("WebSocket connection failed", true);
+          if (!initialRefreshDone) {
+            initialRefreshDone = true;
+            refreshAll();
+          }
         };
       }
 
@@ -1855,6 +1883,10 @@
           if (err) {
             setStatus("error");
             showToast("Connection error: " + err, true);
+            var container = document.getElementById("entityContainer");
+            if (container && container.innerHTML.indexOf("loading-spinner") !== -1) {
+              container.innerHTML = '<div class="empty-state"><div class="empty-icon">&#9888;&#65039;</div><p>Unable to connect to Home Assistant (' + escapeHtml(String(err)) + ').<br>Retrying connection...</p></div>';
+            }
             refreshTimer = setTimeout(refreshAll, REFRESH_INTERVAL);
             return;
           }
@@ -1862,10 +1894,20 @@
           setStatus("connected");
           entities = {};
           var i;
-          for (i = 0; i < data.length; i++) {
-            entities[data[i].entity_id] = data[i];
+          if (data && data.length) {
+            for (i = 0; i < data.length; i++) {
+              entities[data[i].entity_id] = data[i];
+            }
           }
-          renderDashboard(data);
+          try {
+            renderDashboard(data || []);
+          } catch (renderErr) {
+            showToast("Render error: " + renderErr, true);
+            var container = document.getElementById("entityContainer");
+            if (container) {
+              container.innerHTML = '<div class="empty-state"><div class="empty-icon">&#9888;&#65039;</div><p>Render Error: ' + escapeHtml(String(renderErr)) + '</p></div>';
+            }
+          }
           refreshTimer = setTimeout(refreshAll, REFRESH_INTERVAL);
         });
       };
@@ -1955,7 +1997,8 @@
           eid = allStates[i].entity_id;
           domain = eid.split(".")[0];
 
-          if (!allowedEntityIds[eid] && domain !== "water_heater" && eid !== "input_boolean.chemicals_checked_today") continue;
+          var hasLabelFilter = (registryLoaded && allowedEntityIds && Object.keys(allowedEntityIds).length > 0);
+          if (hasLabelFilter && !allowedEntityIds[eid] && domain !== "water_heater" && eid !== "input_boolean.chemicals_checked_today") continue;
           if (eid === "input_boolean.chemicals_checked_today") continue;
 
           if (domain === "light") lights.push(allStates[i]);
@@ -2957,9 +3000,9 @@
           // Filter: only use values matching pool or hot tub context
           if (!isEntityForVolume(eid, name, volumeType)) continue;
 
-          // STRICT CHECK: only evaluate entities actually allowed on the dashboard
           var sDomain = eid.split(".")[0];
-          if (!allowedEntityIds[eid] && sDomain !== "water_heater") continue;
+          var hasLabelFilter = (registryLoaded && allowedEntityIds && Object.keys(allowedEntityIds).length > 0);
+          if (hasLabelFilter && !allowedEntityIds[eid] && sDomain !== "water_heater") continue;
 
           if (eid.indexOf("ph") !== -1 || lowerName.indexOf("ph") !== -1) phVal = val;
           else if (eid.indexOf("orp") !== -1 || lowerName.indexOf("orp") !== -1) orpVal = val;
