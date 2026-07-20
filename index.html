@@ -316,6 +316,13 @@
       fill: #ff453a;
     }
 
+    .tile.active-ocean .tile-icon svg {
+      fill: #00a2ed;
+    }
+    body.dark-theme .tile.active-ocean .tile-icon svg {
+      fill: #4fc3f7;
+    }
+
     /* ======== SECTION ======== */
     .section {
       margin-bottom: 18px;
@@ -329,6 +336,29 @@
       margin-bottom: 8px;
     }
 
+    /* ======== FLOOR TWO-COLUMN GRID ======== */
+    .floor-columns-container {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+      margin: 0 -10px;
+    }
+
+    .floor-column {
+      -webkit-flex: 0 0 100%;
+      flex: 0 0 100%;
+      padding: 0 10px;
+      box-sizing: border-box;
+    }
+
+    @media (min-width: 768px) {
+      .floor-column {
+        -webkit-flex: 0 0 50%;
+        flex: 0 0 50%;
+      }
+    }
+
     /* ======== TILE GRID ======== */
     .tile-grid {
       display: -webkit-flex;
@@ -340,17 +370,23 @@
 
     /* ======== TILE (base) ======== */
     .tile {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
       -webkit-flex: 0 0 calc(50% - 10px);
       flex: 0 0 calc(50% - 10px);
       margin: 5px;
       background: #ffffff;
-      border-radius: 18px;
-      padding: 12px;
-      min-height: 88px;
+      border-radius: 12px;
+      padding: 8px 12px;
+      min-height: 48px;
       position: relative;
-      -webkit-transition: background 0.2s;
-      transition: background 0.2s;
+      border-left: 4px solid transparent;
+      -webkit-transition: all 0.2s;
+      transition: all 0.2s;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
     }
 
     @media (min-width: 768px) {
@@ -360,29 +396,40 @@
       }
     }
 
+    /* Floor column specific tile overrides (full width inside the column card) */
+    .floor-column .tile {
+      -webkit-flex: 0 0 calc(100% - 10px) !important;
+      flex: 0 0 calc(100% - 10px) !important;
+    }
+
     .tile.active {
-      background: rgba(255, 214, 10, 0.08);
-      box-shadow: 0 0 0 2px #ffcc00;
+      background: rgba(255, 214, 10, 0.06) !important;
+      border-left-color: #ffcc00;
     }
 
     .tile.active-green {
-      background: rgba(52, 199, 89, 0.06);
-      box-shadow: 0 0 0 2px #34c759;
+      background: rgba(52, 199, 89, 0.04) !important;
+      border-left-color: #34c759;
     }
 
     .tile.active-blue {
-      background: rgba(0, 122, 255, 0.05);
-      box-shadow: 0 0 0 2px #007aff;
+      background: rgba(0, 122, 255, 0.04) !important;
+      border-left-color: #007aff;
     }
 
     .tile.active-orange {
-      background: rgba(255, 159, 10, 0.06);
-      box-shadow: 0 0 0 2px #ff9f0a;
+      background: rgba(255, 159, 10, 0.04) !important;
+      border-left-color: #ff9f0a;
     }
 
     .tile.active-red {
-      background: rgba(255, 59, 48, 0.06);
-      box-shadow: 0 0 0 2px #ff3b30;
+      background: rgba(255, 59, 48, 0.04) !important;
+      border-left-color: #ff3b30;
+    }
+
+    .tile.active-ocean {
+      background: rgba(79, 195, 247, 0.06) !important;
+      border-left-color: #00a2ed;
     }
 
     /* Alert States (Light Theme) */
@@ -1294,28 +1341,33 @@
     }
 
     body.dark-theme .tile.active {
-      background: rgba(255, 214, 10, 0.12);
-      box-shadow: 0 0 0 2px #ffd60a;
+      background: rgba(255, 214, 10, 0.1) !important;
+      border-left-color: #ffd60a;
     }
 
     body.dark-theme .tile.active-green {
-      background: rgba(48, 209, 88, 0.12);
-      box-shadow: 0 0 0 2px #30d158;
+      background: rgba(48, 209, 88, 0.08) !important;
+      border-left-color: #30d158;
     }
 
     body.dark-theme .tile.active-blue {
-      background: rgba(10, 132, 255, 0.12);
-      box-shadow: 0 0 0 2px #0a84ff;
+      background: rgba(10, 132, 255, 0.08) !important;
+      border-left-color: #0a84ff;
     }
 
     body.dark-theme .tile.active-orange {
-      background: rgba(255, 159, 10, 0.12);
-      box-shadow: 0 0 0 2px #ff9f0a;
+      background: rgba(255, 159, 10, 0.08) !important;
+      border-left-color: #ff9f0a;
     }
 
     body.dark-theme .tile.active-red {
-      background: rgba(255, 69, 58, 0.12);
-      box-shadow: 0 0 0 2px #ff453a;
+      background: rgba(255, 69, 58, 0.08) !important;
+      border-left-color: #ff453a;
+    }
+
+    body.dark-theme .tile.active-ocean {
+      background: rgba(79, 195, 247, 0.1) !important;
+      border-left-color: #4fc3f7;
     }
 
     /* Alert States (Dark Theme) */
@@ -1687,7 +1739,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.0.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.1.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1710,6 +1762,9 @@
       var refreshTimer = null;
       var entities = {};
       var allowedEntityIds = {};
+      var entityRegistry = {};
+      var areaRegistry = {};
+      var floorRegistry = {};
       var registryLoaded = false;
       var sensorHistory = {};
       var bannerDismissed = false;
@@ -1790,6 +1845,12 @@
 
       function getFloor(entity) {
         if (!entity) return "Other";
+
+        // 1. Try actual Home Assistant floor mapping
+        var actualFloor = getActualFloor(entity.entity_id);
+        if (actualFloor) return actualFloor;
+
+        // 2. Fall back to name-based classification
         var name = (friendlyName(entity) || "").toLowerCase();
         var eid = (entity.entity_id || "").toLowerCase();
 
@@ -1814,6 +1875,18 @@
           return "Outdoor";
         }
         return "Main Floor";
+      }
+
+      function getActualFloor(entityId) {
+        var areaId = entityRegistry[entityId];
+        if (areaId) {
+          var floorId = areaRegistry[areaId];
+          if (floorId) {
+            var floorName = floorRegistry[floorId];
+            if (floorName) return floorName;
+          }
+        }
+        return null;
       }
 
       window.handleCardClick = function (event, entityId, domain) {
@@ -1849,7 +1922,19 @@
         }
       };
 
-      function getActiveSvgColor(domain, state) {
+      function isOceanDevice(entityId, name) {
+        var lowerId = (entityId || "").toLowerCase();
+        var lowerName = (name || "").toLowerCase();
+        return (lowerId.indexOf("pool") !== -1 || lowerName.indexOf("pool") !== -1 ||
+                lowerId.indexOf("hottub") !== -1 || lowerName.indexOf("hottub") !== -1 ||
+                lowerId.indexOf("hot_tub") !== -1 || lowerName.indexOf("hot tub") !== -1 ||
+                lowerId.indexOf("spa") !== -1 || lowerName.indexOf("spa") !== -1);
+      }
+
+      function getActiveSvgColor(domain, state, entityId, name) {
+        if (entityId && isOceanDevice(entityId, name)) {
+          return "#00a2ed";
+        }
         if (domain === "light") return "#ffcc00";
         if (domain === "lock" && state === "locked") return "#34c759";
         if (domain === "climate") {
@@ -1890,21 +1975,19 @@
 
         var activeClass = "";
         if (isOn) {
-          if (domain === "lock") activeClass = " active-green";
+          if (isOceanDevice(entity.entity_id, friendlyName(entity))) activeClass = " active-ocean";
+          else if (domain === "lock") activeClass = " active-green";
           else if (domain === "climate" && state === "heat") activeClass = " active-orange";
           else if (domain === "climate" && state === "cool") activeClass = " active-blue";
           else activeClass = " active-blue";
         }
 
-        var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, state) : "");
+        var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, state, entity.entity_id, friendlyName(entity)) : "");
 
-        var h = '<div class="tile overview-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')">';
-        h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
-        h += '</div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
-        h += '<div class="tile-state">' + state + '</div>';
+        var h = '<div class="tile overview-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box;">';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '<div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + state + '</span></div>';
         h += '</div>';
         h += '</div>';
         return h;
@@ -1954,7 +2037,6 @@
           showToast("WebSocket failed: " + e, true);
           return;
         }
-        var msgId = 1;
 
         ws.onmessage = function (event) {
           var msg;
@@ -1968,7 +2050,7 @@
           }
           else if (msg.type === "auth_ok") {
             ws.send(JSON.stringify({
-              id: msgId++,
+              id: 1,
               type: "config/entity_registry/list"
             }));
           }
@@ -1977,25 +2059,60 @@
             ws.close();
           }
           else if (msg.type === "result" && msg.success) {
-            var entries = msg.result || [];
-            allowedEntityIds = {};
-            for (var i = 0; i < entries.length; i++) {
-              var labels = entries[i].labels || [];
-              for (var j = 0; j < labels.length; j++) {
-                if (labels[j] === "ipaddashboard") {
-                  allowedEntityIds[entries[i].entity_id] = true;
-                  break;
+            if (msg.id === 1) {
+              var entries = msg.result || [];
+              allowedEntityIds = {};
+              entityRegistry = {};
+              for (var i = 0; i < entries.length; i++) {
+                var entry = entries[i];
+                if (entry.area_id) {
+                  entityRegistry[entry.entity_id] = entry.area_id;
+                }
+                var labels = entry.labels || [];
+                for (var j = 0; j < labels.length; j++) {
+                  if (labels[j] === "ipaddashboard") {
+                    allowedEntityIds[entry.entity_id] = true;
+                    break;
+                  }
                 }
               }
+              // Fetch Areas next
+              ws.send(JSON.stringify({
+                id: 2,
+                type: "config/area_registry/list"
+              }));
             }
-            registryLoaded = true;
-            var debugList = [];
-            for (var k in allowedEntityIds) {
-              if (allowedEntityIds.hasOwnProperty(k)) debugList.push(k);
+            else if (msg.id === 2) {
+              var entries = msg.result || [];
+              areaRegistry = {};
+              for (var i = 0; i < entries.length; i++) {
+                var entry = entries[i];
+                if (entry.floor_id) {
+                  areaRegistry[entry.id] = entry.floor_id;
+                }
+              }
+              // Fetch Floors next
+              ws.send(JSON.stringify({
+                id: 3,
+                type: "config/floor_registry/list"
+              }));
             }
-            window._debugEntities = debugList;
-            ws.close();
-            refreshAll();
+            else if (msg.id === 3) {
+              var entries = msg.result || [];
+              floorRegistry = {};
+              for (var i = 0; i < entries.length; i++) {
+                var entry = entries[i];
+                floorRegistry[entry.floor_id] = entry.name;
+              }
+              registryLoaded = true;
+              var debugList = [];
+              for (var k in allowedEntityIds) {
+                if (allowedEntityIds.hasOwnProperty(k)) debugList.push(k);
+              }
+              window._debugEntities = debugList;
+              ws.close();
+              refreshAll();
+            }
           }
         };
 
@@ -2504,59 +2621,101 @@
           }
 
           // Sort non-media controls by floor
-          var floorGroups = {
-            "Upstairs": [],
-            "Main Floor": [],
-            "Basement": [],
-            "Outdoor": [],
-            "Other": []
-          };
+          var floorGroups = {};
+          for (var fid in floorRegistry) {
+            if (floorRegistry.hasOwnProperty(fid)) {
+              floorGroups[floorRegistry[fid]] = [];
+            }
+          }
+          var defaultKeys = ["Upstairs", "Main Floor", "Basement", "Outdoor", "Other"];
+          for (var dk = 0; dk < defaultKeys.length; dk++) {
+            if (!floorGroups[defaultKeys[dk]]) {
+              floorGroups[defaultKeys[dk]] = [];
+            }
+          }
 
           var allControls = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
           for (i = 0; i < allControls.length; i++) {
             var ctrl = allControls[i];
             var fl = getFloor(ctrl);
+            if (!floorGroups[fl]) {
+              floorGroups[fl] = [];
+            }
             floorGroups[fl].push(ctrl);
           }
 
-          var floorKeys = ["Upstairs", "Main Floor", "Basement", "Outdoor", "Other"];
-          for (var f = 0; f < floorKeys.length; f++) {
-            var floorName = floorKeys[f];
-            var floorEntities = floorGroups[floorName];
-            if (floorEntities.length > 0) {
-              // Sort entities within the floor (lights first, then switches/fans, then others)
-              floorEntities.sort(function (a, b) {
-                var domA = a.entity_id.split(".")[0];
-                var domB = b.entity_id.split(".")[0];
-                var order = { "light": 1, "switch": 2, "input_boolean": 2, "fan": 2, "climate": 3, "cover": 4, "lock": 5, "water_heater": 6, "input_select": 7 };
-                var valA = order[domA] || 99;
-                var valB = order[domB] || 99;
-                return valA - valB;
-              });
-
-              html += '<div class="section"><div class="section-title">' + floorName + '</div>';
-              html += '<div class="tile-grid">';
-              for (var j = 0; j < floorEntities.length; j++) {
-                var ent = floorEntities[j];
-                var dom = ent.entity_id.split(".")[0];
-                if (dom === "light") {
-                  html += renderLight(ent);
-                } else if (dom === "climate") {
-                  html += renderClimate(ent);
-                } else if (dom === "cover") {
-                  html += renderCover(ent);
-                } else if (dom === "lock") {
-                  html += renderLock(ent);
-                } else if (dom === "water_heater") {
-                  html += renderWaterHeater(ent);
-                } else if (dom === "input_select") {
-                  html += renderInputSelect(ent);
-                } else {
-                  html += renderToggleEntity(ent, dom);
-                }
-              }
-              html += '</div></div>';
+          var activeFloorNames = [];
+          for (var dk = 0; dk < defaultKeys.length; dk++) {
+            var fn = defaultKeys[dk];
+            if (floorGroups[fn] && floorGroups[fn].length > 0) {
+              activeFloorNames.push(fn);
             }
+          }
+          var otherFloors = [];
+          for (var fn in floorGroups) {
+            if (floorGroups.hasOwnProperty(fn) && floorGroups[fn].length > 0) {
+              if (defaultKeys.indexOf(fn) === -1) {
+                otherFloors.push(fn);
+              }
+            }
+          }
+          otherFloors.sort();
+          activeFloorNames = activeFloorNames.concat(otherFloors);
+
+          function renderFloorGroupHTML(floorName, floorEntities) {
+            floorEntities.sort(function (a, b) {
+              var domA = a.entity_id.split(".")[0];
+              var domB = b.entity_id.split(".")[0];
+              var order = { "light": 1, "switch": 2, "input_boolean": 2, "fan": 2, "climate": 3, "cover": 4, "lock": 5, "water_heater": 6, "input_select": 7 };
+              var valA = order[domA] || 99;
+              var valB = order[domB] || 99;
+              return valA - valB;
+            });
+
+            var fHtml = '<div class="section"><div class="section-title">' + floorName + '</div>';
+            fHtml += '<div class="tile-grid">';
+            for (var j = 0; j < floorEntities.length; j++) {
+              var ent = floorEntities[j];
+              var dom = ent.entity_id.split(".")[0];
+              if (dom === "light") {
+                fHtml += renderLight(ent);
+              } else if (dom === "climate") {
+                fHtml += renderClimate(ent);
+              } else if (dom === "cover") {
+                fHtml += renderCover(ent);
+              } else if (dom === "lock") {
+                fHtml += renderLock(ent);
+              } else if (dom === "water_heater") {
+                fHtml += renderWaterHeater(ent);
+              } else if (dom === "input_select") {
+                fHtml += renderInputSelect(ent);
+              } else {
+                fHtml += renderToggleEntity(ent, dom);
+              }
+            }
+            fHtml += '</div></div>';
+            return fHtml;
+          }
+
+          if (activeFloorNames.length > 0) {
+            html += '<div class="floor-columns-container">';
+            var mid = Math.ceil(activeFloorNames.length / 2);
+
+            // Left Column
+            html += '<div class="floor-column">';
+            for (var f = 0; f < mid; f++) {
+              html += renderFloorGroupHTML(activeFloorNames[f], floorGroups[activeFloorNames[f]]);
+            }
+            html += '</div>';
+
+            // Right Column
+            html += '<div class="floor-column">';
+            for (var f = mid; f < activeFloorNames.length; f++) {
+              html += renderFloorGroupHTML(activeFloorNames[f], floorGroups[activeFloorNames[f]]);
+            }
+            html += '</div>';
+
+            html += '</div>';
           }
         } else {
           // TAB: CHEMICALS & SENSORS
@@ -2701,60 +2860,70 @@
           colorModes.indexOf("rgbww") !== -1 ||
           (attrs.supported_features && (attrs.supported_features & 16));
 
-        var tileClass = "tile" + (hasEffects || hasRgb ? " tile-full" : "") + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
-        var icon = getSvg("light", isOn ? "#ffcc00" : "");
-        
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')">';
-        h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
-        if (!unavailable) {
-          h += '<div class="toggle-switch">';
-          h += '<input type="checkbox" id="t_' + eid + '" ' + (isOn ? 'checked' : '') + ' onchange="toggleEntity(\'' + eid + '\', \'light\')">';
-          h += '<label class="toggle-slider" for="t_' + eid + '"></label>';
-          h += '</div>';
-        }
-        h += '</div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
-        var stateText = escapeHtml(entity.state);
-        if (isOn && currentEffect) stateText += ' &middot; ' + escapeHtml(currentEffect);
-        else if (isOn && pct > 0) stateText += ' &middot; ' + pct + '%';
-        h += '<div class="tile-state">' + stateText + '</div>';
-        h += '</div>';
-
-        if (hasBrightness && isOn && !unavailable) {
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:16px; margin-top:8px;">';
-          h += '<button class="footer-btn" style="background:#f2f2f7; color:#1c1c1e; width:34px; height:34px; border-radius:50%; padding:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin:0;" onclick="adjustBrightness(\'' + eid + '\', -25.5)">';
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%; font-weight:700; font-size:16px;">&minus;</div>';
-          h += '</button>';
-          h += '<span style="font-size:11px; font-weight:700; color:#8e8e93; min-width:32px; text-align:center;">' + pct + '%</span>';
-          h += '<button class="footer-btn" style="background:#f2f2f7; color:#1c1c1e; width:34px; height:34px; border-radius:50%; padding:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin:0;" onclick="adjustBrightness(\'' + eid + '\', 25.5)">';
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%; font-weight:700; font-size:16px;">&plus;</div>';
-          h += '</button>';
-          h += '</div>';
-        }
-
-        if (hasRgb && isOn && !unavailable) {
-          h += '<div style="margin-top:10px; border-top:1px solid rgba(128,128,128,0.15); padding-top:8px;">';
-          h += '<div style="font-size:10px; font-weight:700; color:#8e8e93; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Color Presets</div>';
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; margin:0 -2px;">';
-          h += '<button class="footer-btn" style="background:#ffffff; color:#1c1c1e; border:1px solid rgba(0,0,0,0.15); padding:5px 8px; border-radius:7px; font-weight:700; font-size:10.5px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 255, 255, 255)">Bright</button>';
-          h += '<button class="footer-btn" style="background:#ffe8c6; color:#8a5300; border:none; padding:5px 8px; border-radius:7px; font-weight:700; font-size:10.5px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 255, 214, 170)">Warm</button>';
-          h += '<button class="footer-btn" style="background:#ff3b30; color:#ffffff; border:none; padding:5px 8px; border-radius:7px; font-weight:700; font-size:10.5px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 255, 59, 48)">Red</button>';
-          h += '<button class="footer-btn" style="background:#007aff; color:#ffffff; border:none; padding:5px 8px; border-radius:7px; font-weight:700; font-size:10.5px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 0, 122, 255)">Blue</button>';
-          h += '</div></div>';
-        }
-
-        if (hasEffects && !unavailable) {
-          h += '<div class="effect-section">';
-          h += '<div class="effect-label">Effect</div>';
-          h += '<div class="effect-grid">';
-          for (var e = 0; e < effectList.length; e++) {
-            var eff = effectList[e];
-            var effActive = (eff === currentEffect && isOn) ? " active" : "";
-            h += '<button class="effect-btn' + effActive + '" onclick="setEffect(\'' + eid + '\', \'' + escapeHtml(eff.replace(/'/g, "\\'")) + '\')">' + escapeHtml(eff) + '</button>';
+        var tileClass = "tile" + (hasEffects || hasRgb || hasBrightness ? " tile-full" : "");
+        if (isOn) {
+          if (isOceanDevice(entity.entity_id, friendlyName(entity))) {
+            tileClass += " active-ocean";
+          } else {
+            tileClass += " active";
           }
-          h += '</div>';
+        }
+        if (unavailable) tileClass += " unavailable";
+
+        var iconColor = isOn ? getActiveSvgColor("light", entity.state, entity.entity_id, friendlyName(entity)) : "";
+        var icon = getSvg("light", iconColor);
+        
+        var stateText = escapeHtml(entity.state);
+        if (isOn && currentEffect) stateText += ' &bull; ' + escapeHtml(currentEffect);
+        else if (isOn && pct > 0) stateText += ' &bull; ' + pct + '%';
+
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-justify-content:center; justify-content:center; padding:8px 12px; box-sizing:border-box;">';
+        
+        // Row 1: Side-by-side flex layout
+        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
+        h += '  <div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '  <div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '    <div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + stateText + '</span></div>';
+        h += '  </div>';
+        h += '</div>';
+
+        // Row 2: Secondary controls
+        if (isOn && !unavailable && (hasBrightness || hasRgb || hasEffects)) {
+          h += '<div class="tile-details" style="width:100%; margin-top:6px; padding-top:6px; border-top:1px solid rgba(128,128,128,0.15);">';
+          
+          if (hasBrightness) {
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:16px;">';
+            h += '<button class="footer-btn" style="background:#f2f2f7; color:#1c1c1e; width:30px; height:30px; border-radius:50%; padding:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin:0;" onclick="adjustBrightness(\'' + eid + '\', -25.5)">';
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%; font-weight:700; font-size:14px;">&minus;</div>';
+            h += '</button>';
+            h += '<span style="font-size:11px; font-weight:700; color:#8e8e93; min-width:32px; text-align:center;">' + pct + '%</span>';
+            h += '<button class="footer-btn" style="background:#f2f2f7; color:#1c1c1e; width:30px; height:30px; border-radius:50%; padding:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin:0;" onclick="adjustBrightness(\'' + eid + '\', 25.5)">';
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%; font-weight:700; font-size:14px;">&plus;</div>';
+            h += '</button>';
+            h += '</div>';
+          }
+
+          if (hasRgb) {
+            h += '<div style="margin-top:6px; display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; margin-left:-2px; margin-right:-2px;">';
+            h += '<button class="footer-btn" style="background:#ffffff; color:#1c1c1e; border:1px solid rgba(0,0,0,0.15); padding:4px 6px; border-radius:6px; font-weight:700; font-size:10px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 255, 255, 255)">Bright</button>';
+            h += '<button class="footer-btn" style="background:#ffe8c6; color:#8a5300; border:none; padding:4px 6px; border-radius:6px; font-weight:700; font-size:10px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 255, 214, 170)">Warm</button>';
+            h += '<button class="footer-btn" style="background:#ff3b30; color:#ffffff; border:none; padding:4px 6px; border-radius:6px; font-weight:700; font-size:10px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 255, 59, 48)">Red</button>';
+            h += '<button class="footer-btn" style="background:#007aff; color:#ffffff; border:none; padding:4px 6px; border-radius:6px; font-weight:700; font-size:10px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 0, 122, 255)">Blue</button>';
+            h += '</div>';
+          }
+
+          if (hasEffects) {
+            h += '<div class="effect-section" style="margin-top:6px; border-top:none; padding-top:0;">';
+            h += '<div class="effect-grid" style="margin-top:4px;">';
+            for (var e = 0; e < effectList.length; e++) {
+              var eff = effectList[e];
+              var effActive = (eff === currentEffect && isOn) ? " active" : "";
+              h += '<button class="effect-btn' + effActive + '" style="font-size:9.5px; padding:4px 6px;" onclick="setEffect(\'' + eid + '\', \'' + escapeHtml(eff.replace(/'/g, "\\'")) + '\')">' + escapeHtml(eff) + '</button>';
+            }
+            h += '</div>';
+            h += '</div>';
+          }
+
           h += '</div>';
         }
 
@@ -2768,23 +2937,20 @@
         var eid = escapeHtml(entity.entity_id);
         var unavailable = entity.state === "unavailable";
         var iconName = domain === "fan" ? "fan" : "bolt";
+        
         var activeClass = domain === "fan" ? " active-blue" : " active-green";
-        var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state) : "");
+        if (isOn && isOceanDevice(entity.entity_id, friendlyName(entity))) {
+          activeClass = " active-ocean";
+        }
 
         var tileClass = "tile" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')">';
-        h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
-        if (!unavailable) {
-          h += '<div class="toggle-switch">';
-          h += '<input type="checkbox" id="t_' + eid + '" ' + (isOn ? 'checked' : '') + ' onchange="toggleEntity(\'' + eid + '\', \'' + domain + '\')">';
-          h += '<label class="toggle-slider" for="t_' + eid + '"></label>';
-          h += '</div>';
-        }
-        h += '</div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
-        h += '<div class="tile-state">' + escapeHtml(entity.state) + '</div>';
+        var iconColor = isOn ? getActiveSvgColor(domain, entity.state, entity.entity_id, friendlyName(entity)) : "";
+        var icon = getSvg(iconName, iconColor);
+
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box;">';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '<div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(entity.state) + '</span></div>';
         h += '</div>';
         h += '</div>';
         return h;
@@ -2806,38 +2972,42 @@
         else if (hvacMode === "cool") activeClass = " active-blue";
         else if (isActive) activeClass = " active-green";
 
-        var icon = getSvg("climate", isActive ? getActiveSvgColor("climate", hvacMode) : "");
+        var icon = getSvg("climate", isActive ? getActiveSvgColor("climate", hvacMode, entity.entity_id, friendlyName(entity)) : "");
 
-        var h = '<div class="tile tile-full' + activeClass + (unavailable ? ' unavailable' : '') + '">';
-        h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
-        h += '</div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
-        h += '<div class="tile-state">' + escapeHtml(hvacMode) + '</div>';
+        var h = '<div class="tile tile-full' + activeClass + (unavailable ? ' unavailable' : '') + '" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-justify-content:center; justify-content:center; padding:8px 12px; box-sizing:border-box;">';
+        
+        // Row 1: Side-by-side flex layout
+        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
+        h += '  <div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '  <div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '    <div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(hvacMode) + '</span></div>';
+        h += '  </div>';
         h += '</div>';
 
+        // Row 2: Thermostat details (if not unavailable)
         if (!unavailable) {
-          h += '<div class="thermostat-display">';
-          h += '<div class="thermostat-current">Current: ' + escapeHtml(String(currentTemp)) + escapeHtml(unit) + '</div>';
-          h += '<div class="thermostat-target">' + escapeHtml(String(targetTemp)) + '<span class="thermostat-unit">' + escapeHtml(unit) + '</span></div>';
-          h += '</div>';
+          h += '<div class="tile-details" style="width:100%; margin-top:6px; padding-top:6px; border-top:1px solid rgba(128,128,128,0.15);">';
+          h += '  <div class="thermostat-display" style="margin-bottom:6px;">';
+          h += '    <div class="thermostat-current" style="font-size:10px;">Current: ' + escapeHtml(String(currentTemp)) + escapeHtml(unit) + '</div>';
+          h += '    <div class="thermostat-target" style="font-size:18px; margin:2px 0;">' + escapeHtml(String(targetTemp)) + '<span class="thermostat-unit" style="font-size:11px;">' + escapeHtml(unit) + '</span></div>';
+          h += '  </div>';
 
-          h += '<div class="thermostat-controls">';
-          h += '<button class="thermostat-btn" onclick="adjustTemp(\'' + eid + '\', -0.5)">&#8722;</button>';
-          h += '<div class="thermostat-mode">';
-          h += '<div class="thermostat-mode-label">Mode</div>';
+          h += '  <div class="thermostat-controls" style="margin-bottom:6px;">';
+          h += '    <button class="thermostat-btn" style="width:26px; height:26px; line-height:24px; font-size:14px;" onclick="adjustTemp(\'' + eid + '\', -0.5)">&#8722;</button>';
+          h += '    <div class="thermostat-mode" style="font-size:11px;">';
+          h += '      <div class="thermostat-mode-label" style="font-size:8px;">Mode</div>';
           h += escapeHtml(hvacMode);
-          h += '</div>';
-          h += '<button class="thermostat-btn" onclick="adjustTemp(\'' + eid + '\', 0.5)">+</button>';
-          h += '</div>';
+          h += '    </div>';
+          h += '    <button class="thermostat-btn" style="width:26px; height:26px; line-height:24px; font-size:14px;" onclick="adjustTemp(\'' + eid + '\', 0.5)">+</button>';
+          h += '  </div>';
 
-          h += '<div class="mode-selector">';
+          h += '  <div class="mode-selector">';
           for (var m = 0; m < hvacModes.length; m++) {
             var mode = hvacModes[m];
             var mActive = mode === hvacMode ? " active" : "";
-            h += '<button class="mode-btn' + mActive + '" onclick="setHvacMode(\'' + eid + '\', \'' + escapeHtml(mode) + '\')">' + escapeHtml(mode) + '</button>';
+            h += '<button class="mode-btn' + mActive + '" style="font-size:9.5px; padding:4px 6px;" onclick="setHvacMode(\'' + eid + '\', \'' + escapeHtml(mode) + '\')">' + escapeHtml(mode) + '</button>';
           }
+          h += '  </div>';
           h += '</div>';
         }
 
@@ -2852,23 +3022,20 @@
         var isOpen = entity.state === "open";
 
         var tileClass = "tile" + (isOpen ? " active-blue" : "") + (unavailable ? " unavailable" : "");
-        var icon = getSvg("cover", isOpen ? getActiveSvgColor("cover", entity.state) : "");
+        var icon = getSvg("cover", isOpen ? getActiveSvgColor("cover", entity.state, entity.entity_id, friendlyName(entity)) : "");
 
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'cover\')">';
-        h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'cover\')" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box;">';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '  <div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(entity.state) + '</span></div>';
+        h += '</div>';
         if (!unavailable) {
-          h += '<div class="cover-controls">';
-          h += '<button class="cover-btn" onclick="coverAction(\'' + eid + '\', \'open\')" title="Open">&#9650;</button>';
-          h += '<button class="cover-btn" onclick="coverAction(\'' + eid + '\', \'stop\')" title="Stop">&#9632;</button>';
-          h += '<button class="cover-btn" onclick="coverAction(\'' + eid + '\', \'close\')" title="Close">&#9660;</button>';
+          h += '<div class="cover-controls" style="margin:0 0 0 8px; -webkit-flex-shrink:0; flex-shrink:0; display:-webkit-flex; display:flex; gap:4px;">';
+          h += '<button class="cover-btn" style="width:24px; height:24px; font-size:10px; padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;" onclick="coverAction(\'' + eid + '\', \'open\')" title="Open">&#9650;</button>';
+          h += '<button class="cover-btn" style="width:24px; height:24px; font-size:10px; padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;" onclick="coverAction(\'' + eid + '\', \'stop\')" title="Stop">&#9632;</button>';
+          h += '<button class="cover-btn" style="width:24px; height:24px; font-size:10px; padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;" onclick="coverAction(\'' + eid + '\', \'close\')" title="Close">&#9660;</button>';
           h += '</div>';
         }
-        h += '</div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
-        h += '<div class="tile-state">' + escapeHtml(entity.state) + '</div>';
-        h += '</div>';
         h += '</div>';
         return h;
       }
@@ -2880,21 +3047,12 @@
         var unavailable = entity.state === "unavailable";
 
         var tileClass = "tile" + (isLocked ? " active-green" : "") + (unavailable ? " unavailable" : "");
-        var icon = getSvg(isLocked ? "lock" : "unlock", isLocked ? getActiveSvgColor("lock", "locked") : "");
+        var icon = getSvg(isLocked ? "lock" : "unlock", isLocked ? getActiveSvgColor("lock", "locked", entity.entity_id, friendlyName(entity)) : "");
 
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'lock\')">';
-        h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
-        if (!unavailable) {
-          h += '<div class="toggle-switch">';
-          h += '<input type="checkbox" id="t_' + eid + '" ' + (isLocked ? 'checked' : '') + ' onchange="toggleLock(\'' + eid + '\', this.checked)">';
-          h += '<label class="toggle-slider" for="t_' + eid + '"></label>';
-          h += '</div>';
-        }
-        h += '</div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
-        h += '<div class="tile-state">' + escapeHtml(entity.state) + '</div>';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'lock\')" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box;">';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '  <div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(entity.state) + '</span></div>';
         h += '</div>';
         h += '</div>';
         return h;
@@ -2969,44 +3127,45 @@
         }
         var icon = getSvg(iconName, iconColor);
 
-        var h = '<div class="tile' + alertClass + '">';
-        h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
+        var displayVal = isBinary ? stateText : (escapeHtml(entity.state) + ' ' + escapeHtml(unit));
+
+        var h = '<div class="tile' + alertClass + '" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-justify-content:center; justify-content:center; padding:8px 12px; box-sizing:border-box;">';
+        
+        // Row 1: Side-by-side flex layout
+        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
+        h += '  <div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '  <div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        var styleAttr = valueStyle ? ' style="' + valueStyle + '"' : '';
+        h += '    <div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="sensor-value"' + styleAttr + ' style="font-weight:700; font-size:12.5px; display:inline;">' + displayVal + '</span></div>';
+        h += '  </div>';
         h += '</div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
 
-        if (isBinary) {
-          h += '<div class="sensor-value" style="font-size:18px; margin-top:10px;">' + stateText + '</div>';
-        } else {
-          var styleAttr = valueStyle ? ' style="' + valueStyle + '"' : '';
-          h += '<div class="sensor-value"' + styleAttr + '>' + escapeHtml(entity.state) + ' ' + escapeHtml(unit) + '</div>';
-        }
-
-        // Display ideal ranges
+        // Row 2: Ideal ranges & Sparkline
         var idealRange = "";
         if (isPH) idealRange = "Ideal: 7.2 - 7.6";
         else if (isORP) idealRange = "Ideal: 650 - 800";
         else if (isSalt) idealRange = "Ideal: 3500 - 3600";
-        if (idealRange) {
-          h += '<div style="font-size:10.5px;color:#8e8e93;margin-top:4px;font-weight:500;">' + idealRange + '</div>';
-        }
 
-        h += '</div>';
-
-        if (!isBinary && showGraph !== false) {
-          // Sparkline Graph Container
-          h += '<div class="sparkline-container" id="graph_' + cleanEid + '">';
-          if (!sensorHistory[eid]) {
-            sensorHistory[eid] = "loading";
-            fetchSensorHistory(eid);
-            h += '<div style="font-size:10px;color:#8e8e93;text-align:center;line-height:35px;">Loading history...</div>';
-          } else if (sensorHistory[eid] === "loading") {
-            h += '<div style="font-size:10px;color:#8e8e93;text-align:center;line-height:35px;">Loading history...</div>';
-          } else if (sensorHistory[eid] === "error") {
-            h += '<div style="font-size:10px;color:#ff3b30;text-align:center;line-height:35px;">History error</div>';
-          } else {
-            h += buildSvgMarkup(eid, sensorHistory[eid]);
+        var hasGraph = (!isBinary && showGraph !== false);
+        if (idealRange || hasGraph) {
+          h += '<div class="tile-details" style="width:100%; margin-top:6px; padding-top:6px; border-top:1px solid rgba(128,128,128,0.15);">';
+          if (idealRange) {
+            h += '<div style="font-size:10px; color:#8e8e93; font-weight:500;">' + idealRange + '</div>';
+          }
+          if (hasGraph) {
+            h += '<div class="sparkline-container" id="graph_' + cleanEid + '" style="margin-top:4px; height:30px;">';
+            if (!sensorHistory[eid]) {
+              sensorHistory[eid] = "loading";
+              fetchSensorHistory(eid);
+              h += '<div style="font-size:9px;color:#8e8e93;text-align:center;line-height:30px;">Loading history...</div>';
+            } else if (sensorHistory[eid] === "loading") {
+              h += '<div style="font-size:9px;color:#8e8e93;text-align:center;line-height:30px;">Loading history...</div>';
+            } else if (sensorHistory[eid] === "error") {
+              h += '<div style="font-size:9px;color:#ff3b30;text-align:center;line-height:30px;">History error</div>';
+            } else {
+              h += buildSvgMarkup(eid, sensorHistory[eid]);
+            }
+            h += '</div>';
           }
           h += '</div>';
         }
@@ -3803,18 +3962,15 @@
         var unavailable = entity.state === "unavailable";
         var icon = getSvg("list");
 
-        var h = '<div class="tile tile-full' + (unavailable ? ' unavailable' : '') + '">';
-        h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
-        h += '</div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
-        h += '<div class="tile-state">' + escapeHtml(currentOption) + '</div>';
+        var h = '<div class="tile tile-full' + (unavailable ? ' unavailable' : '') + '" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box;">';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '  <div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(currentOption) + '</span></div>';
         h += '</div>';
 
         if (!unavailable && options.length > 0) {
-          h += '<div class="select-wrapper">';
-          h += '<select onchange="selectOption(\'' + eid + '\', this.value)">';
+          h += '<div class="select-wrapper" style="margin:0 0 0 8px; -webkit-flex-shrink:0; flex-shrink:0; max-width:140px;">';
+          h += '<select onchange="selectOption(\'' + eid + '\', this.value)" style="font-size:11px; padding:3px 20px 3px 6px; height:26px;">';
           for (var o = 0; o < options.length; o++) {
             var opt = options[o];
             var selected = opt === currentOption ? ' selected' : '';
@@ -3841,42 +3997,52 @@
         var maxTemp = attrs.max_temp || 104;
         var unavailable = entity.state === "unavailable";
         var isActive = opMode !== "off" && opMode !== "Off" && !unavailable;
-        var activeClass = isActive ? " active-red" : "";
-        var icon = getSvg("water_heater", isActive ? "#ff3b30" : "");
+        
+        var isOcean = isOceanDevice(entity.entity_id, friendlyName(entity));
+        var activeClass = "";
+        if (isActive) {
+          activeClass = isOcean ? " active-ocean" : " active-red";
+        }
+        var iconColor = isActive ? (isOcean ? "#00a2ed" : "#ff3b30") : "";
+        var icon = getSvg("water_heater", iconColor);
 
-        var h = '<div class="tile tile-full' + activeClass + (unavailable ? ' unavailable' : '') + '">';
-        h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
-        h += '</div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
-        h += '<div class="tile-state">' + escapeHtml(opMode) + '</div>';
+        var h = '<div class="tile tile-full' + activeClass + (unavailable ? ' unavailable' : '') + '" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-justify-content:center; justify-content:center; padding:8px 12px; box-sizing:border-box;">';
+        
+        // Row 1: Side-by-side flex layout
+        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
+        h += '  <div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '  <div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '    <div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(opMode) + '</span></div>';
+        h += '  </div>';
         h += '</div>';
 
+        // Row 2: Controls
         if (!unavailable) {
-          h += '<div class="thermostat-display">';
-          h += '<div class="thermostat-current">Current: ' + escapeHtml(String(currentTemp)) + escapeHtml(unit) + '</div>';
-          h += '<div class="thermostat-target">' + escapeHtml(String(targetTemp)) + '<span class="thermostat-unit">' + escapeHtml(unit) + '</span></div>';
-          h += '</div>';
+          h += '<div class="tile-details" style="width:100%; margin-top:6px; padding-top:6px; border-top:1px solid rgba(128,128,128,0.15);">';
+          h += '  <div class="thermostat-display" style="margin-bottom:6px;">';
+          h += '    <div class="thermostat-current" style="font-size:10px;">Current: ' + escapeHtml(String(currentTemp)) + escapeHtml(unit) + '</div>';
+          h += '    <div class="thermostat-target" style="font-size:18px; margin:2px 0;">' + escapeHtml(String(targetTemp)) + '<span class="thermostat-unit" style="font-size:11px;">' + escapeHtml(unit) + '</span></div>';
+          h += '  </div>';
 
-          h += '<div class="thermostat-controls">';
-          h += '<button class="thermostat-btn" onclick="adjustWaterHeaterTemp(\'' + eid + '\', -1)">&#8722;</button>';
-          h += '<div class="thermostat-mode">';
-          h += '<div class="thermostat-mode-label">Mode</div>';
+          h += '  <div class="thermostat-controls" style="margin-bottom:6px;">';
+          h += '    <button class="thermostat-btn" style="width:26px; height:26px; line-height:24px; font-size:14px;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', -1)">&#8722;</button>';
+          h += '    <div class="thermostat-mode" style="font-size:11px;">';
+          h += '      <div class="thermostat-mode-label" style="font-size:8px;">Mode</div>';
           h += escapeHtml(opMode);
-          h += '</div>';
-          h += '<button class="thermostat-btn" onclick="adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
-          h += '</div>';
+          h += '    </div>';
+          h += '    <button class="thermostat-btn" style="width:26px; height:26px; line-height:24px; font-size:14px;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
+          h += '  </div>';
 
           if (opList.length > 0) {
-            h += '<div class="mode-selector">';
+            h += '  <div class="mode-selector">';
             for (var m = 0; m < opList.length; m++) {
               var mode = opList[m];
               var mActive = mode === opMode ? " active" : "";
-              h += '<button class="mode-btn' + mActive + '" onclick="setWaterHeaterMode(\'' + eid + '\', \'' + escapeHtml(mode) + '\')">' + escapeHtml(mode) + '</button>';
+              h += '<button class="mode-btn' + mActive + '" style="font-size:9.5px; padding:4px 6px;" onclick="setWaterHeaterMode(\'' + eid + '\', \'' + escapeHtml(mode) + '\')">' + escapeHtml(mode) + '</button>';
             }
-            h += '</div>';
+            h += '  </div>';
           }
+          h += '</div>';
         }
 
         h += '</div>';
@@ -5013,14 +5179,18 @@
         var name = escapeHtml(friendlyName(entity));
         var eid = escapeHtml(entity.entity_id);
         var isOn = entity.state === "on" || entity.state === "On";
+        
         var activeClass = isOn ? (domain === "light" ? " active" : " active-blue") : "";
+        if (isOn && isOceanDevice(entity.entity_id, friendlyName(entity))) {
+          activeClass = " active-ocean";
+        }
         var iconName = domain === "light" ? "light" : (domain === "fan" ? "fan" : "bolt");
-        var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state) : "");
+        var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state, entity.entity_id, friendlyName(entity)) : "");
 
-        var h = '<div class="tile overview-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer;">';
-        h += '<div class="tile-top"><div class="tile-icon">' + icon + '</div></div>';
-        h += '<div class="tile-bottom" style="margin-top:4px;">';
-        h += '<div class="tile-name" style="margin-bottom:0;">' + name + '</div>';
+        var h = '<div class="tile overview-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box; cursor:pointer;">';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '<div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(entity.state) + '</span></div>';
         h += '</div>';
         h += '</div>';
         return h;
@@ -5034,14 +5204,20 @@
         var eid = escapeHtml(entity.entity_id);
         var unit = attrs.unit_of_measurement || "\u00B0F";
         var isActive = opMode !== "off" && opMode !== "Off";
-        var activeClass = isActive ? " active-red" : "";
-        var icon = getSvg("water_heater", isActive ? "#ff3b30" : "");
+        
+        var isOcean = isOceanDevice(entity.entity_id, friendlyName(entity));
+        var activeClass = "";
+        if (isActive) {
+          activeClass = isOcean ? " active-ocean" : " active-red";
+        }
+        var iconColor = isActive ? (isOcean ? "#00a2ed" : "#ff3b30") : "";
+        var icon = getSvg("water_heater", iconColor);
 
-        var h = '<div class="tile overview-tile heater-tile' + activeClass + '" onclick="toggleWaterHeater(\'' + eid + '\', \'' + escapeHtml(opMode) + '\')" style="cursor:pointer;">';
-        h += '<div class="tile-top"><div class="tile-icon">' + icon + '</div></div>';
-        h += '<div class="tile-bottom" style="margin-top:4px; display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-name" style="margin-bottom:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; -webkit-flex:1; flex:1; text-align:left; margin-right:4px;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:0; font-size:11px; font-weight:700; white-space:nowrap;">' + currentTemp + unit + '</div>';
+        var h = '<div class="tile overview-tile heater-tile' + activeClass + '" onclick="toggleWaterHeater(\'' + eid + '\', \'' + escapeHtml(opMode) + '\')" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box; cursor:pointer;">';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left; display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center;">';
+        h += '<div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(opMode) + '</span></div>';
+        h += '<div class="tile-state" style="margin:0 0 0 8px; font-size:11px; font-weight:700; color:#8e8e93; white-space:nowrap;">' + currentTemp + unit + '</div>';
         h += '</div>';
         h += '</div>';
         return h;
@@ -5052,11 +5228,10 @@
         var currentOption = entity.state || "";
         var icon = getSvg("list");
 
-        var h = '<div class="tile overview-tile">';
-        h += '<div class="tile-top"><div class="tile-icon">' + icon + '</div></div>';
-        h += '<div class="tile-bottom">';
-        h += '<div class="tile-name">' + name + '</div>';
-        h += '<div class="tile-state">' + escapeHtml(currentOption) + '</div>';
+        var h = '<div class="tile overview-tile" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box;">';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '<div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(currentOption) + '</span></div>';
         h += '</div>';
         h += '</div>';
         return h;
