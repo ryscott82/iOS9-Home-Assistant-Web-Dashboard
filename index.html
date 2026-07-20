@@ -790,8 +790,33 @@
 
     .tab-btn.active {
       background: #ffffff;
-      color: #1c1c1e;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      color: #007aff;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    }
+
+    .tab-btn.alert-red-muted {
+      background: rgba(255, 59, 48, 0.15);
+      color: #d70015;
+      font-weight: 700;
+      border: 1px solid rgba(255, 59, 48, 0.3);
+    }
+    body.dark-theme .tab-btn.alert-red-muted {
+      background: rgba(255, 69, 58, 0.22);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 69, 58, 0.35);
+    }
+
+    .tab-btn.alert-yellow-muted {
+      background: rgba(255, 149, 0, 0.15);
+      color: #c77000;
+      font-weight: 700;
+      border: 1px solid rgba(255, 149, 0, 0.3);
+    }
+    body.dark-theme .tab-btn.alert-yellow-muted {
+      background: rgba(255, 159, 10, 0.22);
+      color: #ffb340;
+      border: 1px solid rgba(255, 159, 10, 0.35);
     }
 
     /* ======== SLIDER CONFIRM BUTTON ======== */
@@ -880,9 +905,10 @@
     }
 
     body.dark-theme .tab-btn.active {
-      background: #21262d;
-      color: #e6edf3;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      background: #007aff;
+      color: #ffffff;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.4);
     }
 
     .tab-btn:active {
@@ -1547,7 +1573,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.31.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.32.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1705,6 +1731,28 @@
           refreshAll();
         });
       };
+
+      function isMasterSwitch(entity) {
+        if (!entity) return false;
+        var name = (friendlyName(entity) || "").toLowerCase();
+        var eid = (entity.entity_id || "").toLowerCase();
+        var labelsStr = "";
+        if (entity.attributes) {
+          if (entity.attributes.labels) {
+            labelsStr = JSON.stringify(entity.attributes.labels).toLowerCase();
+          } else if (entity.attributes.label) {
+            labelsStr = String(entity.attributes.label).toLowerCase();
+          }
+        }
+        return (
+          name.indexOf("master room switch") !== -1 ||
+          eid.indexOf("master_room_switch") !== -1 ||
+          name.indexOf("ipaddashboard") !== -1 ||
+          eid.indexOf("ipaddashboard") !== -1 ||
+          name.indexOf("ipad dashboard") !== -1 ||
+          labelsStr.indexOf("master room switch") !== -1
+        );
+      }
 
       function hideSetup() {
         document.getElementById("setupOverlay").className = "setup-overlay hidden";
@@ -1933,9 +1981,17 @@
         html += '<button class="tab-btn' + ovActive + '" onclick="switchTab(\'overview\')">Overview</button>';
         html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">Controls</button>';
         if (hasRedWarning) {
-          html += '<button class="tab-btn' + chActive + '" style="background:#ff3b30; color:#ffffff; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">🚨 Chemical Alert</button>';
+          if (activeTab === "chemicals") {
+            html += '<button class="tab-btn active" style="background:#ff3b30; color:#ffffff; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">🚨 Chemical Alert</button>';
+          } else {
+            html += '<button class="tab-btn alert-red-muted" onclick="switchTab(\'chemicals\')">🚨 Chemical Alert</button>';
+          }
         } else if (!chemicalsCheckedToday) {
-          html += '<button class="tab-btn' + chActive + '" style="background:#ffcc00; color:#1c1c1e; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">⚠️ Check Chemicals</button>';
+          if (activeTab === "chemicals") {
+            html += '<button class="tab-btn active" style="background:#ffcc00; color:#1c1c1e; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">⚠️ Check Chemicals</button>';
+          } else {
+            html += '<button class="tab-btn alert-yellow-muted" onclick="switchTab(\'chemicals\')">⚠️ Check Chemicals</button>';
+          }
         } else {
           html += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals & Sensors</button>';
         }
@@ -2086,82 +2142,105 @@
             html += '</div></div>';
           }
 
-          // LIGHTS
-          if (lights.length > 0) {
+          // Partition entities into Lights, Master Switches, and Features
+          var masterSwitches = [];
+          var overviewLights = [];
+          var overviewFeatures = [];
+
+          // 1. Lights
+          for (i = 0; i < lights.length; i++) {
+            if (isMasterSwitch(lights[i])) {
+              masterSwitches.push(lights[i]);
+            } else {
+              overviewLights.push(lights[i]);
+            }
+          }
+
+          // 2. Switches
+          for (i = 0; i < switches.length; i++) {
+            if (isMasterSwitch(switches[i])) {
+              masterSwitches.push(switches[i]);
+            } else {
+              overviewFeatures.push({ entity: switches[i], type: "switch" });
+            }
+          }
+
+          // 3. Fans
+          for (i = 0; i < fans.length; i++) {
+            if (isMasterSwitch(fans[i])) {
+              masterSwitches.push(fans[i]);
+            } else {
+              overviewFeatures.push({ entity: fans[i], type: "fan" });
+            }
+          }
+
+          // 4. Climate, Water Heaters, Covers, Locks, InputSelects
+          for (i = 0; i < climates.length; i++) {
+            if (isMasterSwitch(climates[i])) masterSwitches.push(climates[i]);
+            else overviewFeatures.push({ entity: climates[i], type: "climate" });
+          }
+          for (i = 0; i < waterHeaters.length; i++) {
+            if (isMasterSwitch(waterHeaters[i])) masterSwitches.push(waterHeaters[i]);
+            else overviewFeatures.push({ entity: waterHeaters[i], type: "water_heater" });
+          }
+          for (i = 0; i < covers.length; i++) {
+            if (isMasterSwitch(covers[i])) masterSwitches.push(covers[i]);
+            else overviewFeatures.push({ entity: covers[i], type: "cover" });
+          }
+          for (i = 0; i < locks.length; i++) {
+            if (isMasterSwitch(locks[i])) masterSwitches.push(locks[i]);
+            else overviewFeatures.push({ entity: locks[i], type: "lock" });
+          }
+          for (i = 0; i < inputSelects.length; i++) {
+            if (isMasterSwitch(inputSelects[i])) masterSwitches.push(inputSelects[i]);
+            else overviewFeatures.push({ entity: inputSelects[i], type: "input_select" });
+          }
+
+          // RENDER LIGHTS SECTION
+          if (overviewLights.length > 0) {
             html += '<div class="section"><div class="section-title">Lights</div>';
             html += '<div class="tile-grid">';
-            for (i = 0; i < lights.length; i++) {
-              html += renderLight(lights[i]);
+            for (i = 0; i < overviewLights.length; i++) {
+              html += renderLight(overviewLights[i]);
             }
             html += '</div></div>';
           }
 
-          // SWITCHES
-          if (switches.length > 0) {
-            html += '<div class="section"><div class="section-title">Switches</div>';
+          // RENDER MASTER SWITCHES SECTION
+          if (masterSwitches.length > 0) {
+            html += '<div class="section"><div class="section-title">Master Switches</div>';
             html += '<div class="tile-grid">';
-            for (i = 0; i < switches.length; i++) {
-              html += renderToggleEntity(switches[i], "switch");
+            for (i = 0; i < masterSwitches.length; i++) {
+              var msEntity = masterSwitches[i];
+              var msDomain = msEntity.entity_id.split(".")[0];
+              if (msDomain === "light") {
+                html += renderLight(msEntity);
+              } else {
+                html += renderToggleEntity(msEntity, msDomain);
+              }
             }
             html += '</div></div>';
           }
 
-          // FANS
-          if (fans.length > 0) {
-            html += '<div class="section"><div class="section-title">Fans</div>';
+          // RENDER FEATURES SECTION
+          if (overviewFeatures.length > 0) {
+            html += '<div class="section"><div class="section-title">Features</div>';
             html += '<div class="tile-grid">';
-            for (i = 0; i < fans.length; i++) {
-              html += renderToggleEntity(fans[i], "fan");
-            }
-            html += '</div></div>';
-          }
-
-          // CLIMATE
-          if (climates.length > 0) {
-            html += '<div class="section"><div class="section-title">Climate</div>';
-            html += '<div class="tile-grid">';
-            for (i = 0; i < climates.length; i++) {
-              html += renderClimate(climates[i]);
-            }
-            html += '</div></div>';
-          }
-
-          // WATER HEATERS
-          if (waterHeaters.length > 0) {
-            html += '<div class="section"><div class="section-title">Water Heaters</div>';
-            html += '<div class="tile-grid">';
-            for (i = 0; i < waterHeaters.length; i++) {
-              html += renderWaterHeater(waterHeaters[i]);
-            }
-            html += '</div></div>';
-          }
-
-          // COVERS
-          if (covers.length > 0) {
-            html += '<div class="section"><div class="section-title">Covers</div>';
-            html += '<div class="tile-grid">';
-            for (i = 0; i < covers.length; i++) {
-              html += renderCover(covers[i]);
-            }
-            html += '</div></div>';
-          }
-
-          // LOCKS
-          if (locks.length > 0) {
-            html += '<div class="section"><div class="section-title">Locks</div>';
-            html += '<div class="tile-grid">';
-            for (i = 0; i < locks.length; i++) {
-              html += renderLock(locks[i]);
-            }
-            html += '</div></div>';
-          }
-
-          // DROPDOWNS (INPUT SELECTS)
-          if (inputSelects.length > 0) {
-            html += '<div class="section"><div class="section-title">Dropdowns</div>';
-            html += '<div class="tile-grid">';
-            for (i = 0; i < inputSelects.length; i++) {
-              html += renderInputSelect(inputSelects[i]);
+            for (i = 0; i < overviewFeatures.length; i++) {
+              var feat = overviewFeatures[i];
+              if (feat.type === "climate") {
+                html += renderClimate(feat.entity);
+              } else if (feat.type === "water_heater") {
+                html += renderWaterHeater(feat.entity);
+              } else if (feat.type === "cover") {
+                html += renderCover(feat.entity);
+              } else if (feat.type === "lock") {
+                html += renderLock(feat.entity);
+              } else if (feat.type === "input_select") {
+                html += renderInputSelect(feat.entity);
+              } else {
+                html += renderToggleEntity(feat.entity, feat.type);
+              }
             }
             html += '</div></div>';
           }
