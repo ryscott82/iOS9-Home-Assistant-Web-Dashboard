@@ -396,10 +396,79 @@
       }
     }
 
-    /* Floor column specific tile overrides (full width inside the column card) */
-    .floor-column .tile {
+    /* Floor column specific tile overrides (only tile-full is full width inside floor column card) */
+    .floor-column .tile.tile-full {
       -webkit-flex: 0 0 calc(100% - 10px) !important;
       flex: 0 0 calc(100% - 10px) !important;
+    }
+
+    .room-group {
+      background: rgba(120, 120, 128, 0.04);
+      border-radius: 12px;
+      padding: 8px 10px 10px 10px;
+      margin-bottom: 14px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+
+    body.dark-theme .room-group {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .room-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #8e8e93;
+      margin-left: 5px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    @media (min-width: 768px) {
+      .floor-column:first-child {
+        border-right: 1px solid rgba(128, 128, 128, 0.15);
+      }
+    }
+
+    /* Pulsing animations for heaters/coolers */
+    @-webkit-keyframes heat-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(255, 59, 48, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+    }
+    @keyframes heat-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(255, 59, 48, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+    }
+    @-webkit-keyframes cool-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(0, 122, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
+    }
+    @keyframes cool-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(0, 122, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 122, 255, 0); }
+    }
+    @-webkit-keyframes ocean-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 162, 237, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(0, 162, 237, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 162, 237, 0); }
+    }
+    @keyframes ocean-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 162, 237, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(0, 162, 237, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 162, 237, 0); }
+    }
+
+    .tile.active-ocean {
+      background: rgba(0, 162, 237, 0.08) !important;
+      border-left-color: #00a2ed !important;
+    }
+    body.dark-theme .tile.active-ocean {
+      background: rgba(0, 162, 237, 0.15) !important;
+      border-left-color: #00a2ed !important;
     }
 
     .tile.active {
@@ -1739,7 +1808,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.1.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.2.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1765,6 +1834,7 @@
       var entityRegistry = {};
       var areaRegistry = {};
       var floorRegistry = {};
+      var areaNames = {};
       var registryLoaded = false;
       var sensorHistory = {};
       var bannerDismissed = false;
@@ -1812,7 +1882,14 @@
         } else if (iconName === 'fan') {
           svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm0 18a8 8 0 118-8 8 8 0 01-8 8zm0-10.5a2.5 2.5 0 102.5 2.5A2.5 2.5 0 0012 9.5zm-5.5 3a1.5 1.5 0 111.5-1.5 1.5 1.5 0 01-1.5 1.5zm11 0a1.5 1.5 0 111.5-1.5 1.5 1.5 0 01-1.5 1.5z"/></svg>';
         } else if (iconName === 'switch' || iconName === 'bolt') {
-          svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><path d="M11 21h-1l1-7H5.5L13 3h1l-1 7h5.5L11 21z"/></svg>';
+          // Clean MDI Power Button Icon
+          svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><path d="M12 2c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1s1-.45 1-1V3c0-.55-.45-1-1-1zm5.13 2.87c-.39-.39-1.03-.39-1.42 0-.39.39-.39 1.02 0 1.41C17.37 7.94 18 10.06 18 12.33c0 3.31-2.69 6-6 6s-6-2.69-6-6c0-2.27.63-4.39 1.72-6.05.39-.39.39-1.02 0-1.41-.39-.39-1.03-.39-1.42 0C4.94 6.78 4 9.53 4 12.33c0 4.41 3.59 8 8 8s8-3.59 8-8c0-2.8-1.07-5.55-2.87-7.46z"/></svg>';
+        } else if (iconName === 'pool') {
+          // Custom Pool Icon (Pool Ladder with Water Waves)
+          svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><path d="M19 2v3h-2V2c0-.55-.45-1-1-1s-1 .45-1 1v3H7V2c0-.55-.45-1-1-1s-1 .45-1 1v3H3v2h2v4H3v2h2v4H3v2h18v-2h-2v-4h2v-2h-2V7h2V5h-2V2c0-.55-.45-1-1-1s-1 .45-1 1zm-2 5v4h-4V7h4zm-6 0v4H7V7h4zm-4 6h4v4H7v-4zm6 0h4v4h-4v-4z"/></svg>';
+        } else if (iconName === 'hottub') {
+          // Custom Hot Tub Icon (Tub with Steam Lines)
+          svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><path d="M7 6c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1s-1 .45-1 1v2c0 .55.45 1 1 1zm5 0c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1s-1 .45-1 1v2c0 .55.45 1 1 1zm5 0c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1s-1 .45-1 1v2c0 .55.45 1 1 1zM2 12v6c0 2.2 1.8 4 4 4h12c2.2 0 4-1.8 4-4v-6H2zm4 8c-1.1 0-2-.9-2-2h16c0 1.1-.9 2-2 2H6z"/></svg>';
         } else if (iconName === 'climate' || iconName === 'temp') {
           svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><path d="M15 13V5a3 3 0 00-6 0v8a5 5 0 106 0zm-3-9a1 1 0 011 1v3h-2V5a1 1 0 011-1z"/></svg>';
         } else if (iconName === 'cover') {
@@ -1922,6 +1999,42 @@
         }
       };
 
+      function getEntityAreaName(entityId) {
+        var areaId = entityRegistry[entityId];
+        if (!areaId) return "";
+        return areaNames[areaId] || "";
+      }
+
+      function getIconName(entity) {
+        var eid = entity.entity_id || "";
+        var name = friendlyName(entity) || "";
+        var domain = eid.split(".")[0];
+        
+        // Exclude lights from pool/hot tub custom icons as requested: "excluding lights"
+        if (domain !== "light") {
+          var lowerId = eid.toLowerCase();
+          var lowerName = name.toLowerCase();
+          if (lowerId.indexOf("pool") !== -1 || lowerName.indexOf("pool") !== -1) {
+            return "pool";
+          }
+          if (lowerId.indexOf("hottub") !== -1 || lowerName.indexOf("hottub") !== -1 ||
+              lowerId.indexOf("hot_tub") !== -1 || lowerName.indexOf("hot tub") !== -1 ||
+              lowerId.indexOf("spa") !== -1 || lowerName.indexOf("spa") !== -1) {
+            return "hottub";
+          }
+        }
+        
+        // Fallback resolution
+        if (domain === "light") return "light";
+        if (domain === "fan") return "fan";
+        if (domain === "switch" || domain === "input_boolean") return "switch"; // power button icon
+        if (domain === "climate") return "climate";
+        if (domain === "lock") return "lock";
+        if (domain === "cover") return "cover";
+        if (domain === "water_heater") return "water_heater";
+        return "list";
+      }
+
       function isOceanDevice(entityId, name) {
         var lowerId = (entityId || "").toLowerCase();
         var lowerName = (name || "").toLowerCase();
@@ -1970,8 +2083,8 @@
           isOn = (state !== "off" && state !== "unavailable" && state !== "closed" && state !== "locked");
         }
 
-        var iconName = domain;
-        if (domain === "climate") iconName = "temp";
+        var iconName = getIconName(entity);
+        if (iconName === "bolt" && domain === "climate") iconName = "climate";
 
         var activeClass = "";
         if (isOn) {
@@ -1984,10 +2097,15 @@
 
         var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, state, entity.entity_id, friendlyName(entity)) : "");
 
+        var stateSuffix = "";
+        if (state !== "on" && state !== "off") {
+          stateSuffix = " &bull; <span class=\"tile-state\" style=\"font-weight:500; color:#8e8e93; display:inline;\">" + state + "</span>";
+        }
+
         var h = '<div class="tile overview-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + state + '</span></div>';
+        h += '<div class="tile-name" style="font-weight:600; margin:0;">' + name + stateSuffix + '</div>';
         h += '</div>';
         h += '</div>';
         return h;
@@ -2085,11 +2203,13 @@
             else if (msg.id === 2) {
               var entries = msg.result || [];
               areaRegistry = {};
+              areaNames = {};
               for (var i = 0; i < entries.length; i++) {
                 var entry = entries[i];
                 if (entry.floor_id) {
                   areaRegistry[entry.id] = entry.floor_id;
                 }
+                areaNames[entry.id] = entry.name;
               }
               // Fetch Floors next
               ws.send(JSON.stringify({
@@ -2663,37 +2783,73 @@
           activeFloorNames = activeFloorNames.concat(otherFloors);
 
           function renderFloorGroupHTML(floorName, floorEntities) {
-            floorEntities.sort(function (a, b) {
-              var domA = a.entity_id.split(".")[0];
-              var domB = b.entity_id.split(".")[0];
-              var order = { "light": 1, "switch": 2, "input_boolean": 2, "fan": 2, "climate": 3, "cover": 4, "lock": 5, "water_heater": 6, "input_select": 7 };
-              var valA = order[domA] || 99;
-              var valB = order[domB] || 99;
-              return valA - valB;
+            // Group entities by Room (Area)
+            var rooms = {};
+            for (var j = 0; j < floorEntities.length; j++) {
+              var ent = floorEntities[j];
+              var rName = getEntityAreaName(ent.entity_id) || "Other Devices";
+              if (!rooms[rName]) {
+                rooms[rName] = [];
+              }
+              rooms[rName].push(ent);
+            }
+
+            // Sort room names
+            var rNames = [];
+            for (var rn in rooms) {
+              if (rooms.hasOwnProperty(rn)) {
+                rNames.push(rn);
+              }
+            }
+            rNames.sort(function (a, b) {
+              if (a === "Other Devices") return 1;
+              if (b === "Other Devices") return -1;
+              return a.localeCompare(b);
             });
 
             var fHtml = '<div class="section"><div class="section-title">' + floorName + '</div>';
-            fHtml += '<div class="tile-grid">';
-            for (var j = 0; j < floorEntities.length; j++) {
-              var ent = floorEntities[j];
-              var dom = ent.entity_id.split(".")[0];
-              if (dom === "light") {
-                fHtml += renderLight(ent);
-              } else if (dom === "climate") {
-                fHtml += renderClimate(ent);
-              } else if (dom === "cover") {
-                fHtml += renderCover(ent);
-              } else if (dom === "lock") {
-                fHtml += renderLock(ent);
-              } else if (dom === "water_heater") {
-                fHtml += renderWaterHeater(ent);
-              } else if (dom === "input_select") {
-                fHtml += renderInputSelect(ent);
-              } else {
-                fHtml += renderToggleEntity(ent, dom);
+            
+            for (var r = 0; r < rNames.length; r++) {
+              var rName = rNames[r];
+              var rEntities = rooms[rName];
+
+              // Sort entities within the room (lights first, then switches/fans, then others)
+              rEntities.sort(function (a, b) {
+                var domA = a.entity_id.split(".")[0];
+                var domB = b.entity_id.split(".")[0];
+                var order = { "light": 1, "switch": 2, "input_boolean": 2, "fan": 2, "climate": 3, "cover": 4, "lock": 5, "water_heater": 6, "input_select": 7 };
+                var valA = order[domA] || 99;
+                var valB = order[domB] || 99;
+                return valA - valB;
+              });
+
+              fHtml += '<div class="room-group">';
+              fHtml += '  <div class="room-title">' + rName + '</div>';
+              fHtml += '  <div class="tile-grid">';
+              for (var j = 0; j < rEntities.length; j++) {
+                var ent = rEntities[j];
+                var dom = ent.entity_id.split(".")[0];
+                if (dom === "light") {
+                  fHtml += renderLight(ent);
+                } else if (dom === "climate") {
+                  fHtml += renderClimate(ent);
+                } else if (dom === "cover") {
+                  fHtml += renderCover(ent);
+                } else if (dom === "lock") {
+                  fHtml += renderLock(ent);
+                } else if (dom === "water_heater") {
+                  fHtml += renderWaterHeater(ent);
+                } else if (dom === "input_select") {
+                  fHtml += renderInputSelect(ent);
+                } else {
+                  fHtml += renderToggleEntity(ent, dom);
+                }
               }
+              fHtml += '  </div>';
+              fHtml += '</div>';
             }
-            fHtml += '</div></div>';
+            
+            fHtml += '</div>';
             return fHtml;
           }
 
@@ -3120,6 +3276,18 @@
           }
         }
 
+        var iconName = getIconName(entity);
+        if (iconName !== "pool" && iconName !== "hottub") {
+          iconName = "list";
+          if (dc === "temperature") iconName = "temp";
+          else if (dc === "humidity") iconName = "humidity";
+          else if (dc === "battery") iconName = "battery";
+          else if (dc === "power" || dc === "energy") iconName = "bolt";
+          else if (dc === "illuminance") iconName = "illuminance";
+          else if (dc === "motion") iconName = "motion";
+          else if (dc === "door" || dc === "window" || dc === "opening" || eid.indexOf("cover") !== -1) iconName = "cover";
+        }
+
         var isAlertActive = (alertClass !== "");
         var iconColor = "";
         if (isAlertActive) {
@@ -3136,7 +3304,7 @@
         h += '  <div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '  <div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
         var styleAttr = valueStyle ? ' style="' + valueStyle + '"' : '';
-        h += '    <div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="sensor-value"' + styleAttr + ' style="font-weight:700; font-size:12.5px; display:inline;">' + displayVal + '</span></div>';
+        h += '    <div class="tile-name" style="font-weight:600; margin:0;">' + name + ' &bull; <span class="sensor-value"' + styleAttr + ' style="font-weight:700; display:inline;">' + displayVal + '</span></div>';
         h += '  </div>';
         h += '</div>';
 
@@ -5184,13 +5352,13 @@
         if (isOn && isOceanDevice(entity.entity_id, friendlyName(entity))) {
           activeClass = " active-ocean";
         }
-        var iconName = domain === "light" ? "light" : (domain === "fan" ? "fan" : "bolt");
+        var iconName = getIconName(entity);
         var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state, entity.entity_id, friendlyName(entity)) : "");
 
         var h = '<div class="tile overview-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box; cursor:pointer;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(entity.state) + '</span></div>';
+        h += '<div class="tile-name" style="font-weight:600; margin:0;">' + name + '</div>';
         h += '</div>';
         h += '</div>';
         return h;
@@ -5210,14 +5378,15 @@
         if (isActive) {
           activeClass = isOcean ? " active-ocean" : " active-red";
         }
+        var iconName = getIconName(entity);
         var iconColor = isActive ? (isOcean ? "#00a2ed" : "#ff3b30") : "";
-        var icon = getSvg("water_heater", iconColor);
+        var icon = getSvg(iconName, iconColor);
 
         var h = '<div class="tile overview-tile heater-tile' + activeClass + '" onclick="toggleWaterHeater(\'' + eid + '\', \'' + escapeHtml(opMode) + '\')" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; padding:8px 12px; min-height:48px; box-sizing:border-box; cursor:pointer;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left; display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center;">';
-        h += '<div class="tile-name" style="font-weight:600; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; font-size:12px; color:#8e8e93; display:inline;">' + escapeHtml(opMode) + '</span></div>';
-        h += '<div class="tile-state" style="margin:0 0 0 8px; font-size:11px; font-weight:700; color:#8e8e93; white-space:nowrap;">' + currentTemp + unit + '</div>';
+        h += '<div class="tile-name" style="font-weight:600; margin:0;">' + name + ' &bull; <span class="tile-state" style="font-weight:500; color:#8e8e93; display:inline;">' + escapeHtml(opMode) + '</span></div>';
+        h += '<div class="tile-state" style="margin:0 0 0 8px; font-weight:700; color:#8e8e93; white-space:nowrap;">' + currentTemp + unit + '</div>';
         h += '</div>';
         h += '</div>';
         return h;
