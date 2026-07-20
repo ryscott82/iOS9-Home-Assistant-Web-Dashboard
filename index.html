@@ -274,25 +274,31 @@
       }
     }
 
-    .tile.active {
-      background: #ffd60a;
-    }
-
-    .tile.active-green {
-      background: #34c759;
-    }
-
-    .tile.active-blue {
-      background: #007aff;
-    }
-
+    .tile.active,
+    .tile.active-green,
+    .tile.active-blue,
     .tile.active-orange {
-      background: #ff9f0a;
+      background: rgba(0, 122, 255, 0.06);
+      border: 1.5px solid #007aff;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
+    }
+    .tile.active .tile-icon,
+    .tile.active-blue .tile-icon {
+      background: rgba(0, 122, 255, 0.12);
+      color: #007aff;
+    }
+    .tile.active-green .tile-icon {
+      background: rgba(52, 199, 89, 0.12);
+      color: #34c759;
+    }
+    .tile.active-orange .tile-icon {
+      background: rgba(255, 149, 0, 0.12);
+      color: #ff9500;
     }
 
     .tile.active-red {
-      background: rgba(255, 59, 48, 0.12);
-      border: 1px solid rgba(255, 59, 48, 0.2);
+      background: rgba(255, 59, 48, 0.08);
+      border: 1.5px solid rgba(255, 59, 48, 0.6);
     }
 
     /* Alert States (Light Theme) */
@@ -1192,25 +1198,31 @@
       background: rgba(255, 255, 255, 0.06);
     }
 
-    body.dark-theme .tile.active {
-      background: #ffd60a;
-    }
-
-    body.dark-theme .tile.active-green {
-      background: #34c759;
-    }
-
-    body.dark-theme .tile.active-blue {
-      background: #007aff;
-    }
-
+    body.dark-theme .tile.active,
+    body.dark-theme .tile.active-green,
+    body.dark-theme .tile.active-blue,
     body.dark-theme .tile.active-orange {
-      background: #ff9f0a;
+      background: rgba(10, 132, 255, 0.12);
+      border: 1.5px solid #0a84ff;
+      box-shadow: 0 2px 10px rgba(10, 132, 255, 0.25);
+    }
+    body.dark-theme .tile.active .tile-icon,
+    body.dark-theme .tile.active-blue .tile-icon {
+      background: rgba(10, 132, 255, 0.25);
+      color: #0a84ff;
+    }
+    body.dark-theme .tile.active-green .tile-icon {
+      background: rgba(48, 209, 88, 0.25);
+      color: #30d158;
+    }
+    body.dark-theme .tile.active-orange .tile-icon {
+      background: rgba(255, 159, 10, 0.25);
+      color: #ff9f0a;
     }
 
     body.dark-theme .tile.active-red {
-      background: rgba(255, 59, 48, 0.16);
-      border-color: rgba(255, 59, 48, 0.3);
+      background: rgba(255, 69, 58, 0.12);
+      border: 1.5px solid rgba(255, 69, 58, 0.5);
     }
 
     /* Alert States (Dark Theme) */
@@ -1558,7 +1570,13 @@
   </div>
 
   <!-- APP -->
-  <main class="app-content" id="appContent" style="display:none; padding-top: 30px;">
+  <main class="app-content" id="appContent" style="display:none; padding-top: 20px;">
+
+    <!-- TOP HEADER (WELCOME MESSAGE & LIVE CLOCK) -->
+    <div id="topHeaderBar" class="top-header-bar" style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:14px; padding:0 4px;">
+      <div id="welcomeMsg" style="font-size:18px; font-weight:700; color:#1c1c1e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:60%;">Welcome Home</div>
+      <div id="headerClock" style="font-size:13.5px; font-weight:600; color:#8e8e93; text-align:right;"></div>
+    </div>
 
     <div id="entityContainer">
       <div class="loading-spinner">
@@ -1573,7 +1591,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.32.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.0.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1627,9 +1645,46 @@
         if (cachedScene) lastActivatedScene = cachedScene;
       } catch (e) { }
 
+      function updateClock() {
+        var now = new Date();
+        var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        
+        var dayName = days[now.getDay()];
+        var monthName = months[now.getMonth()];
+        var dateNum = now.getDate();
+        
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        
+        var clockStr = dayName + ', ' + monthName + ' ' + dateNum + ' \u2022 ' + hours + ':' + minutes + ' ' + ampm;
+        
+        var clockEl = document.getElementById("headerClock");
+        if (clockEl) {
+          clockEl.textContent = clockStr;
+        }
+      }
+
+      function updateWelcomeMessage() {
+        var msgEl = document.getElementById("welcomeMsg");
+        if (!msgEl) return;
+        var welcomeEntity = entities["input_text.dashboard_welcome_message"];
+        if (welcomeEntity && welcomeEntity.state && welcomeEntity.state !== "unknown" && welcomeEntity.state !== "unavailable") {
+          msgEl.textContent = welcomeEntity.state;
+        } else {
+          msgEl.textContent = "Welcome Home";
+        }
+      }
+
       // ======== INIT ========
       function init() {
         hideSetup();
+        updateClock();
+        setInterval(updateClock, 1000);
         loadEntityRegistry();
         startMediaTickers();
       }
@@ -1922,6 +1977,8 @@
 
         // Check if chemicals were logged today
         var chemicalsCheckedToday = true;
+        updateWelcomeMessage();
+
         for (i = 0; i < allStates.length; i++) {
           if (allStates[i].entity_id === "input_boolean.chemicals_checked_today") {
             chemicalsCheckedToday = (allStates[i].state === "on" || allStates[i].state === "On");
@@ -2142,107 +2199,53 @@
             html += '</div></div>';
           }
 
-          // Partition entities into Lights, Master Switches, and Features
-          var masterSwitches = [];
-          var overviewLights = [];
-          var overviewFeatures = [];
+          // Partition Controls entities by Floor
+          var floorMap = {
+            "Main Floor": [],
+            "Upper Floor": [],
+            "Basement": [],
+            "Outdoor & Pool": [],
+            "General": []
+          };
 
-          // 1. Lights
-          for (i = 0; i < lights.length; i++) {
-            if (isMasterSwitch(lights[i])) {
-              masterSwitches.push(lights[i]);
-            } else {
-              overviewLights.push(lights[i]);
-            }
-          }
+          var allControls = []
+            .concat(lights)
+            .concat(switches)
+            .concat(fans)
+            .concat(climates)
+            .concat(waterHeaters)
+            .concat(covers)
+            .concat(locks)
+            .concat(inputSelects);
 
-          // 2. Switches
-          for (i = 0; i < switches.length; i++) {
-            if (isMasterSwitch(switches[i])) {
-              masterSwitches.push(switches[i]);
-            } else {
-              overviewFeatures.push({ entity: switches[i], type: "switch" });
-            }
-          }
-
-          // 3. Fans
-          for (i = 0; i < fans.length; i++) {
-            if (isMasterSwitch(fans[i])) {
-              masterSwitches.push(fans[i]);
-            } else {
-              overviewFeatures.push({ entity: fans[i], type: "fan" });
-            }
+          for (i = 0; i < allControls.length; i++) {
+            var cent = allControls[i];
+            var fName = getFloorForEntity(cent);
+            if (!floorMap[fName]) floorMap[fName] = [];
+            floorMap[fName].push(cent);
           }
 
-          // 4. Climate, Water Heaters, Covers, Locks, InputSelects
-          for (i = 0; i < climates.length; i++) {
-            if (isMasterSwitch(climates[i])) masterSwitches.push(climates[i]);
-            else overviewFeatures.push({ entity: climates[i], type: "climate" });
-          }
-          for (i = 0; i < waterHeaters.length; i++) {
-            if (isMasterSwitch(waterHeaters[i])) masterSwitches.push(waterHeaters[i]);
-            else overviewFeatures.push({ entity: waterHeaters[i], type: "water_heater" });
-          }
-          for (i = 0; i < covers.length; i++) {
-            if (isMasterSwitch(covers[i])) masterSwitches.push(covers[i]);
-            else overviewFeatures.push({ entity: covers[i], type: "cover" });
-          }
-          for (i = 0; i < locks.length; i++) {
-            if (isMasterSwitch(locks[i])) masterSwitches.push(locks[i]);
-            else overviewFeatures.push({ entity: locks[i], type: "lock" });
-          }
-          for (i = 0; i < inputSelects.length; i++) {
-            if (isMasterSwitch(inputSelects[i])) masterSwitches.push(inputSelects[i]);
-            else overviewFeatures.push({ entity: inputSelects[i], type: "input_select" });
-          }
-
-          // RENDER LIGHTS SECTION
-          if (overviewLights.length > 0) {
-            html += '<div class="section"><div class="section-title">Lights</div>';
-            html += '<div class="tile-grid">';
-            for (i = 0; i < overviewLights.length; i++) {
-              html += renderLight(overviewLights[i]);
-            }
-            html += '</div></div>';
-          }
-
-          // RENDER MASTER SWITCHES SECTION
-          if (masterSwitches.length > 0) {
-            html += '<div class="section"><div class="section-title">Master Switches</div>';
-            html += '<div class="tile-grid">';
-            for (i = 0; i < masterSwitches.length; i++) {
-              var msEntity = masterSwitches[i];
-              var msDomain = msEntity.entity_id.split(".")[0];
-              if (msDomain === "light") {
-                html += renderLight(msEntity);
-              } else {
-                html += renderToggleEntity(msEntity, msDomain);
+          var floorOrder = ["Main Floor", "Upper Floor", "Basement", "Outdoor & Pool", "General"];
+          for (var f = 0; f < floorOrder.length; f++) {
+            var floorKey = floorOrder[f];
+            var fEntities = floorMap[floorKey];
+            if (fEntities && fEntities.length > 0) {
+              html += '<div class="section">';
+              html += '<div class="section-title">' + escapeHtml(floorKey) + '</div>';
+              html += '<div class="tile-grid">';
+              for (i = 0; i < fEntities.length; i++) {
+                var ent = fEntities[i];
+                var dName = ent.entity_id.split(".")[0];
+                if (dName === "light") html += renderLight(ent);
+                else if (dName === "climate") html += renderClimate(ent);
+                else if (dName === "water_heater") html += renderWaterHeater(ent);
+                else if (dName === "cover") html += renderCover(ent);
+                else if (dName === "lock") html += renderLock(ent);
+                else if (dName === "input_select") html += renderInputSelect(ent);
+                else html += renderToggleEntity(ent, dName);
               }
+              html += '</div></div>';
             }
-            html += '</div></div>';
-          }
-
-          // RENDER FEATURES SECTION
-          if (overviewFeatures.length > 0) {
-            html += '<div class="section"><div class="section-title">Features</div>';
-            html += '<div class="tile-grid">';
-            for (i = 0; i < overviewFeatures.length; i++) {
-              var feat = overviewFeatures[i];
-              if (feat.type === "climate") {
-                html += renderClimate(feat.entity);
-              } else if (feat.type === "water_heater") {
-                html += renderWaterHeater(feat.entity);
-              } else if (feat.type === "cover") {
-                html += renderCover(feat.entity);
-              } else if (feat.type === "lock") {
-                html += renderLock(feat.entity);
-              } else if (feat.type === "input_select") {
-                html += renderInputSelect(feat.entity);
-              } else {
-                html += renderToggleEntity(feat.entity, feat.type);
-              }
-            }
-            html += '</div></div>';
           }
         } else {
           // TAB: CHEMICALS & SENSORS
@@ -2358,11 +2361,103 @@
         return (entity.attributes && entity.attributes.friendly_name) || entity.entity_id;
       }
 
-      function escapeHtml(str) {
-        var div = document.createElement("div");
-        div.appendChild(document.createTextNode(str));
-        return div.innerHTML;
+      function getSvgIcon(entity, defaultDomain) {
+        var domain = defaultDomain || (entity ? entity.entity_id.split(".")[0] : "");
+        var name = entity ? (friendlyName(entity) || "").toLowerCase() : "";
+        var mdi = (entity && entity.attributes && entity.attributes.icon) ? entity.attributes.icon.toLowerCase() : "";
+
+        var svgPrefix = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;">';
+        var svgSuffix = '</svg>';
+
+        // 1. LIGHT
+        if (domain === "light" || name.indexOf("light") !== -1 || name.indexOf("lamp") !== -1 || name.indexOf("led") !== -1 || mdi.indexOf("light") !== -1 || mdi.indexOf("bulb") !== -1) {
+          return svgPrefix + '<path d="M12 2a6 6 0 0 0-6 6c0 2.2 1.2 4.1 3 5.2V16a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-2.8c1.8-1.1 3-3 3-5.2a6 6 0 0 0-6-6z"/><path d="M10 21h4"/>' + svgSuffix;
+        }
+        // 2. POOL / WATER / SPA / HOT TUB
+        if (name.indexOf("pool") !== -1 || name.indexOf("tub") !== -1 || name.indexOf("spa") !== -1 || mdi.indexOf("pool") !== -1 || mdi.indexOf("tub") !== -1 || mdi.indexOf("water") !== -1) {
+          return svgPrefix + '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>' + svgSuffix;
+        }
+        // 3. HEATER / FLAME / FIRE
+        if (name.indexOf("heater") !== -1 || name.indexOf("fire") !== -1 || name.indexOf("heat") !== -1 || mdi.indexOf("fire") !== -1) {
+          return svgPrefix + '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3.5z"/>' + svgSuffix;
+        }
+        // 4. THERMOMETER / CLIMATE
+        if (domain === "climate" || name.indexOf("temp") !== -1 || domain === "water_heater" || mdi.indexOf("thermometer") !== -1) {
+          return svgPrefix + '<path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>' + svgSuffix;
+        }
+        // 5. FAN / AIR
+        if (domain === "fan" || name.indexOf("fan") !== -1 || mdi.indexOf("fan") !== -1) {
+          return svgPrefix + '<path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0"/><path d="M12 9A3 3 0 0 0 9 6H3"/><path d="M15 12A3 3 0 0 0 18 9V3"/><path d="M12 15A3 3 0 0 0 15 18H21"/><path d="M9 12A3 3 0 0 0 6 15V21"/>' + svgSuffix;
+        }
+        // 6. MEDIA / AUDIO
+        if (domain === "media_player" || name.indexOf("speaker") !== -1 || name.indexOf("tv") !== -1 || name.indexOf("audio") !== -1 || mdi.indexOf("music") !== -1) {
+          return svgPrefix + '<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>' + svgSuffix;
+        }
+        // 7. LOCK / SECURITY
+        if (domain === "lock" || name.indexOf("lock") !== -1 || mdi.indexOf("lock") !== -1) {
+          return svgPrefix + '<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>' + svgSuffix;
+        }
+        // 8. COVER / WINDOW / BLIND
+        if (domain === "cover" || name.indexOf("window") !== -1 || name.indexOf("blind") !== -1 || name.indexOf("shade") !== -1 || mdi.indexOf("window") !== -1) {
+          return svgPrefix + '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/>' + svgSuffix;
+        }
+        // 9. CHEMICAL / FLASK
+        if (name.indexOf("chlorine") !== -1 || name.indexOf("ph") !== -1 || name.indexOf("salt") !== -1 || name.indexOf("cya") !== -1 || name.indexOf("alkalinity") !== -1 || mdi.indexOf("flask") !== -1) {
+          return svgPrefix + '<path d="M10 2v7.31L4.75 18.2a2 2 0 0 0 1.63 3.05h11.24a2 2 0 0 0 1.63-3.05L14 9.31V2z"/><path d="M8.5 2h7"/>' + svgSuffix;
+        }
+        // 10. MASTER SWITCH / DASHBOARD
+        if (isMasterSwitch(entity)) {
+          return svgPrefix + '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>' + svgSuffix;
+        }
+        // 11. SCENE / MAGIC
+        if (domain === "scene" || name.indexOf("scene") !== -1) {
+          return svgPrefix + '<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>' + svgSuffix;
+        }
+        // 12. HOUSE / ROOM / FLOOR
+        if (domain === "house" || domain === "floor" || domain === "basement") {
+          return svgPrefix + '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>' + svgSuffix;
+        }
+        // DEFAULT: POWER SWITCH / PLUG
+        return svgPrefix + '<path d="M18.36 5.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>' + svgSuffix;
       }
+
+      function getFloorForEntity(entity) {
+        if (!entity) return "General";
+        var name = (friendlyName(entity) || "").toLowerCase();
+        var eid = (entity.entity_id || "").toLowerCase();
+        var attrs = entity.attributes || {};
+        var area = (attrs.area_name || attrs.area_id || "").toLowerCase();
+
+        // 1. OUTDOOR & POOL / SPA
+        if (name.indexOf("pool") !== -1 || name.indexOf("tub") !== -1 || name.indexOf("spa") !== -1 || name.indexOf("patio") !== -1 || name.indexOf("deck") !== -1 || name.indexOf("yard") !== -1 || name.indexOf("outdoor") !== -1 || name.indexOf("garage") !== -1 || area.indexOf("pool") !== -1 || area.indexOf("outdoor") !== -1 || area.indexOf("patio") !== -1) {
+          return "Outdoor & Pool";
+        }
+        // 2. BASEMENT / LOWER LEVEL
+        if (name.indexOf("basement") !== -1 || name.indexOf("lower") !== -1 || name.indexOf("cellar") !== -1 || area.indexOf("basement") !== -1) {
+          return "Basement";
+        }
+        // 3. UPPER FLOOR / UPSTAIRS
+        if (name.indexOf("upstairs") !== -1 || name.indexOf("upper") !== -1 || name.indexOf("2nd") !== -1 || name.indexOf("master") !== -1 || name.indexOf("bedroom") !== -1 || area.indexOf("upstairs") !== -1 || area.indexOf("bedroom") !== -1) {
+          return "Upper Floor";
+        }
+        // 4. MAIN FLOOR / GROUND FLOOR
+        if (name.indexOf("main") !== -1 || name.indexOf("ground") !== -1 || name.indexOf("1st") !== -1 || name.indexOf("living") !== -1 || name.indexOf("kitchen") !== -1 || name.indexOf("dining") !== -1 || name.indexOf("foyer") !== -1 || area.indexOf("main") !== -1 || area.indexOf("living") !== -1 || area.indexOf("kitchen") !== -1) {
+          return "Main Floor";
+        }
+        // 5. DEFAULT / GENERAL
+        return "General";
+      }
+
+      window.setLightColor = function (entityId, rgbArr) {
+        haRequest("POST", "/api/services/light/turn_on", {
+          entity_id: entityId,
+          rgb_color: rgbArr
+        }, function (err) {
+          if (err) showToast("Error setting color: " + err, true);
+          else showToast("Color updated");
+          setTimeout(refreshAll, 500);
+        });
+      };
 
       function renderLight(entity) {
         var isOn = entity.state === "on";
@@ -2377,10 +2472,11 @@
         var currentEffect = attrs.effect || "";
         var hasEffects = effectList.length > 0;
 
-        var tileClass = "tile" + (hasEffects ? " tile-full" : "") + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
+        var isColor = (attrs && (attrs.rgb_color || attrs.supported_color_modes || (attrs.supported_features && (attrs.supported_features & 16))));
+        var tileClass = "tile" + ((hasEffects || isColor) ? " tile-full" : "") + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
         var h = '<div class="' + tileClass + '">';
         h += '<div class="tile-top">';
-        h += '<div class="tile-icon">&#128161;</div>';
+        h += '<div class="tile-icon' + (isOn ? ' active' : '') + '">' + getSvgIcon(entity, "light") + '</div>';
         if (!unavailable) {
           h += '<div class="toggle-switch">';
           h += '<input type="checkbox" id="t_' + eid + '" ' + (isOn ? 'checked' : '') + ' onchange="toggleEntity(\'' + eid + '\', \'light\')">';
@@ -2408,6 +2504,26 @@
           h += '</div>';
         }
 
+        if (isOn && isColor && !unavailable) {
+          var colors = [
+            { name: "Warm White", rgb: [255, 214, 170] },
+            { name: "Cool White", rgb: [255, 255, 255] },
+            { name: "Red", rgb: [255, 59, 48] },
+            { name: "Orange", rgb: [255, 149, 0] },
+            { name: "Green", rgb: [52, 199, 89] },
+            { name: "Blue", rgb: [0, 122, 255] },
+            { name: "Purple", rgb: [175, 82, 222] }
+          ];
+
+          h += '<div style="margin-top:10px; display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; padding:0 4px;">';
+          for (var c = 0; c < colors.length; c++) {
+            var col = colors[c];
+            var rgbStr = col.rgb.join(",");
+            h += '<button class="color-dot" style="width:18px; height:18px; border-radius:50%; border:1px solid rgba(0,0,0,0.15); background:rgb(' + rgbStr + '); cursor:pointer; padding:0; margin:0 2px;" title="' + col.name + '" onclick="event.stopPropagation(); setLightColor(\'' + eid + '\', [' + rgbStr + '])"></button>';
+          }
+          h += '</div>';
+        }
+
         if (hasEffects && !unavailable) {
           h += '<div class="effect-section">';
           h += '<div class="effect-label">Effect</div>';
@@ -2430,13 +2546,12 @@
         var name = escapeHtml(friendlyName(entity));
         var eid = escapeHtml(entity.entity_id);
         var unavailable = entity.state === "unavailable";
-        var icon = domain === "fan" ? "&#127744;" : "&#9889;";
         var activeClass = domain === "fan" ? " active-blue" : " active-green";
 
         var tileClass = "tile" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
         var h = '<div class="' + tileClass + '">';
         h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
+        h += '<div class="tile-icon' + (isOn ? ' active' : '') + '">' + getSvgIcon(entity, domain) + '</div>';
         if (!unavailable) {
           h += '<div class="toggle-switch">';
           h += '<input type="checkbox" id="t_' + eid + '" ' + (isOn ? 'checked' : '') + ' onchange="toggleEntity(\'' + eid + '\', \'' + domain + '\')">';
@@ -2470,7 +2585,7 @@
 
         var h = '<div class="tile tile-full' + activeClass + (unavailable ? ' unavailable' : '') + '">';
         h += '<div class="tile-top">';
-        h += '<div class="tile-icon">&#127777;&#65039;</div>';
+        h += '<div class="tile-icon' + (isActive ? ' active' : '') + '">' + getSvgIcon(entity, "climate") + '</div>';
         h += '</div>';
         h += '<div class="tile-bottom">';
         h += '<div class="tile-name">' + name + '</div>';
@@ -2514,7 +2629,7 @@
         var tileClass = "tile" + (isOpen ? " active-blue" : "") + (unavailable ? " unavailable" : "");
         var h = '<div class="' + tileClass + '">';
         h += '<div class="tile-top">';
-        h += '<div class="tile-icon">&#128726;</div>';
+        h += '<div class="tile-icon' + (isOpen ? ' active' : '') + '">' + getSvgIcon(entity, "cover") + '</div>';
         if (!unavailable) {
           h += '<div class="cover-controls">';
           h += '<button class="cover-btn" onclick="coverAction(\'' + eid + '\', \'open\')" title="Open">&#9650;</button>';
@@ -2540,7 +2655,7 @@
         var tileClass = "tile" + (isLocked ? " active-green" : "") + (unavailable ? " unavailable" : "");
         var h = '<div class="' + tileClass + '">';
         h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + (isLocked ? '&#128274;' : '&#128275;') + '</div>';
+        h += '<div class="tile-icon' + (isLocked ? ' active' : '') + '">' + getSvgIcon(entity, "lock") + '</div>';
         if (!unavailable) {
           h += '<div class="toggle-switch">';
           h += '<input type="checkbox" id="t_' + eid + '" ' + (isLocked ? 'checked' : '') + ' onchange="toggleLock(\'' + eid + '\', this.checked)">';
@@ -2566,14 +2681,7 @@
         var domain = eid.split(".")[0];
         var isBinary = (domain === "binary_sensor");
 
-        var icon = "&#128202;";
-        if (dc === "temperature") icon = "&#127777;&#65039;";
-        else if (dc === "humidity") icon = "&#128167;";
-        else if (dc === "battery") icon = "&#128267;";
-        else if (dc === "power" || dc === "energy") icon = "&#9889;";
-        else if (dc === "illuminance") icon = "&#9728;&#65039;";
-        else if (dc === "motion") icon = "&#128694;";
-        else if (dc === "door" || dc === "window" || dc === "opening" || eid.indexOf("cover") !== -1) icon = "&#128726;";
+        var iconSvg = getSvgIcon(entity, "sensor");
 
         // Binary sensor text formatting
         var stateText = escapeHtml(entity.state);
@@ -2620,7 +2728,7 @@
 
         var h = '<div class="tile' + alertClass + '">';
         h += '<div class="tile-top">';
-        h += '<div class="tile-icon">' + icon + '</div>';
+        h += '<div class="tile-icon">' + iconSvg + '</div>';
         h += '</div>';
         h += '<div class="tile-bottom">';
         h += '<div class="tile-name">' + name + '</div>';
