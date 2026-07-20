@@ -482,57 +482,7 @@
       color: rgba(0, 0, 0, 0.5);
     }
 
-    /* ======== TOGGLE SWITCH ======== */
-    .toggle-switch {
-      position: relative;
-      width: 50px;
-      height: 30px;
-      -webkit-flex-shrink: 0;
-      flex-shrink: 0;
-    }
 
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-      position: absolute;
-    }
-
-    .toggle-slider {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.12);
-      border-radius: 15px;
-      cursor: pointer;
-      -webkit-transition: background 0.3s;
-      transition: background 0.3s;
-    }
-
-    .toggle-slider:before {
-      content: "";
-      position: absolute;
-      width: 26px;
-      height: 26px;
-      left: 2px;
-      bottom: 2px;
-      background: #ffffff;
-      border-radius: 50%;
-      -webkit-transition: -webkit-transform 0.3s;
-      transition: transform 0.3s;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-    }
-
-    .toggle-switch input:checked+.toggle-slider {
-      background: rgba(255, 255, 255, 0.5);
-    }
-
-    .toggle-switch input:checked+.toggle-slider:before {
-      -webkit-transform: translateX(20px);
-      transform: translateX(20px);
-    }
 
     /* ======== BRIGHTNESS SLIDER ======== */
     .slider-row {
@@ -654,30 +604,7 @@
       z-index: 1;
     }
 
-    /* ======== THERMOSTAT ======== */
-    .thermostat-display {
-      text-align: center;
-      padding: 12px 0 4px;
-    }
 
-    .thermostat-current {
-      font-size: 13px;
-      color: #8e8e93;
-      margin-bottom: 4px;
-    }
-
-    .thermostat-target {
-      font-size: 48px;
-      font-weight: 300;
-      color: #1c1c1e;
-      line-height: 1;
-    }
-
-    .thermostat-unit {
-      font-size: 22px;
-      color: #8e8e93;
-      vertical-align: super;
-    }
 
     .thermostat-controls {
       display: -webkit-flex;
@@ -711,20 +638,7 @@
       background: #e5e5ea;
     }
 
-    .thermostat-mode {
-      margin: 0 28px;
-      font-size: 14px;
-      color: #8e8e93;
-      text-align: center;
-    }
 
-    .thermostat-mode-label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #c7c7cc;
-      margin-bottom: 2px;
-    }
 
     .mode-selector {
       display: -webkit-flex;
@@ -1367,13 +1281,7 @@
       background: rgba(255, 255, 255, 0.08);
     }
 
-    body.dark-theme .toggle-slider {
-      background: rgba(255, 255, 255, 0.15);
-    }
 
-    body.dark-theme .toggle-switch input:checked+.toggle-slider {
-      background: rgba(255, 255, 255, 0.65);
-    }
 
     body.dark-theme .slider-row {
       border-top-color: rgba(255, 255, 255, 0.06);
@@ -1391,9 +1299,7 @@
       background: rgba(255, 255, 255, 0.15);
     }
 
-    body.dark-theme .thermostat-target {
-      color: #e6edf3;
-    }
+
 
     body.dark-theme .thermostat-btn {
       background: #21262d;
@@ -1689,7 +1595,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.1.1</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.2.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1748,14 +1654,6 @@
         var cachedScene = localStorage.getItem("ha_last_scene");
         if (cachedScene) lastActivatedScene = cachedScene;
       } catch (e) { }
-
-      var FLOOR_ORDER = {
-        "Upstairs": 1,
-        "Main Floor": 2,
-        "Basement": 3,
-        "Outdoor": 4,
-        "Other": 5
-      };
 
       function getSvg(iconName, color) {
         var fillStyle = color ? ' style="fill:' + color + '; color:' + color + ';"' : '';
