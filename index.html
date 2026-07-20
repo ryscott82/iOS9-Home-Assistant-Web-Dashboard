@@ -554,7 +554,7 @@
       left: 0;
       top: 0;
       bottom: 0;
-      background: #e1f5fe;
+      background: #64b5f6;
       -webkit-transition: width 0.15s ease-out;
       transition: width 0.15s ease-out;
       pointer-events: none;
@@ -1325,7 +1325,7 @@
       background: rgba(255, 255, 255, 0.08);
     }
     body.dark-theme .volume-bar-fill {
-      background: rgba(47, 137, 252, 0.25);
+      background: rgba(0, 122, 255, 0.55);
     }
 
     body.dark-theme .heater-tile .tile-name,
@@ -5139,46 +5139,44 @@
           }
         }
 
-        // Helper function to query a specific browse path and collect playlists
-        function fetchPlaylistsFromPath(browsePath) {
+        if (!targetEid) {
+          maPlaylistsLoading = false;
+          maPlaylistsError = "No speaker selected or available to browse media.";
+          if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
+          return;
+        }
+
+        // Helper to fetch playlists from a specific browse path
+        function fetchPlaylistsFromPath(browsePath, depth) {
+          depth = depth || 0;
           queryHAWebSocket("media_player/browse_media", {
-            entity_id: targetEid || "media_player.mass",
+            entity_id: targetEid,
             media_content_id: browsePath,
             media_content_type: "library"
           }, function (err, res) {
             if (err) {
               maPlaylistsLoading = false;
-              maPlaylistsError = err;
+              maPlaylistsError = "Failed browsing media: " + err;
               if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
               return;
             }
 
             var items = (res && res.children) ? res.children : [];
-            // If items contains subfolders like "Playlists" or "Favorites", navigate into them
+            
+            // If items contains subfolders like "Playlists" or "Favorites", navigate into them (max depth 2)
             var playlistSubfolder = null;
-            for (var k = 0; k < items.length; k++) {
-              var itTitle = (items[k].title || "").toLowerCase();
-              if (itTitle.indexOf("playlist") !== -1 || itTitle.indexOf("favorite") !== -1) {
-                playlistSubfolder = items[k].media_content_id;
-                break;
+            if (depth < 2) {
+              for (var k = 0; k < items.length; k++) {
+                var itTitle = (items[k].title || "").toLowerCase();
+                if (itTitle.indexOf("playlist") !== -1 || itTitle.indexOf("favorite") !== -1) {
+                  playlistSubfolder = items[k].media_content_id;
+                  break;
+                }
               }
             }
 
             if (playlistSubfolder && playlistSubfolder !== browsePath) {
-              // Deep browse into the playlist subfolder
-              queryHAWebSocket("media_player/browse_media", {
-                entity_id: targetEid || "media_player.mass",
-                media_content_id: playlistSubfolder,
-                media_content_type: "library"
-              }, function (errSub, resSub) {
-                maPlaylistsLoading = false;
-                if (errSub) {
-                  maPlaylistsError = errSub;
-                } else {
-                  maPlaylists = (resSub && resSub.children) ? resSub.children : [];
-                }
-                if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
-              });
+              fetchPlaylistsFromPath(playlistSubfolder, depth + 1);
             } else {
               maPlaylistsLoading = false;
               maPlaylists = items;
@@ -5187,37 +5185,48 @@
           });
         }
 
-        // Step 1: Browse Root Media Sources to discover Music Assistant's registered media_content_id
+        // Step 1: Browse Root Media Browser for target speaker (omitting media_content_id)
         queryHAWebSocket("media_player/browse_media", {
-          entity_id: targetEid || "media_player.mass",
-          media_content_id: "",
-          media_content_type: ""
+          entity_id: targetEid
         }, function (err, rootResult) {
           if (err) {
-            // Fallback direct attempt if root browse fails
-            fetchPlaylistsFromPath("media-source://mass/favorites/playlists");
+            maPlaylistsLoading = false;
+            maPlaylistsError = "Media Browser error on " + targetEid + ": " + err;
+            if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
             return;
           }
 
           var rootChildren = (rootResult && rootResult.children) ? rootResult.children : [];
           var maSourceId = "";
+          var fallbackPath = "";
 
-          // Find Music Assistant in root media sources list
           for (var c = 0; c < rootChildren.length; c++) {
             var rItem = rootChildren[c];
             var rCid = (rItem.media_content_id || "").toLowerCase();
             var rTitle = (rItem.title || "").toLowerCase();
+
             if (rCid.indexOf("mass") !== -1 || rCid.indexOf("music_assistant") !== -1 || rTitle.indexOf("music assistant") !== -1) {
               maSourceId = rItem.media_content_id;
               break;
             }
+            if (rTitle.indexOf("playlist") !== -1 || rTitle.indexOf("favorite") !== -1) {
+              if (!fallbackPath) fallbackPath = rItem.media_content_id;
+            }
           }
 
           if (maSourceId) {
-            fetchPlaylistsFromPath(maSourceId);
+            fetchPlaylistsFromPath(maSourceId, 1);
+          } else if (fallbackPath) {
+            fetchPlaylistsFromPath(fallbackPath, 1);
+          } else if (rootChildren.length > 0) {
+            // Display top-level media sources directly if no specific playlist folder matched
+            maPlaylistsLoading = false;
+            maPlaylists = rootChildren;
+            if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
           } else {
-            // Fallback attempts
-            fetchPlaylistsFromPath("media-source://mass/favorites/playlists");
+            maPlaylistsLoading = false;
+            maPlaylistsError = "No media content found on " + friendlyName(entities[targetEid] || { entity_id: targetEid });
+            if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
           }
         });
       };
