@@ -1533,15 +1533,6 @@
 
   <!-- APP -->
   <main class="app-content" id="appContent" style="display:none; padding-top: 30px;">
-    <!-- ALERT BANNER -->
-    <div id="alertBanner" class="alert-banner hidden">
-      <div style="-webkit-flex: 1; flex: 1; cursor: pointer;" onclick="switchTab('chemicals')">
-        <div class="alert-banner-text" id="alertBannerTitle" style="font-weight:700; margin-bottom:4px;">⚠️ Check Hot
-          Tub Chemicals</div>
-        <div id="alertBannerContent" style="font-size:13px; line-height:1.4;"></div>
-      </div>
-      <button class="alert-banner-close" onclick="event.stopPropagation(); dismissBanner()">&times;</button>
-    </div>
 
     <div id="entityContainer">
       <div class="loading-spinner">
@@ -1556,7 +1547,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.30.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v1.31.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1932,41 +1923,6 @@
 
         var hasRedWarning = htRedRecs.length > 0 || poolRedRecs.length > 0;
 
-        if (!hasRedWarning) {
-          bannerDismissed = false; // Reset dismissal when state is clean
-        }
-
-        var bannerEl = document.getElementById("alertBanner");
-        var bannerTitleEl = document.querySelector("#alertBanner .alert-banner-text");
-        var bannerContentEl = document.getElementById("alertBannerContent");
-        if (bannerEl) {
-          if (hasRedWarning && !bannerDismissed) {
-            if (bannerTitleEl) {
-              if (htRedRecs.length > 0 && poolRedRecs.length > 0) {
-                bannerTitleEl.textContent = "⚠️ Check Pool & Hot Tub Chemicals";
-              } else if (htRedRecs.length > 0) {
-                bannerTitleEl.textContent = "⚠️ Check Hot Tub Chemicals";
-              } else {
-                bannerTitleEl.textContent = "⚠️ Check Pool Chemicals";
-              }
-            }
-            if (bannerContentEl) {
-              var bulletList = '<ul style="margin:4px 0 0 0; padding-left:20px; list-style-type:disc;">';
-              for (var r = 0; r < htRedRecs.length; r++) {
-                bulletList += '<li style="margin-top:2px;">[Hot Tub] ' + htRedRecs[r] + '</li>';
-              }
-              for (var r = 0; r < poolRedRecs.length; r++) {
-                bulletList += '<li style="margin-top:2px;">[Pool] ' + poolRedRecs[r] + '</li>';
-              }
-              bulletList += '</ul>';
-              bannerContentEl.innerHTML = bulletList;
-            }
-            bannerEl.className = "alert-banner";
-          } else {
-            bannerEl.className = "alert-banner hidden";
-          }
-        }
-
         var html = "";
 
         // Render Tab Segmented control
@@ -1976,8 +1932,10 @@
         var chActive = activeTab === "chemicals" ? " active" : "";
         html += '<button class="tab-btn' + ovActive + '" onclick="switchTab(\'overview\')">Overview</button>';
         html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">Controls</button>';
-        if (!chemicalsCheckedToday) {
-          html += '<button class="tab-btn' + chActive + '" style="background:#ff3b30; color:#ffffff; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">🚨 Check Chemicals</button>';
+        if (hasRedWarning) {
+          html += '<button class="tab-btn' + chActive + '" style="background:#ff3b30; color:#ffffff; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">🚨 Chemical Alert</button>';
+        } else if (!chemicalsCheckedToday) {
+          html += '<button class="tab-btn' + chActive + '" style="background:#ffcc00; color:#1c1c1e; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">⚠️ Check Chemicals</button>';
         } else {
           html += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals & Sensors</button>';
         }
