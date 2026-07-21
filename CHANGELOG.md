@@ -2,6 +2,11 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.40.0] - 2026-07-21
+- **Dynamic Header Navigation Button**: Header button displays a 3-line Hamburger SVG (`title="Menu"`) when on the Home screen (tapping goes to Controls), and a House SVG (`title="Home"`) when on Controls or Chemicals (tapping goes to Home).
+- **Removed "Home" from Menu Bar**: Omitted the redundant "Home" button from the `.tab-bar` menu bar.
+- **90% Height Card Fill**: Configured card height (`52px`, `padding: 3px 12px`, icon `36px`, controls `34px`) so the icon and text fill 90% of the card height with zero top/bottom dead space.
+
 ## [v2.39.0] - 2026-07-21
 - **Streamlined House Navigation Handler**: Rewrote `toggleMainNavigation(event)` and `window.switchTab` for 100% reliable tab switching (Home -> Controls on Home tab; Controls/Chemicals -> Home on other tabs).
 - **Zero-Dead-Space 84px Overview Cards**: Maintained 84px card height (`min-height: 84px`, `height: 84px`, `padding: 10px 16px`) with 44px icons, 42px controls, and 28px titles so the entire 84px height is filled with zero top/bottom dead space.
