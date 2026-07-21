@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.52.0] - 2026-07-21
+- **Smart Heater Highlight Logic**: Disabled red active highlight on climate and water heater cards whenever the current temperature is higher than the set target temperature (`current > target`).
+- **Target Equal/Active Heating Refinement**: Maintained soft red outline when `current == target` and full red highlight tint when actively heating (`current < target`).
+
 ## [v2.49.0] - 2026-07-21
 - **Album Art Live Refresh**: Appended dynamic cache-busting version parameter (`_v=` + track title hash + timestamp) to album art URLs so Safari on iOS 9 instantly re-renders new artwork on track changes.
 - **`ipadhomescreen` Tag Filtering for Home Tab**: Added `homeEntityIds` parsing and `isHomeScreenEntity()` helper. Only devices tagged with `ipadhomescreen` appear on the Home tab.
