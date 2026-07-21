@@ -35,7 +35,7 @@ All notable changes and features to the Home Assistant iPad Mini Web Dashboard a
 - **Instant Optimistic Fire Button Switching (<1ms)**: Direct DOM element targeting (`btn_fire_<eid>`) updates Fire button background, border, and flame color instantly in <1ms when pressed.
 
 ## [v2.31.0] - 2026-07-21
-- **Uniform 30px Card Title Font Scale**: Replaced length-based step scaling with a consistent, uniform `30px` bold title font across all Overview cards (using natural 1-2 line wrapping for title length).
+- **Uniform 30px Card Title Font Scale**: Replaced length-based step scaling with a consistent, uniform `30px` bold title font across all Overview tiles (using natural 1-2 line wrapping for title length).
 
 ## [v2.30.0] - 2026-07-21
 - **Fire Button State Toggle (100°F / 68°F)**: Fire button is muted gray when target != 100° (tapping sets target to 100°F) and glowing orange when target == 100° (tapping sets target to 68°F).
@@ -118,5 +118,132 @@ All notable changes and features to the Home Assistant iPad Mini Web Dashboard a
 - **Card Height Scale**: Set card min-height to 88px for display height fitting.
 - **Omitted "General Controls" Label**: Omitted room headers when no specific room is matched.
 
-## [v1.0.0] - 2026-07-20
-- Initial release of the iPad Mini 1st Gen Home Assistant Web Dashboard (iOS 9 Safari compatible, WebSocket + HTTP REST API fallback).
+## [v2.8.0] - 2026-07-21
+- **Theme: Simplicity**: Set big Overview controls to 50% width with inline Room & Feature names (18.5px bold). Hidden header/footer on Overview and removed section headers.
+
+## [v2.7.0] - 2026-07-21
+- **Area Grouping**: Grouped Overview controls by Room (Area), increased overall text sizes, and reduced min-height to eliminate whitespace.
+
+## [v2.6.0] - 2026-07-21
+- **Clean Overview**: Hidden idle media players from Overview tab.
+- **Controls Tuning**: Deployed a clearer cascading waterfall SVG icon and increased font size & padding for Controls cards.
+
+## [v2.5.0] - 2026-07-21
+- **Tab Layouts**: Reordered floors to Outside, Basement, Upstairs, Main Floor, and fixed target temperature text color contrast in dark theme.
+
+## [v2.4.0] - 2026-07-20
+- **Overhaul Layout**: Built side-by-side split grid layouts, customized SVG indicators (waterfall, bubbles, fire, hottub), and centered top floor navigation.
+
+## [v2.3.0] - 2026-07-20
+- **Climate density**: Built high-density 25% climate tiles and Pool/Hot Tub presets.
+- **Visuals**: Added set/current temperature match highlights and implemented a 15-minute inactivity idle reset.
+
+## [v2.2.0] - 2026-07-20
+- **Streamlining CSS**: Deleted unused toggle-switch and thermostat CSS.
+- **Layout overhaul**: Implemented dynamic floors, compact card layouts, and pulsing heater animations.
+
+## [v2.1.1] - 2026-07-20
+- **Hotfix loading**: Added a fallback timeout to resolve loading screen hangs, and fixed Controls tab crash during dynamic floor key resolution.
+
+## [v2.1.0] - 2026-07-20
+- **Floor registries**: Integrated dynamic floor and area fetching via Home Assistant WebSockets, condensed temperature control UI, and removed redundant switches.
+
+## [v2.0.1] - 2026-07-20
+- **Safari 9 & WebSocket Fallback**: Integrated 2.5s WebSocket fallback registry timers, safe label filtering guards, and try-catch blocks to prevent blank screen hangs.
+
+## [v2.0.0] - 2026-07-20
+- **Landmark Visual Redesign**: Introduced dynamic top header with custom welcome message and live clock, minimalist SVG vector icons (no emojis), and muted outline-only active card styling.
+- **Sorting**: Grouped Overview tab into Media, Lights, Features, and Master Switches, and Controls tab by Floor.
+
+## [v1.33.0] - 2026-07-20
+- **RGB Preset Picker**: Added one-tap preset buttons (Bright White, Warm White, Red, Blue) directly on color-enabled light cards when turned ON.
+
+## [v1.32.0] - 2026-07-20
+- **Muted Badges**: Muted navigation alert badges for enhanced tab contrast, and restructured Overview tab.
+
+## [v1.31.0] - 2026-07-20
+- **Navigation alerts**: Removed top red alert banner in favor of a navigation badge priority gate (Red Chemical Alert > Yellow Check Chemicals).
+
+## [v1.30.0] - 2026-07-20
+- **Confirm All logs**: Added a single-tap "Confirm All" button to batch-confirm all entered chemical values.
+- **Logs Expiry**: Auto-expiry timers to clear unconfirmed chemical selections after 3 minutes.
+
+## [v1.29.0] - 2026-07-19
+- **Removed Music Tab**: Completely removed the Music tab, player selector, and associated Music Assistant code.
+
+## [v1.28.15] - 2026-07-19
+- **Music Assistant Tab**: Added Music Assistant integration tab with speaker selector, playlist browser, and shuffle playback actions.
+
+## [v1.27.15] - 2026-07-19
+- **Logs UX**: Positioned current values inline with chemical titles, increased font sizes, and enlarged Confirm buttons.
+
+## [v1.26.15] - 2026-07-19
+- **Presets**: Centered quick log buttons, enforced single row layouts, and disabled Confirm buttons until a value is selected.
+
+## [v1.25.15] - 2026-07-19
+- **Chlorine presets**: Excluded chlorine names from isCalcium checks to prevent Free Chlorine from inheriting wrong calcium fallback presets.
+
+## [v1.24.15] - 2026-07-19
+- **Safari 9 layout**: Replaced flexbox `gap` spacing with margins for Safari 9 compatibility in stacked media cards and confirmation overlays.
+
+## [v1.23.15] - 2026-07-19
+- **Button bars**: Overhauled volume controllers to use rounded rectangle button bars with 6.25% increments and progress fills.
+
+## [v1.22.15] - 2026-07-19
+- **Fix Controls Tab Crash**: Restored the `isGroupIdle` helper to resolve Controls page loading ReferenceErrors.
+
+## [v1.22.14] - 2026-07-19
+- **Sliderless UX**: Removed all sliders from the dashboard (replaced volume sliders with Down/Mute/Up buttons, brightness with +/- adjustments, and chemical inputs with presets + keypad).
+
+## [v1.21.14] - 2026-07-19
+- **Keypad flexbox**: Wrapped Play SVG contents in flex div container to fix button alignment bugs on iPad.
+
+## [v1.20.14] - 2026-07-19
+- **Stacked cards**: Columns of up to 3 cards for idle media players to prevent layout heights mismatch on Controls page.
+
+## [v1.19.14] - 2026-07-19
+- **Compact players**: Compacted Controls page idle media players to 1/3 height and hid redundant speaker names in single-speaker groups.
+
+## [v1.18.14] - 2026-07-09
+- **Track logging**: Tracked and logged skipped grouped speakers and details for robust transitions.
+
+## [v1.17.14] - 2026-07-09
+- **Footer details**: Displayed dashboard version tags directly in footer.
+
+## [v1.0.0] - 2026-07-07
+- **Initial release of the iPad Mini 1st Gen Home Assistant Web Dashboard (iOS 9 Safari compatible, WebSocket + HTTP REST API fallback).**
+
+## [v0.9.0] - 2026-07-06
+- **Speaker Sticky Transitions**: Deployed a 10-second sticky period for grouped speaker cards to prevent visual splitting during transition states.
+- **Optimistic Skipped Track Details**: Added transition logging of skipped track metadata and album art to pick up new tracks smoothly when speakers are in flux.
+
+## [v0.8.0] - 2026-07-05
+- **Auto-Idle Timeout Reset**: Implemented a 15-minute inactivity automated tab switching timer, resetting active view back to the Overview tab.
+- **Overview Check Chemicals Warning Card**: Replaced full-screen chemical splash screens with a yellow reminder card on the Overview tab.
+
+## [v0.7.0] - 2026-07-04
+- **Agenda Calendar Tab (Beta)**: Deployed a Calendar tab with active agenda views, subsequently reverted to optimize dashboard performance.
+
+## [v0.6.0] - 2026-07-03
+- **Manual Theme overrides**: Introduced manual dark/light theme overrides with persistent state caching.
+- **Safari 9 CSS Adjustments**: Handled iOS 9 strict mode scopes and CSS fallbacks.
+
+## [v0.5.0] - 2026-07-02
+- **Virtual Keypad Entry**: Built a virtual numeric keypad overlay to replace chemical sliders, enabling tap-to-input logging.
+- **Automated Hot Tub Fixes**: Added an automated 15-second hot tub chlorine boost timer switch.
+
+## [v0.4.0] - 2026-07-01
+- **Superchlorination Calculator**: Integrated duration formulas matching salt cell output rates to Combined Chlorine burn targets.
+- **ORP/pH Alert Cross-Suppression**: Cross-correlated sensor readings to prevent conflicting alert alerts (e.g. pH vs ORP dosing).
+
+## [v0.3.0] - 2026-06-30
+- **Chemical Recommendation Engine**: Programmed dosage conversions targeting cups, tbsp, and 40lb salt bags for Pool (20,000 gal) and Hot Tub (600 gal).
+
+## [v0.2.0] - 2026-06-25
+- **Speaker Group Manager**: Integrated custom virtual groups to bypass hardware speaker join limitations, resolving HTTP 500 join errors.
+- **Media Grouping**: Grouped speaker cards dynamically by current track / media status.
+
+## [v0.1.0] - 2026-06-20
+- **Core Boilerplate**: Deployed foundational single-page dashboard architecture.
+- **Long-Lived Access Token Auth**: Programmed Home Assistant REST and WebSocket authentication.
+- **High-Performance UI Grid**: Programmed CSS grid layouts optimized for 1st generation iPad Mini (iOS 9 Safari).
