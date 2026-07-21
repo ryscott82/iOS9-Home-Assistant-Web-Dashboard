@@ -1011,9 +1011,25 @@
       border: 2px solid #ff453a !important;
     }
 
-    body.tab-overview .tab-bar {
+    body.tab-home .tab-bar {
       display: none !important;
     }
+
+    /* Keep footer visible on Home tab */
+    body.tab-home footer.app-footer {
+      display: -webkit-flex !important;
+      display: flex !important;
+    }
+
+    body.show-nav .tab-bar {
+      display: -webkit-flex !important;
+      display: flex !important;
+    }
+
+    body.tab-overview footer.app-footer {
+      display: none !important;
+    }
+
     body.tab-controls .tab-bar,
     body.tab-chemicals .tab-bar {
       display: -webkit-flex !important;
@@ -1768,8 +1784,8 @@
       <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:clamp(18px, 3.2vw, 32px); font-weight:800; white-space:normal; word-break:break-word; line-height:1.1; padding-right:12px;">Welcome Home</div>
       <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; -webkit-flex-shrink:0; flex-shrink:0;">
         <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:clamp(14px, 2.4vw, 24px); font-weight:700; white-space:nowrap;"></div>
-        <button class="menu-icon-btn" onclick="toggleMainNavigation()" title="Toggle Menu" style="width:38px; height:38px; border-radius:10px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        <button class="menu-icon-btn" onclick="toggleMainNavigation()" title="Home / Menu" style="width:38px; height:38px; border-radius:10px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
         </button>
       </div>
     </header>
@@ -1787,7 +1803,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.35.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.36.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1826,7 +1842,7 @@
       var areaRegistryDone = false;
       var floorRegistryDone = false;
       var recentlySkippedTracks = [];
-      var activeTab = "overview";
+      var activeTab = "home";
       var activeChemTab = "inputs";
       var lastActivatedScene = "";
       var checkedTodayAlertDismissed = false;
@@ -1843,18 +1859,44 @@
         var cachedVol = localStorage.getItem("ha_rec_volume");
         if (cachedVol) selectedRecVolume = cachedVol;
         var cachedTab = localStorage.getItem("ha_active_tab");
-        if (cachedTab) activeTab = cachedTab;
+        if (cachedTab) {
+          if (cachedTab === "overview") activeTab = "home";
+          else activeTab = cachedTab;
+        }
         var cachedChemTab = localStorage.getItem("ha_active_chem_tab");
         if (cachedChemTab) activeChemTab = cachedChemTab;
         var cachedScene = localStorage.getItem("ha_last_scene");
         if (cachedScene) lastActivatedScene = cachedScene;
       } catch (e) { }
 
+      function applyTabClass(tabName) {
+        document.body.className = document.body.className.replace(/\btab-[a-z]+\b/g, "").trim();
+        document.body.classList.add("tab-" + tabName);
+        try {
+          localStorage.setItem("ha_active_tab", tabName);
+        } catch (e) { }
+
+        if (tabName === "home") {
+          window.scrollTo(0, 0);
+        }
+      }
+
+      function switchTab(tabName) {
+        activeTab = tabName;
+        applyTabClass(tabName);
+
+        if (activeTab === "home") {
+          renderHomeTab();
+        } else {
+          switchTab("home");
+        }
+      }
+
       window.toggleMainNavigation = function () {
-        if (activeTab === "overview") {
+        if (activeTab === "home") {
           switchTab("controls");
         } else {
-          switchTab("overview");
+          switchTab("home");
         }
       };
 
@@ -2033,7 +2075,7 @@
         return "#007aff";
       }
 
-      function renderOverviewCard(entity) {
+      function renderHomeCard(entity) {
         var domain = entity.entity_id.split(".")[0];
         var name = escapeHtml(friendlyName(entity));
         var room = escapeHtml(getRoomName(entity));
@@ -2165,7 +2207,7 @@
         return h;
       }
 
-      function renderOverviewMediaPlayerCard(group) {
+      function renderHomeMediaPlayerCard(group) {
         var primary = group[0] || group;
         var names = [];
         if (group.length) {
@@ -2189,7 +2231,7 @@
         var isIdle = (state !== "playing" && state !== "paused" && title !== "Skipping...");
         if (isIdle) return "";
 
-        // If paused for > 15 minutes (900,000 ms), hide from Overview tab
+        // If paused for > 15 minutes (900,000 ms), hide from Home tab
         if (state === "paused" && primary.last_changed) {
           var lastChangedTs = new Date(primary.last_changed).getTime();
           if (!isNaN(lastChangedTs) && (Date.now() - lastChangedTs > 900000)) {
@@ -2268,18 +2310,19 @@
       }
 
       var idleTimer = null;
-      window.resetIdleTimer = function () {
+      function resetInactivityTimer() {
         if (idleTimer) {
           clearTimeout(idleTimer);
         }
         idleTimer = setTimeout(function () {
-          if (activeTab !== "overview") {
-            switchTab("overview");
+          if (activeTab !== "home") {
+            switchTab("home");
           }
-          window.scrollTo(0, 0);
-          showToast("Returned to Overview due to inactivity");
+          resetInactivityTimer();
+          showToast("Returned to Home due to inactivity");
         }, 15 * 60 * 1000); // 15 minutes
-      };
+      }
+      window.resetIdleTimer = resetInactivityTimer;
 
       // ======== INIT ========
       function init() {
@@ -2288,7 +2331,7 @@
         startMediaTickers();
         updateClock();
         setInterval(updateClock, 10000);
-        resetIdleTimer();
+        resetInactivityTimer();
         document.addEventListener("click", resetIdleTimer);
         document.addEventListener("touchstart", resetIdleTimer);
       }
@@ -2708,10 +2751,10 @@
 
         // Render Tab Segmented control
         html += '<div class="tab-bar">';
-        var ovActive = activeTab === "overview" ? " active" : "";
+        var hmActive = activeTab === "home" ? " active" : "";
         var cActive = activeTab === "controls" ? " active" : "";
         var chActive = activeTab === "chemicals" ? " active" : "";
-        html += '<button class="tab-btn' + ovActive + '" onclick="switchTab(\'overview\')">Overview</button>';
+        html += '<button class="tab-btn' + hmActive + '" onclick="switchTab(\'home\')">Home</button>';
         html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">Controls</button>';
         if (hasRedWarning) {
           if (activeTab === "chemicals") {
@@ -2733,8 +2776,8 @@
         // RENDER BASED ON ACTIVE TAB
         document.body.className = (themeOverride === "dark" || isNight ? "dark-theme " : "") + "tab-" + activeTab;
 
-        if (activeTab === "overview") {
-          // Render Media Players + Overview entities grid
+        if (activeTab === "home") {
+          // Render Media Players + Home entities grid
           var mediaGroups = [];
           var songGroups = {};
           for (i = 0; i < mediaPlayers.length; i++) {
@@ -2753,14 +2796,14 @@
             }
           }
 
-          var overviewEntities = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
-          if (mediaGroups.length > 0 || overviewEntities.length > 0) {
+          var homeEntities = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
+          if (mediaGroups.length > 0 || homeEntities.length > 0) {
             html += '<div class="tile-grid">';
             for (i = 0; i < mediaGroups.length; i++) {
-              html += renderOverviewMediaPlayerCard(mediaGroups[i]);
+              html += renderHomeMediaPlayerCard(mediaGroups[i]);
             }
-            for (i = 0; i < overviewEntities.length; i++) {
-              html += renderOverviewCard(overviewEntities[i]);
+            for (i = 0; i < homeEntities.length; i++) {
+              html += renderHomeCard(homeEntities[i]);
             }
             html += '</div>';
           }
