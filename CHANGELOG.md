@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.28.0] - 2026-07-21
+- **Whole-Number Temperatures**: Temperature adjustments step by 1° whole numbers, and all readouts/target temperatures are rounded to the nearest integer (`Math.round`).
+- **34px Max Font Scale**: Card feature titles scale up to `34px` bold (`34px`/`28px`/`22px` dynamic scale), taking up to 95% of card height and 100% card length.
+
 ## [v2.27.0] - 2026-07-21
 - **15-Minute Media Pause Auto-Hide**: Paused media players automatically hide from the Overview tab after 15 minutes of inactivity (`last_changed` > 15 mins).
 - **Live Instant Set Temperature UI**: Pressing `+` or `-` updates set temperature text on screen instantly (<1ms).
