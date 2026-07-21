@@ -944,6 +944,26 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    .tile.overview-big-tile {
+      -webkit-flex: 0 0 calc(50% - 12px);
+      flex: 0 0 calc(50% - 12px);
+      min-height: 70px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: #ffffff;
+      margin: 6px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.04);
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.overview-view header.app-header,
+    body.overview-view footer.app-footer {
+      display: none !important;
+    }
+
     @media (min-width: 768px) {
       .tile.overview-tile {
         -webkit-flex: 0 0 calc(25% - 10px);
@@ -1671,7 +1691,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.7.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.8.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1907,126 +1927,56 @@
         return "#007aff";
       }
 
-      function renderOverviewToggleEntity(entity, domain) {
-        var name = escapeHtml(friendlyName(entity));
-        var eid = escapeHtml(entity.entity_id);
-        var isOn = entity.state === "on" || entity.state === "On";
-        var activeClass = isOn ? (domain === "light" ? " active" : " active-blue") : "";
-        var iconName = getEntityIcon(entity, domain);
-        var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state) : "");
-
-        var h = '<div class="tile overview-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer;">';
-        
-        // Compact side-by-side left-align layout
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:8px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
-        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-weight:700; font-size:12px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        h += '</div>';
-        h += '</div>';
-        
-        h += '</div>';
-        return h;
-      }
-
-      function renderOverviewWaterHeater(entity) {
-        var name = escapeHtml(friendlyName(entity));
-        var attrs = entity.attributes || {};
-        var currentTemp = attrs.current_temperature || "--";
-        var opMode = entity.state || "off";
-        var eid = escapeHtml(entity.entity_id);
-        var unit = attrs.unit_of_measurement || "\u00B0F";
-        var isActive = opMode !== "off" && opMode !== "Off";
-        var activeClass = isActive ? " active-red" : "";
-        var iconName = getEntityIcon(entity, "water_heater");
-        var icon = getSvg(iconName, isActive ? "#ff3b30" : "");
-
-        var h = '<div class="tile overview-tile heater-tile' + activeClass + '" onclick="toggleWaterHeater(\'' + eid + '\', \'' + escapeHtml(opMode) + '\')" style="cursor:pointer;">';
-        
-        // Compact side-by-side left-align layout
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:8px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
-        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-weight:700; font-size:12px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        h += '<div class="tile-state" style="font-size:10px; font-weight:700;">' + currentTemp + unit + '</div>';
-        h += '</div>';
-        h += '</div>';
-        
-        h += '</div>';
-        return h;
-      }
-
-      function renderOverviewInputSelect(entity) {
-        var name = escapeHtml(friendlyName(entity));
-        var currentOption = entity.state || "";
-        var icon = getSvg("list");
-
-        var h = '<div class="tile overview-tile">';
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:8px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
-        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-weight:700; font-size:12px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        h += '<div class="tile-state" style="font-size:10px;">' + escapeHtml(currentOption) + '</div>';
-        h += '</div>';
-        h += '</div>';
-        h += '</div>';
-        return h;
-      }
-
-      function renderOverviewFeature(entity) {
+      function renderOverviewCard(entity) {
         var domain = entity.entity_id.split(".")[0];
-        if (domain === "water_heater") return renderOverviewWaterHeater(entity);
-        if (domain === "switch" || domain === "fan" || domain === "input_boolean") {
-          return renderOverviewToggleEntity(entity, domain);
-        }
-
         var name = escapeHtml(friendlyName(entity));
+        var room = escapeHtml(getRoomName(entity));
         var eid = escapeHtml(entity.entity_id);
-        var state = escapeHtml(entity.state);
-
+        var state = entity.state || "off";
+        var unavailable = state === "unavailable";
         var isOn = false;
-        if (domain === "lock") {
+
+        if (domain === "light" || domain === "switch" || domain === "fan" || domain === "input_boolean") {
+          isOn = (state === "on" || state === "On");
+        } else if (domain === "lock") {
           isOn = (state === "locked");
         } else if (domain === "climate") {
-          isOn = (state !== "off" && state !== "unavailable");
+          isOn = (state !== "off" && !unavailable);
         } else if (domain === "cover") {
           isOn = (state === "open" || state === "opening");
         } else {
-          isOn = (state !== "off" && state !== "unavailable" && state !== "closed" && state !== "locked");
+          isOn = (state !== "off" && !unavailable && state !== "closed");
         }
-
-        var iconName = getEntityIcon(entity, domain);
-        if (domain === "climate") iconName = "temp";
 
         var activeClass = "";
         if (isOn) {
-          if (domain === "lock") activeClass = " active-green";
+          if (domain === "light") activeClass = " active";
+          else if (domain === "lock") activeClass = " active-green";
           else if (domain === "climate" && state === "heat") activeClass = " active-orange";
           else if (domain === "climate" && state === "cool") activeClass = " active-blue";
           else activeClass = " active-blue";
         }
 
+        var iconName = getEntityIcon(entity, domain);
         var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, state) : "");
 
-        var h = '<div class="tile overview-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')">';
-        
-        // Compact side-by-side left-align layout
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:8px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
-        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-weight:700; font-size:12px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        
-        var stateText = state;
+        var stateText = escapeHtml(state);
         if (domain === "climate") {
           var targetTemp = entity.attributes.temperature || "--";
           var currentTemp = entity.attributes.current_temperature || "--";
           var unit = entity.attributes.unit_of_measurement || "°F";
           stateText = currentTemp + unit + " / " + targetTemp + unit;
         }
-        h += '<div class="tile-state" style="font-size:10px;">' + stateText + '</div>';
+
+        var h = '<div class="tile overview-big-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer;">';
+        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
+        h += '<div class="tile-icon" style="width:30px; height:30px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        h += '<div style="font-size:11px; font-weight:700; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:1px;">' + room + '</div>';
+        h += '<div style="font-size:18.5px; font-weight:800; color:#1c1c1e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + name + '</div>';
         h += '</div>';
+        h += '<div class="tile-state" style="font-size:14.5px; font-weight:700; margin-left:12px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + stateText + '</div>';
         h += '</div>';
-        
         h += '</div>';
         return h;
       }
@@ -2521,92 +2471,20 @@
 
         // RENDER BASED ON ACTIVE TAB
         if (activeTab === "overview") {
-          // 1. SCENES (in its own separate section at the top)
-          if (scenes.length > 0) {
-            html += '<div class="section"><div class="section-title">Scenes</div>';
+          document.body.className = (themeOverride === "dark" || isNight ? "dark-theme " : "") + "overview-view";
+
+          // Continuous grid of big controls without any section headers!
+          var overviewEntities = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
+          if (overviewEntities.length > 0) {
             html += '<div class="tile-grid">';
-
-            for (i = 0; i < scenes.length; i++) {
-              html += renderOverviewScene(scenes[i]);
+            for (i = 0; i < overviewEntities.length; i++) {
+              html += renderOverviewCard(overviewEntities[i]);
             }
-            html += '</div></div>';
-          }
-
-          // 2. MEDIA (compact media player tiles, grouped dynamically when linked)
-          if (mediaPlayers.length > 0) {
-            var mediaGroups = [];
-            var songGroups = {};
-            for (i = 0; i < mediaPlayers.length; i++) {
-              var mp = mediaPlayers[i];
-              var state = mp.state;
-              if (state !== "playing" && state !== "paused") {
-                continue; // Do not show idle media players on Overview tab
-              }
-
-              var key = getMediaGroupKey(mp);
-              if (key) {
-                if (!songGroups[key]) {
-                  songGroups[key] = [];
-                  mediaGroups.push(songGroups[key]);
-                }
-                songGroups[key].push(mp);
-              } else {
-                mediaGroups.push([mp]);
-              }
-            }
-
-            if (mediaGroups.length > 0) {
-              html += '<div class="section"><div class="section-title">Media</div>';
-              html += '<div class="tile-grid">';
-              for (i = 0; i < mediaGroups.length; i++) {
-                html += renderOverviewMediaPlayer(mediaGroups[i]);
-              }
-              html += '</div></div>';
-            }
-          }
-
-          // Partition Overview entities by Room (Area)
-          var allOverviewControls = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
-          var roomGroups = {};
-          for (i = 0; i < allOverviewControls.length; i++) {
-            var ctrl = allOverviewControls[i];
-            var rm = getRoomName(ctrl);
-            if (!roomGroups[rm]) {
-              roomGroups[rm] = [];
-            }
-            roomGroups[rm].push(ctrl);
-          }
-
-          var roomKeys = [];
-          for (var rk in roomGroups) {
-            if (roomGroups.hasOwnProperty(rk)) {
-              roomKeys.push(rk);
-            }
-          }
-          roomKeys.sort();
-
-          if (roomKeys.length > 0) {
-            for (i = 0; i < roomKeys.length; i++) {
-              var roomName = roomKeys[i];
-              var roomEntities = roomGroups[roomName];
-              if (roomEntities.length > 0) {
-                html += '<div class="section"><div class="section-title">' + escapeHtml(roomName) + '</div>';
-                html += '<div class="tile-grid">';
-                for (var j = 0; j < roomEntities.length; j++) {
-                  var ent = roomEntities[j];
-                  var dom = ent.entity_id.split(".")[0];
-                  if (dom === "light") {
-                    html += renderOverviewToggleEntity(ent, "light");
-                  } else {
-                    html += renderOverviewFeature(ent);
-                  }
-                }
-                html += '</div></div>';
-              }
-            }
+            html += '</div>';
           }
 
         } else if (activeTab === "controls") {
+          document.body.className = (themeOverride === "dark" || isNight ? "dark-theme" : "");
           // 1. Group controls by floor first
           var floorGroups = {};
           var allControls = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
