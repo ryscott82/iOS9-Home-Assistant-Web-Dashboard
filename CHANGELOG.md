@@ -2,6 +2,11 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.39.0] - 2026-07-21
+- **Streamlined House Navigation Handler**: Rewrote `toggleMainNavigation(event)` and `window.switchTab` for 100% reliable tab switching (Home -> Controls on Home tab; Controls/Chemicals -> Home on other tabs).
+- **Zero-Dead-Space 84px Overview Cards**: Maintained 84px card height (`min-height: 84px`, `height: 84px`, `padding: 10px 16px`) with 44px icons, 42px controls, and 28px titles so the entire 84px height is filled with zero top/bottom dead space.
+- **Clean Text Chemical Banner (No Emojis)**: Updated `#headerChemBanner` text to clean `"Chemical Alert"` or `"Check Chemicals"` without emojis.
+
 ## [v2.38.0] - 2026-07-21
 - **Header Chemical Banner**: Added a subtle, non-cluttering "Check Chemicals" / "Chemical Alert" banner directly below the date & time in the top-right header area, removing individual card exclamation icons.
 - **Sleek 60px Compact Card Height**: Reduced card height from 84px to 60px (`padding: 4px 14px`, `border-radius: 16px`, icon `34px`, buttons `34px`) to eliminate all top/bottom vertical dead space.
