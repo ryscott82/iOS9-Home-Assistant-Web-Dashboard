@@ -1741,7 +1741,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.23.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.24.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -4278,18 +4278,19 @@
         }
       }
 
-      function sendTemperatureWithRetries(entityId, domain, newTarget, attemptsLeft) {
-        var domainName = domain || entityId.split(".")[0];
+      window.sendTemperatureCommand = function (entityId, newTarget) {
+        var domain = entityId.split(".")[0];
 
-        if (domainName === "climate") {
-          var entity = null;
-          for (var i = 0; i < lastStatesCache.length; i++) {
-            if (lastStatesCache[i].entity_id === entityId) {
-              entity = lastStatesCache[i];
-              break;
-            }
+        // Find entity from cache
+        var entity = null;
+        for (var i = 0; i < lastStatesCache.length; i++) {
+          if (lastStatesCache[i].entity_id === entityId) {
+            entity = lastStatesCache[i];
+            break;
           }
+        }
 
+        if (domain === "climate") {
           var currentTemp = entity && entity.attributes ? parseFloat(entity.attributes.current_temperature) : NaN;
           var desiredHvacMode = null;
           if (!isNaN(currentTemp)) {
@@ -4300,75 +4301,61 @@
             }
           }
 
-          // Auto-switch HVAC mode if target temp is higher (heat) or lower (cool) than current temp
-          if (desiredHvacMode && entity && entity.state !== desiredHvacMode) {
-            entity.state = desiredHvacMode;
-            sendWsMessage({
-              id: msgId++,
-              type: "call_service",
-              domain: "climate",
-              service: "set_hvac_mode",
-              service_data: {
-                entity_id: entityId,
-                hvac_mode: desiredHvacMode
-              }
-            });
-            haRequest("POST", "/api/services/climate/set_hvac_mode", {
-              entity_id: entityId,
-              hvac_mode: desiredHvacMode
-            }, function () { });
+          var climateData = {
+            entity_id: entityId,
+            temperature: newTarget
+          };
+
+          if (desiredHvacMode) {
+            climateData.hvac_mode = desiredHvacMode;
+            if (entity) entity.state = desiredHvacMode;
           }
 
-          // Dispatch set_temperature service
+          // 1. WebSocket call
           sendWsMessage({
             id: msgId++,
             type: "call_service",
             domain: "climate",
             service: "set_temperature",
-            service_data: {
-              entity_id: entityId,
-              temperature: newTarget
+            target: { entity_id: entityId },
+            service_data: climateData
+          });
+
+          // 2. REST API fallback
+          haRequest("POST", "/api/services/climate/set_temperature", climateData, function (err, res) {
+            if (err) {
+              console.warn("REST climate.set_temperature failed:", err);
+            } else {
+              console.log("REST climate.set_temperature success:", res);
             }
           });
 
-          haRequest("POST", "/api/services/climate/set_temperature", {
+        } else if (domain === "water_heater") {
+          var waterHeaterCmd = {
             entity_id: entityId,
             temperature: newTarget
-          }, function (err) {
-            if (err && attemptsLeft > 1) {
-              console.warn("Climate temp attempt failed, retrying...", attemptsLeft);
-              setTimeout(function () {
-                sendTemperatureWithRetries(entityId, domainName, newTarget, attemptsLeft - 1);
-              }, 600);
-            }
-          });
+          };
 
-        } else if (domainName === "water_heater") {
-          // Dispatch water_heater set_temperature service
+          // 1. WebSocket call
           sendWsMessage({
             id: msgId++,
             type: "call_service",
             domain: "water_heater",
             service: "set_temperature",
-            service_data: {
-              entity_id: entityId,
-              temperature: newTarget
-            }
+            target: { entity_id: entityId },
+            service_data: waterHeaterCmd
           });
 
-          haRequest("POST", "/api/services/water_heater/set_temperature", {
-            entity_id: entityId,
-            temperature: newTarget
-          }, function (err) {
-            if (err && attemptsLeft > 1) {
-              console.warn("Water heater temp attempt failed, retrying...", attemptsLeft);
-              setTimeout(function () {
-                sendTemperatureWithRetries(entityId, domainName, newTarget, attemptsLeft - 1);
-              }, 600);
+          // 2. REST API fallback
+          haRequest("POST", "/api/services/water_heater/set_temperature", waterHeaterCmd, function (err, res) {
+            if (err) {
+              console.warn("REST water_heater.set_temperature failed:", err);
+            } else {
+              console.log("REST water_heater.set_temperature success:", res);
             }
           });
         }
-      }
+      };
 
       window.adjustTemp = function (entityId, delta) {
         var entity = null;
@@ -4402,8 +4389,8 @@
 
         tempDebounceTimers[entityId] = setTimeout(function () {
           delete tempDebounceTimers[entityId];
-          sendTemperatureWithRetries(entityId, "climate", newTarget, 3);
-        }, 500);
+          sendTemperatureCommand(entityId, newTarget);
+        }, 300);
       };
 
       window.setHvacMode = function (entityId, mode) {
@@ -5026,8 +5013,8 @@
 
         tempDebounceTimers[entityId] = setTimeout(function () {
           delete tempDebounceTimers[entityId];
-          sendTemperatureWithRetries(entityId, "water_heater", newTemp, 3);
-        }, 500);
+          sendTemperatureCommand(entityId, newTemp);
+        }, 300);
       };
 
       window.setWaterHeaterMode = function (entityId, mode) {
