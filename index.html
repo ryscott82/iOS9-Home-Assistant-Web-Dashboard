@@ -1728,10 +1728,12 @@
   <!-- APP -->
   <main class="app-content" id="appContent" style="display:none; padding-top: 30px;">
 
-    <!-- HEADER CONTROLS (Welcome Message & Date/Time) -->
+    <!-- HEADER (Date/Time & 3-Line Hamburger Menu Button) -->
     <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-bottom:12px; padding:0 6px;">
-      <div id="headerWelcome" class="header-welcome" style="margin:0;">Welcome Home</div>
-      <div id="headerDateTime" class="header-datetime" style="margin:0;"></div>
+      <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:16px; font-weight:700;"></div>
+      <button class="menu-icon-btn" onclick="switchTab('controls')" title="More Controls" style="width:34px; height:34px; border-radius:10px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
     </header>
 
     <div id="entityContainer">
@@ -1747,7 +1749,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.17.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.18.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
