@@ -1741,7 +1741,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.25.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.26.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2042,12 +2042,12 @@
           if (unit === "°F" || unit === "°C") unit = "°";
           if (!unavailable) {
             stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
-            stateControlHtml += '<button class="thermostat-btn" style="width:34px; height:34px; line-height:34px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
-            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:44px;">';
-            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:16.5px; font-weight:800; line-height:1.1;">' + currentTemp + unit + '</span>';
-            stateControlHtml += '<span style="font-size:11px; font-weight:700; color:#8e8e93; margin-top:1px;">Set ' + targetTemp + unit + '</span>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:20px; margin:0;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
+            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:48px;">';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:17px; font-weight:800; line-height:1.1;">' + currentTemp + unit + '</span>';
+            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:12px; font-weight:700; color:#8e8e93; margin-top:1px;">Set ' + targetTemp + unit + '</span>';
             stateControlHtml += '</div>';
-            stateControlHtml += '<button class="thermostat-btn" style="width:34px; height:34px; line-height:34px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', 0.5)">+</button>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:20px; margin:0;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', 0.5)">+</button>';
             stateControlHtml += '</div>';
           } else {
             stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + currentTemp + unit + '</div>';
@@ -2057,14 +2057,12 @@
           if (unit === "°F" || unit === "°C") unit = "°";
           if (!unavailable) {
             stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
-            stateControlHtml += '<button class="thermostat-btn" style="width:34px; height:34px; line-height:34px; font-size:18px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', -1)">&minus;</button>';
-            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:44px;">';
-            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:16.5px; font-weight:800; line-height:1.1;">' + currentTemp + unit + '</span>';
-            if (targetTemp !== "--") {
-              stateControlHtml += '<span style="font-size:11px; font-weight:700; color:#8e8e93; margin-top:1px;">Set ' + targetTemp + unit + '</span>';
-            }
+            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:20px; margin:0;" onclick="event.stopPropagation(); adjustWaterHeaterTemp(\'' + eid + '\', -1)">&minus;</button>';
+            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:48px;">';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:17px; font-weight:800; line-height:1.1;">' + currentTemp + unit + '</span>';
+            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:12px; font-weight:700; color:#8e8e93; margin-top:1px;">' + (targetTemp !== "--" ? "Set " + targetTemp + unit : "--") + '</span>';
             stateControlHtml += '</div>';
-            stateControlHtml += '<button class="thermostat-btn" style="width:34px; height:34px; line-height:34px; font-size:18px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:20px; margin:0;" onclick="event.stopPropagation(); adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
             stateControlHtml += '</div>';
           } else {
             stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + currentTemp + unit + '</div>';
@@ -2073,19 +2071,16 @@
           stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + escapeHtml(state) + '</div>';
         }
 
-        // Dynamic font size scaling for far-away readability (wrapped text, no ellipsis)
-        var titleFontSize = "25px";
-        if (name.length > 22) titleFontSize = "18px";
-        else if (name.length > 14) titleFontSize = "21px";
+        // Dynamic font size scaling (28px max, no room labels!)
+        var titleFontSize = "28px";
+        if (name.length > 22) titleFontSize = "20px";
+        else if (name.length > 14) titleFontSize = "24px";
 
         var h = '<div class="tile overview-big-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer;">';
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="width:36px; height:36px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div class="tile-icon" style="width:38px; height:38px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
         h += '<div class="tile-name" style="font-size:' + titleFontSize + '; font-weight:800; white-space:normal; word-break:break-word; line-height:1.15; letter-spacing:-0.4px;">' + name + '</div>';
-        if (room) {
-          h += '<div style="font-size:11px; font-weight:700; color:#8e8e93; text-transform:uppercase; letter-spacing:0.6px; margin-top:3px;">' + room + '</div>';
-        }
         h += '</div>';
         h += stateControlHtml;
         h += '</div>';
@@ -2117,9 +2112,9 @@
         var isIdle = (state !== "playing" && state !== "paused" && title !== "Skipping...");
         if (isIdle) return "";
 
-        var titleFontSize = "24px";
-        if (speakerName.length > 22) titleFontSize = "18px";
-        else if (speakerName.length > 14) titleFontSize = "21px";
+        var titleFontSize = "28px";
+        if (speakerName.length > 22) titleFontSize = "20px";
+        else if (speakerName.length > 14) titleFontSize = "24px";
 
         var trackSubtext = escapeHtml(title) + (artist ? ' • ' + escapeHtml(artist) : '');
 
@@ -2127,10 +2122,10 @@
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         
         if (artUrl) {
-          h += '<img src="' + artUrl + '" style="width:36px; height:36px; border-radius:10px; object-fit:cover; margin-right:14px; background:#f2f2f7; -webkit-flex-shrink:0; flex-shrink:0;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
-          h += '<div style="display:none; width:36px; height:36px; border-radius:10px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:16px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
+          h += '<img src="' + artUrl + '" style="width:38px; height:38px; border-radius:10px; object-fit:cover; margin-right:14px; background:#f2f2f7; -webkit-flex-shrink:0; flex-shrink:0;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
+          h += '<div style="display:none; width:38px; height:38px; border-radius:10px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:16px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
         } else {
-          h += '<div style="display:-webkit-flex; display:flex; width:36px; height:36px; border-radius:10px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:16px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
+          h += '<div style="display:-webkit-flex; display:flex; width:38px; height:38px; border-radius:10px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:16px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
         }
 
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
@@ -4378,6 +4373,12 @@
         var newTarget = Math.round((currentTarget + delta) * 2) / 2;
         entity.attributes.temperature = newTarget;
 
+        var elId = "set_temp_" + entityId.replace(/[^a-zA-Z0-9_-]/g, "_");
+        var setEl = document.getElementById(elId);
+        if (setEl) {
+          setEl.textContent = newTarget + "°";
+        }
+
         showToast("Target: " + newTarget + "°");
 
         if (typeof window.renderCurrentTab === "function") {
@@ -4385,6 +4386,37 @@
         }
 
         // 500ms Debounce: Wait until user finishes rapid multi-taps before sending requests
+        if (tempDebounceTimers[entityId]) {
+          clearTimeout(tempDebounceTimers[entityId]);
+        }
+
+        tempDebounceTimers[entityId] = setTimeout(function () {
+          delete tempDebounceTimers[entityId];
+          sendTemperatureCommand(entityId, newTarget);
+        }, 300);
+      };
+
+      window.adjustWaterHeaterTemp = function (entityId, delta) {
+        var entity = null;
+        for (var i = 0; i < lastStatesCache.length; i++) {
+          if (lastStatesCache[i].entity_id === entityId) {
+            entity = lastStatesCache[i];
+            break;
+          }
+        }
+        if (!entity) return;
+        if (!entity.attributes) entity.attributes = {};
+
+        var currentTarget = parseFloat(entity.attributes.temperature) || 100;
+        var newTarget = Math.round(currentTarget + delta);
+        entity.attributes.temperature = newTarget;
+
+        var elId = "set_temp_" + entityId.replace(/[^a-zA-Z0-9_-]/g, "_");
+        var setEl = document.getElementById(elId);
+        if (setEl) {
+          setEl.textContent = newTarget + "°";
+        }
+
         if (tempDebounceTimers[entityId]) {
           clearTimeout(tempDebounceTimers[entityId]);
         }
@@ -5003,6 +5035,13 @@
         var newTemp = current + delta;
         
         entity.attributes.temperature = newTemp;
+
+        var elId = "set_temp_" + entityId.replace(/[^a-zA-Z0-9_-]/g, "_");
+        var setEl = document.getElementById(elId);
+        if (setEl) {
+          setEl.textContent = "Set " + newTemp + "°";
+        }
+
         showToast("Set target to " + newTemp + "°");
 
         if (typeof window.renderCurrentTab === "function") {
