@@ -1662,7 +1662,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.5.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.6.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1756,7 +1756,7 @@
         } else if (iconName === 'house') {
           svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>';
         } else if (iconName === 'waterfall') {
-          svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><path d="M12 21c-3.31 0-6-2.69-6-6 0-2.97 2.16-5.43 5-5.91V3h2v6.09c2.84.48 5 2.94 5 5.91 0 3.31-2.69 6-6 6zm-4-6c0 2.21 1.79 4 4 4s4-1.79 4-4-1.79-4-4-4-4 1.79-4 4z"/></svg>';
+          svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><path d="M4 4h16v2H4zm2 4c0 3 1.5 5 1.5 8S6 20 6 20h2s1.5-2 1.5-4-1.5-5-1.5-8zm6 0c0 3 1.5 5 1.5 8s-1.5 4-1.5 4h2s1.5-2 1.5-4-1.5-5-1.5-8zm6 0c0 3 1.5 5 1.5 8s-1.5 4-1.5 4h2s1.5-2 1.5-4-1.5-5-1.5-8z"/></svg>';
         } else if (iconName === 'bubbles') {
           svgStr = '<svg' + fillStyle + ' viewBox="0 0 24 24"><circle cx="6" cy="18" r="3"/><circle cx="16" cy="14" r="4"/><circle cx="8" cy="8" r="2"/><circle cx="18" cy="6" r="3"/></svg>';
         } else if (iconName === 'hottub' || iconName === 'spa') {
@@ -2505,15 +2505,7 @@
               var mp = mediaPlayers[i];
               var state = mp.state;
               if (state !== "playing" && state !== "paused") {
-                var isIdleTooLong = true;
-                if (mp.last_changed) {
-                  var lastChanged = new Date(mp.last_changed);
-                  var elapsedMs = Date.now() - lastChanged.getTime();
-                  if (elapsedMs < 4 * 60 * 60 * 1000) {
-                    isIdleTooLong = false;
-                  }
-                }
-                if (isIdleTooLong) continue;
+                continue; // Do not show idle media players on Overview tab
               }
 
               var key = getMediaGroupKey(mp);
@@ -2916,17 +2908,17 @@
         var iconName = getEntityIcon(entity, "light");
         var icon = getSvg(iconName, isOn ? "#ffcc00" : "");
         
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')">';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')" style="padding:14px 16px;">';
         
-        // Compact side-by-side left-align layout
+        // Compact side-by-side left-align layout with larger text
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         var stateText = escapeHtml(entity.state);
         if (isOn && currentEffect) stateText += ' &middot; ' + escapeHtml(currentEffect);
         else if (isOn && pct > 0) stateText += ' &middot; ' + pct + '%';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:11.5px; font-weight:500;">' + stateText + '</div>';
+        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + stateText + '</div>';
         h += '</div>';
         h += '</div>';
 
@@ -2980,14 +2972,14 @@
         var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state) : "");
 
         var tileClass = "tile" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')">';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="padding:14px 16px;">';
         
-        // Compact side-by-side left-align layout
+        // Compact side-by-side left-align layout with larger text
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:11.5px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
+        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
         h += '</div>';
         
@@ -3081,13 +3073,13 @@
         var iconName = getEntityIcon(entity, "cover");
         var icon = getSvg(iconName, isOpen ? getActiveSvgColor("cover", entity.state) : "");
 
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'cover\')">';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'cover\')" style="padding:14px 16px;">';
         
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left; margin-right:8px;">';
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:11.5px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
+        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
         
         if (!unavailable) {
@@ -3114,14 +3106,14 @@
         var actualIcon = isLocked ? iconName : (iconName === "lock" ? "unlock" : iconName);
         var icon = getSvg(actualIcon, isLocked ? getActiveSvgColor("lock", "locked") : "");
 
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'lock\')">';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'lock\')" style="padding:14px 16px;">';
         
         // Compact side-by-side left-align layout
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:11.5px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
+        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
         h += '</div>';
         
