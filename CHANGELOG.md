@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.46.0] - 2026-07-21
+- **Full Width Climate & Heater Cards**: Expanded climate thermostats and water heater cards on the Home page to full width (`flex: 0 0 calc(100% - 12px)`), providing ample room for full 34px titles ("Upstairs", "Hot Tub", "Pool", "Main AC") alongside thermostat +/- buttons and boost fire controls without wrapping or truncating.
+- **Larger Centered Header Navigation Icon**: Increased header button to `48px x 48px` and SVG icon to `26px x 26px`, adding `style="display:block; margin:auto;"` for perfect flex alignment on iOS 9 Safari.
+
 ## [v2.45.0] - 2026-07-21
 - **Stripped Filler Words ("Overheads", "Thermostat")**: Cleaned card names on the Home page (e.g. "Theater Overheads" -> "Theater", "Main AC Thermostat" -> "Main AC").
 - **Uniform 34px Bold Title Font**: Enforced a uniform **`34px` bold** font (`font-weight: 850`, `line-height: 1.05`, `letter-spacing: -0.8px`) across all card titles for complete visual continuity.
