@@ -1741,7 +1741,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.26.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.27.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2111,6 +2111,14 @@
 
         var isIdle = (state !== "playing" && state !== "paused" && title !== "Skipping...");
         if (isIdle) return "";
+
+        // If paused for > 15 minutes (900,000 ms), hide from Overview tab
+        if (state === "paused" && primary.last_changed) {
+          var lastChangedTs = new Date(primary.last_changed).getTime();
+          if (!isNaN(lastChangedTs) && (Date.now() - lastChangedTs > 900000)) {
+            return "";
+          }
+        }
 
         var titleFontSize = "28px";
         if (speakerName.length > 22) titleFontSize = "20px";
