@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.42.0] - 2026-07-21
+- **Dynamic 2x2 Grid Tile Packing**: Grouped single-height 1-tap control cards into 2-card vertical stacks (`singleStacks`) in the Controls menu.
+- **Eliminated Excess Empty Space**: Unified the card grid so 4 single-height cards automatically stack 2-high and 2-wide next to double-height heater/thermostat cards, completely filling the grid layout.
+
 ## [v2.41.0] - 2026-07-21
 - **Full 84px Card Fill (Zero Vertical Dead Space)**: Maintained full 84px card height (`min-height: 84px`, `height: 84px`, `padding: 2px 14px`, `border-radius: 20px`) while scaling icons to `58px x 58px`, title font to `34px` bold for 1-line titles, and control buttons to `52px x 52px`.
 - **Top-to-Bottom Edge Stretch**: Scaled elements to stretch across 90%+ of the card height, filling the entire card from top edge to bottom edge.
