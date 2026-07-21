@@ -1719,11 +1719,11 @@
 
     <!-- UNIFIED HEADER (Top Left: Welcome Message | Top Right: Date/Time + 3-Line Hamburger Menu Button) -->
     <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-bottom:14px; padding:0 4px;">
-      <div id="headerWelcome" class="header-welcome" style="margin:0; font-size:18px; font-weight:800;">Welcome Home</div>
-      <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px;">
-        <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:14px; font-weight:600;"></div>
-        <button class="menu-icon-btn" onclick="toggleMainNavigation()" title="Toggle Menu" style="width:34px; height:34px; border-radius:10px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      <div id="headerWelcome" class="header-welcome" style="margin:0; font-size:clamp(18px, 3.2vw, 32px); font-weight:800; max-width:33vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Welcome Home</div>
+      <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; max-width:65vw;">
+        <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:clamp(14px, 2.6vw, 26px); font-weight:700; max-width:33vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+        <button class="menu-icon-btn" onclick="toggleMainNavigation()" title="Toggle Menu" style="width:38px; height:38px; border-radius:10px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
         </button>
       </div>
     </header>
@@ -1741,7 +1741,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.29.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.30.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2063,11 +2063,18 @@
 
           if (!unavailable) {
             var isHotTub = (eid.indexOf("hot_tub") !== -1 || name.toLowerCase().indexOf("hot tub") !== -1);
+            var is100 = (Math.round(parseFloat(targetTemp)) === 100);
             stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
             
             if (isHotTub) {
-              stateControlHtml += '<button class="thermostat-btn" style="width:40px; height:40px; border-radius:10px; background:rgba(255,159,10,0.18); border:1.5px solid #ff9f0a; margin-right:4px; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;" onclick="event.stopPropagation(); setHotTubMaxTemp(\'' + eid + '\', 100)" title="Boost Hot Tub to 100°F">';
-              stateControlHtml += '<svg width="20" height="20" viewBox="0 0 24 24" fill="#ff9f0a"><path d="M12 12.9a3.1 3.1 0 0 0-3.1 3.1c0 1.71 1.39 3.1 3.1 3.1s3.1-1.39 3.1-3.1c0-1.71-1.39-3.1-3.1-3.1zm0-10.9C10.5 4.5 6 9.1 6 14.5c0 3.31 2.69 6 6 6s6-2.69 6-6c0-5.4-4.5-10-6-12.5zm0 16.5c-2.21 0-4-1.79-4-4 0-3.11 2.68-6.54 4-8.09 1.32 1.55 4 4.98 4 8.09 0 2.21-1.79 4-4 4z"/></svg>';
+              var btnBg = is100 ? "rgba(255,159,10,0.25)" : "rgba(142,142,147,0.15)";
+              var btnBorder = is100 ? "2px solid #ff9f0a" : "1px solid rgba(142,142,147,0.3)";
+              var svgColor = is100 ? "#ff9f0a" : "#8e8e93";
+              var targetToggle = is100 ? 68 : 100;
+              var btnTitle = is100 ? "Set Hot Tub to 68°F" : "Boost Hot Tub to 100°F";
+
+              stateControlHtml += '<button class="thermostat-btn" style="width:40px; height:40px; border-radius:10px; background:' + btnBg + '; border:' + btnBorder + '; margin-right:4px; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;" onclick="event.stopPropagation(); setHotTubMaxTemp(\'' + eid + '\', ' + targetToggle + ')" title="' + btnTitle + '">';
+              stateControlHtml += '<svg width="22" height="22" viewBox="0 0 24 24" fill="' + svgColor + '"><path d="M13.5 1.5c-.83 0-1.5.67-1.5 1.5v3.17C10.74 5.4 9.5 4.3 8.35 3.15c-.34-.34-.91-.12-.91.36V7.5C6.01 8.87 5 10.82 5 13c0 3.87 3.13 7 7 7s7-3.13 7-7c0-2.38-1.19-4.47-3-5.74V4.5c0-.83-.67-1.5-1.5-1.5zm-1.5 16.5c-2.21 0-4-1.79-4-4 0-1.58.91-2.95 2.25-3.61.46-.23 1-.02 1.2.42.2.44.02.97-.4 1.19C10.15 12.52 9.5 13.44 9.5 14.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5c0-.75-.33-1.42-.85-1.88-.38-.34-.43-.91-.1-1.3.34-.38.92-.43 1.3-.1A4.47 4.47 0 0116.5 14.5c0 2.21-1.79 4-4 4z"/></svg>';
               stateControlHtml += '</button>';
             }
 
@@ -4436,7 +4443,7 @@
           setEl.textContent = "Set " + targetTemp + "°";
         }
 
-        showToast("🔥 Hot Tub set to " + targetTemp + "°");
+        showToast(targetTemp === 100 ? "🔥 Hot Tub boosted to 100°" : "♨️ Hot Tub set to 68°");
 
         if (typeof window.renderCurrentTab === "function") {
           window.renderCurrentTab();
