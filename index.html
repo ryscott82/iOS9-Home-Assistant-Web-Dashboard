@@ -1187,6 +1187,16 @@
       color: #ffffff;
     }
 
+    .tile.active-red-outline {
+      background: #ffffff;
+      border-color: #ff3b30 !important;
+    }
+
+    body.dark-theme .tile.active-red-outline {
+      background: #161b22;
+      border-color: #ff453a !important;
+    }
+
     /* ======== FLOOR NAVIGATION BAR ======== */
     .floor-nav-bar {
       display: -webkit-flex;
@@ -1695,7 +1705,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.9.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.10.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1938,6 +1948,7 @@
         var eid = escapeHtml(entity.entity_id);
         var state = entity.state || "off";
         var unavailable = state === "unavailable";
+        var attrs = entity.attributes || {};
         var isOn = false;
 
         if (domain === "light" || domain === "switch" || domain === "fan" || domain === "input_boolean") {
@@ -1952,10 +1963,21 @@
           isOn = (state !== "off" && !unavailable && state !== "closed");
         }
 
+        var targetTemp = attrs.temperature || "--";
+        var currentTemp = attrs.current_temperature || "--";
+        var isTargetEqualsCurrent = false;
+        if (targetTemp !== "--" && currentTemp !== "--" && parseFloat(targetTemp) === parseFloat(currentTemp)) {
+          isTargetEqualsCurrent = true;
+        }
+
         var activeClass = "";
         if (isOn) {
           if (domain === "climate" || domain === "water_heater") {
-            activeClass = " active-red"; // Red outline for temperature controllers
+            if (isTargetEqualsCurrent) {
+              activeClass = " active-red-outline"; // Red outline only when set == actual
+            } else {
+              activeClass = " active-red"; // Full red tint + outline when actively heating/cooling
+            }
           } else if (domain === "light") {
             activeClass = " active";
           } else if (domain === "lock") {
@@ -1968,18 +1990,33 @@
         var iconName = getEntityIcon(entity, domain);
         var icon = getSvg(iconName, isOn ? (domain === "climate" || domain === "water_heater" ? "#ff3b30" : getActiveSvgColor(domain, state)) : "");
 
-        var stateText = "";
+        var stateControlHtml = "";
         if (domain === "climate") {
-          var targetTemp = entity.attributes.temperature || "--";
-          var currentTemp = entity.attributes.current_temperature || "--";
-          var unit = entity.attributes.unit_of_measurement || "°F";
-          stateText = currentTemp + unit + " / " + targetTemp + unit;
+          var unit = attrs.unit_of_measurement || "°F";
+          var stateText = currentTemp + unit + " / " + targetTemp + unit;
+          if (!unavailable) {
+            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:12px; -webkit-flex-shrink:0; flex-shrink:0;">';
+            stateControlHtml += '<button class="thermostat-btn" style="width:32px; height:32px; line-height:32px; font-size:16px; margin:0;" onclick="adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:14px; font-weight:700; min-width:60px; text-align:center;">' + stateText + '</span>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:32px; height:32px; line-height:32px; font-size:16px; margin:0;" onclick="adjustTemp(\'' + eid + '\', 0.5)">+</button>';
+            stateControlHtml += '</div>';
+          } else {
+            stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + stateText + '</div>';
+          }
         } else if (domain === "water_heater") {
-          var currentTemp = entity.attributes.current_temperature || "--";
-          var unit = entity.attributes.unit_of_measurement || "°F";
-          stateText = currentTemp + unit;
+          var unit = attrs.unit_of_measurement || "°F";
+          var stateText = currentTemp + unit;
+          if (!unavailable) {
+            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:12px; -webkit-flex-shrink:0; flex-shrink:0;">';
+            stateControlHtml += '<button class="thermostat-btn" style="width:32px; height:32px; line-height:32px; font-size:16px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', -1)">&minus;</button>';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:14px; font-weight:700; min-width:44px; text-align:center;">' + stateText + '</span>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:32px; height:32px; line-height:32px; font-size:16px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
+            stateControlHtml += '</div>';
+          } else {
+            stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + stateText + '</div>';
+          }
         } else if (domain === "input_select") {
-          stateText = escapeHtml(state);
+          stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + escapeHtml(state) + '</div>';
         }
 
         var h = '<div class="tile overview-big-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer;">';
@@ -1991,9 +2028,7 @@
         }
         h += '<div class="tile-name" style="font-size:19.5px; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + name + '</div>';
         h += '</div>';
-        if (stateText) {
-          h += '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + stateText + '</div>';
-        }
+        h += stateControlHtml;
         h += '</div>';
         h += '</div>';
         return h;
