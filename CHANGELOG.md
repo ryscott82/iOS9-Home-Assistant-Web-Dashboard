@@ -2,6 +2,13 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.48.0] - 2026-07-21
+- **Clean 100° Button Label**: Replaced the fire emoji with clean text `100°` on the Hot Tub quick heat preset button.
+- **Muted Orange Heater Controls**: Unified all heater power buttons and preset buttons to a cohesive, muted orange palette (`rgba(255, 159, 10, ...)`).
+- **Matching Icon Highlight Colors**: Tile SVG icons now dynamically match their card's background highlight color (Yellow for lights, Orange/Red for heat, Blue for media players, Green for other features).
+- **Blue Playing Media Highlight**: Media cards highlight in **blue** (`active-blue`) when playing.
+- **Track Title Big Text Formatting**: Media cards format Track Title as big text (`26px` bold) and speaker names as subtext (`13px`), fitting multiple speaker names without exceeding the standard 84px card height.
+
 ## [v2.47.0] - 2026-07-21
 - **Green Active Highlight Color**: Configured green tint (`active-green`, `background: rgba(52, 199, 89, 0.14); border: 2px solid #34c759;`) for all non-light and non-heat feature cards.
 - **Playing-Only Media Card Highlight**: Media cards only display active green highlight when actively playing (`state === 'playing'`); unhighlighted when paused/idle.
