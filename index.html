@@ -1741,7 +1741,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.24.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.25.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1762,6 +1762,8 @@
       var STORAGE_KEY = "ha_controls_config";
       var REFRESH_INTERVAL = 15000;
       var refreshTimer = null;
+      var globalMsgId = 100;
+      function getNextMsgId() { return globalMsgId++; }
       var entities = {};
       var allowedEntityIds = {};
       var registryLoaded = false;
@@ -2222,7 +2224,7 @@
           showToast("WebSocket failed: " + e, true);
           return;
         }
-        var msgId = 1;
+        var msgId = getNextMsgId();
         var entityRequestId = -1;
         var areaRequestId = -1;
         var floorRequestId = -1;
@@ -2248,17 +2250,17 @@
             }));
           }
           else if (msg.type === "auth_ok") {
-            entityRequestId = msgId++;
+            entityRequestId = getNextMsgId();
             ws.send(JSON.stringify({
               id: entityRequestId,
               type: "config/entity_registry/list"
             }));
-            areaRequestId = msgId++;
+            areaRequestId = getNextMsgId();
             ws.send(JSON.stringify({
               id: areaRequestId,
               type: "config/area_registry/list"
             }));
-            floorRequestId = msgId++;
+            floorRequestId = getNextMsgId();
             ws.send(JSON.stringify({
               id: floorRequestId,
               type: "config/floor_registry/list"
@@ -4313,7 +4315,7 @@
 
           // 1. WebSocket call
           sendWsMessage({
-            id: msgId++,
+            id: getNextMsgId(),
             type: "call_service",
             domain: "climate",
             service: "set_temperature",
@@ -4338,7 +4340,7 @@
 
           // 1. WebSocket call
           sendWsMessage({
-            id: msgId++,
+            id: getNextMsgId(),
             type: "call_service",
             domain: "water_heater",
             service: "set_temperature",
