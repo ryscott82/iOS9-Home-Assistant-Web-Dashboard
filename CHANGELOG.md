@@ -2,6 +2,14 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.53.0] - 2026-07-21
+- **Controls Page 4-Column CSS Grid Overhaul**: Overhauled Controls page layout into a clean, standardized 4-column CSS Grid (`repeat(4, 1fr)`) with `grid-auto-flow: dense` for automated gap packing.
+- **Standardized Card Unit Dimensions**:
+  - **1x1 Cards (`card-1x1`)**: Standard 1-tap lights, switches, fans, locks, covers, input_booleans (1 column wide, 1 row tall).
+  - **2x1 Cards (`card-2x1`)**: Climate thermostats and water heaters (2 columns wide, 1 row tall).
+  - **2x2 Cards (`card-2x2`)**: Lights with effects, dimming, or color controls (2 columns wide, 2 rows tall).
+- **Media Player Exemption**: Media player cards retain their specialized layout.
+
 ## [v2.52.0] - 2026-07-21
 - **Smart Heater Highlight Logic**: Disabled red active highlight on climate and water heater cards whenever the current temperature is higher than the set target temperature (`current > target`).
 - **Target Equal/Active Heating Refinement**: Maintained soft red outline when `current == target` and full red highlight tint when actively heating (`current < target`).

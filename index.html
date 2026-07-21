@@ -1040,6 +1040,46 @@
       display: flex !important;
     }
 
+    /* ======== 4-COLUMN CONTROLS GRID ======== */
+    .controls-grid {
+      display: grid !important;
+      grid-template-columns: repeat(4, 1fr) !important;
+      grid-auto-flow: dense !important;
+      gap: 12px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .card-1x1 {
+      grid-column: span 1 !important;
+      grid-row: span 1 !important;
+      min-height: 84px !important;
+      height: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .card-2x1 {
+      grid-column: span 2 !important;
+      grid-row: span 1 !important;
+      min-height: 84px !important;
+      height: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    .card-2x2 {
+      grid-column: span 2 !important;
+      grid-row: span 2 !important;
+      min-height: 180px !important;
+      height: 100% !important;
+      box-sizing: border-box !important;
+    }
+
+    @media (max-width: 600px) {
+      .controls-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+    }
+
     body.tab-overview footer.app-footer {
       display: none !important;
     }
@@ -1805,7 +1845,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.52.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.53.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -3003,57 +3043,28 @@
                 return valA - valB;
               });
 
-              var doubleItems = [];
-              var singleItems = [];
+              var fClean = floorName.replace(/\s+/g, "_");
+              html += '<div class="section" id="sec_' + fClean + '"><div class="section-title">' + escapeHtml(floorName) + '</div>';
+              html += '<div class="controls-grid">';
+
               for (var j = 0; j < floorEntities.length; j++) {
                 var ent = floorEntities[j];
                 var dom = ent.entity_id.split(".")[0];
-                if (dom === "climate" || dom === "water_heater" || dom === "input_select") {
-                  doubleItems.push(ent);
+                if (dom === "light") {
+                  html += renderLight(ent);
+                } else if (dom === "climate") {
+                  html += renderClimate(ent);
+                } else if (dom === "water_heater") {
+                  html += renderWaterHeater(ent);
+                } else if (dom === "cover") {
+                  html += renderCover(ent);
+                } else if (dom === "lock") {
+                  html += renderLock(ent);
+                } else if (dom === "input_select") {
+                  html += renderInputSelect(ent);
                 } else {
-                  singleItems.push(ent);
+                  html += renderToggleEntity(ent, dom);
                 }
-              }
-
-              // Group single items into 2-card vertical stacks (2x2 grid dynamic packing)
-              var singleStacks = [];
-              for (var s = 0; s < singleItems.length; s += 2) {
-                if (s + 1 < singleItems.length) {
-                  singleStacks.push([singleItems[s], singleItems[s + 1]]);
-                } else {
-                  singleStacks.push([singleItems[s]]);
-                }
-              }
-
-              var fClean = floorName.replace(/\s+/g, "_");
-              html += '<div class="section" id="sec_' + fClean + '"><div class="section-title">' + escapeHtml(floorName) + '</div>';
-              html += '<div class="tile-grid">';
-
-              // Helper renderer function for individual control cards
-              var renderControlItem = function (ent) {
-                var dom = ent.entity_id.split(".")[0];
-                if (dom === "light") return renderLight(ent);
-                if (dom === "cover") return renderCover(ent);
-                if (dom === "lock") return renderLock(ent);
-                if (dom === "climate") return renderClimate(ent);
-                if (dom === "water_heater") return renderWaterHeater(ent);
-                if (dom === "input_select") return renderInputSelect(ent);
-                return renderToggleEntity(ent, dom);
-              };
-
-              // Render double-height items first
-              for (var d = 0; d < doubleItems.length; d++) {
-                html += renderControlItem(doubleItems[d]);
-              }
-
-              // Render 2-stacks of single-height items (stacks 2 high to fit next to double-height cards in 2x2 grid)
-              for (var st = 0; st < singleStacks.length; st++) {
-                var stack = singleStacks[st];
-                html += '<div style="-webkit-flex: 0 0 calc(50% - 12px); flex: 0 0 calc(50% - 12px); display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; gap:0;">';
-                for (var sj = 0; sj < stack.length; sj++) {
-                  html += renderControlItem(stack[sj]);
-                }
-                html += '</div>';
               }
 
               html += '</div>';
@@ -3173,17 +3184,11 @@
         var eid = escapeHtml(entity.entity_id);
         var attrs = entity.attributes || {};
         var isOn = entity.state === "on";
-        var pct = 0;
-        if (typeof attrs.brightness !== "undefined") {
-          pct = Math.round((attrs.brightness / 255) * 100);
-        }
-        var hasBrightness = typeof attrs.brightness !== "undefined" || 
-          (attrs.supported_features && (attrs.supported_features & 1));
         var unavailable = entity.state === "unavailable";
+        var hasBrightness = typeof attrs.brightness !== "undefined" || (attrs.supported_color_modes && attrs.supported_color_modes.length > 0);
+        var hasEffects = attrs.effect_list && attrs.effect_list.length > 0;
         var effectList = attrs.effect_list || [];
         var currentEffect = attrs.effect || "";
-        var hasEffects = effectList.length > 0;
-
         var colorModes = attrs.supported_color_modes || [];
         var hasRgb = typeof attrs.rgb_color !== "undefined" ||
           colorModes.indexOf("rgb") !== -1 ||
@@ -3193,9 +3198,14 @@
           colorModes.indexOf("rgbww") !== -1 ||
           (attrs.supported_features && (attrs.supported_features & 16));
 
-        var tileClass = "tile" + (hasEffects || hasRgb ? " tile-full" : "") + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
+        var brightness = attrs.brightness || 0;
+        var pct = Math.round((brightness / 255) * 100);
+
+        var is2x2Card = hasEffects || hasBrightness || hasRgb;
+        var spanClass = is2x2Card ? " card-2x2" : " card-1x1";
+        var tileClass = "tile" + spanClass + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
         var iconName = getEntityIcon(entity, "light");
-        var icon = getSvg(iconName, isOn ? "#ffcc00" : "");
+        var icon = getSvg(iconName, isOn ? getActiveSvgColor("light", entity.state) : "");
         
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')" style="padding:14px 16px;">';
         
@@ -3260,7 +3270,7 @@
         var activeClass = (domain === "fan" || iconName === "hottub" || iconName === "waterfall" || iconName === "bubbles") ? " active-blue" : " active-green";
         var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state) : "");
 
-        var tileClass = "tile" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
+        var tileClass = "tile card-1x1" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="padding:14px 16px;">';
         
         // Compact side-by-side left-align layout with larger text
@@ -3301,7 +3311,7 @@
         var iconName = getEntityIcon(entity, "climate");
         var icon = getSvg(iconName, isActive ? getActiveSvgColor("climate", hvacMode) : "");
 
-        var h = '<div class="tile' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
+        var h = '<div class="tile card-2x1' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
         
         // Compact side-by-side left-align layout
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
@@ -3358,7 +3368,7 @@
         var unavailable = entity.state === "unavailable";
         var isOpen = entity.state === "open";
 
-        var tileClass = "tile" + (isOpen ? " active-blue" : "") + (unavailable ? " unavailable" : "");
+        var tileClass = "tile card-1x1" + (isOpen ? " active-blue" : "") + (unavailable ? " unavailable" : "");
         var iconName = getEntityIcon(entity, "cover");
         var icon = getSvg(iconName, isOpen ? getActiveSvgColor("cover", entity.state) : "");
 
@@ -3390,7 +3400,7 @@
         var isLocked = entity.state === "locked";
         var unavailable = entity.state === "unavailable";
 
-        var tileClass = "tile" + (isLocked ? " active-green" : "") + (unavailable ? " unavailable" : "");
+        var tileClass = "tile card-1x1" + (isLocked ? " active-green" : "") + (unavailable ? " unavailable" : "");
         var iconName = getEntityIcon(entity, "lock");
         var actualIcon = isLocked ? iconName : (iconName === "lock" ? "unlock" : iconName);
         var icon = getSvg(actualIcon, isLocked ? getActiveSvgColor("lock", "locked") : "");
@@ -4377,7 +4387,7 @@
         var activeClass = isActive ? " active-red" : "";
         var icon = getSvg("water_heater", isActive ? "#ff3b30" : "#8e8e93");
 
-        var h = '<div class="tile' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
+        var h = '<div class="tile card-2x1' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
         h += '<div class="tile-top" style="margin-bottom: 6px;">';
         h += '<div class="tile-icon">' + icon + '</div>';
         h += '</div>';
