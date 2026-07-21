@@ -2,6 +2,11 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.45.0] - 2026-07-21
+- **Stripped Filler Words ("Overheads", "Thermostat")**: Cleaned card names on the Home page (e.g. "Theater Overheads" -> "Theater", "Main AC Thermostat" -> "Main AC").
+- **Uniform 34px Bold Title Font**: Enforced a uniform **`34px` bold** font (`font-weight: 850`, `line-height: 1.05`, `letter-spacing: -0.8px`) across all card titles for complete visual continuity.
+- **Dynamic Card Height Allowance**: Configured `.tile.overview-big-tile` to `height: auto; min-height: 84px; padding: 6px 12px;` so cards with extra controls or 2-line titles dynamically expand height to fit the 34px font without truncation.
+
 ## [v2.44.0] - 2026-07-21
 - **Large 84px Card Size Maintained**: Retained the large 84px card height (`min-height: 84px`, `height: 84px`, `padding: 0 16px`, `border-radius: 20px`).
 - **100% Vertical Card Fill**: Scaled title text to **`36px` bold** (`font-weight: 850`, `line-height: 1.05`), tile icons to `60px x 60px`, and thermostat buttons to `54px x 54px` with 0px top/bottom padding so the text and icon stretch across 100% of the card's height from top edge to bottom edge.
