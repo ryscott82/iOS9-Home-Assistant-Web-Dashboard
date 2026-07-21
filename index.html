@@ -1741,7 +1741,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.22.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.23.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -4279,37 +4279,95 @@
       }
 
       function sendTemperatureWithRetries(entityId, domain, newTarget, attemptsLeft) {
-        var domainName = domain || "climate";
-        var serviceName = "set_temperature";
+        var domainName = domain || entityId.split(".")[0];
 
-        // 1. WebSocket Call
-        sendWsMessage({
-          id: msgId++,
-          type: "call_service",
-          domain: domainName,
-          service: serviceName,
-          service_data: {
-            entity_id: entityId,
-            temperature: newTarget
-          }
-        });
-
-        // 2. Dual HTTP API fallback with retries
-        haRequest("POST", "/api/services/" + domainName + "/" + serviceName, {
-          entity_id: entityId,
-          temperature: newTarget
-        }, function(err) {
-          if (err) {
-            console.warn("Temperature service attempt failed (" + err + "). Attempts left: " + (attemptsLeft - 1));
-            if (attemptsLeft > 1) {
-              setTimeout(function() {
-                sendTemperatureWithRetries(entityId, domain, newTarget, attemptsLeft - 1);
-              }, 600);
-            } else {
-              showToast("Error setting temperature", true);
+        if (domainName === "climate") {
+          var entity = null;
+          for (var i = 0; i < lastStatesCache.length; i++) {
+            if (lastStatesCache[i].entity_id === entityId) {
+              entity = lastStatesCache[i];
+              break;
             }
           }
-        });
+
+          var currentTemp = entity && entity.attributes ? parseFloat(entity.attributes.current_temperature) : NaN;
+          var desiredHvacMode = null;
+          if (!isNaN(currentTemp)) {
+            if (newTarget > currentTemp) {
+              desiredHvacMode = "heat";
+            } else if (newTarget < currentTemp) {
+              desiredHvacMode = "cool";
+            }
+          }
+
+          // Auto-switch HVAC mode if target temp is higher (heat) or lower (cool) than current temp
+          if (desiredHvacMode && entity && entity.state !== desiredHvacMode) {
+            entity.state = desiredHvacMode;
+            sendWsMessage({
+              id: msgId++,
+              type: "call_service",
+              domain: "climate",
+              service: "set_hvac_mode",
+              service_data: {
+                entity_id: entityId,
+                hvac_mode: desiredHvacMode
+              }
+            });
+            haRequest("POST", "/api/services/climate/set_hvac_mode", {
+              entity_id: entityId,
+              hvac_mode: desiredHvacMode
+            }, function () { });
+          }
+
+          // Dispatch set_temperature service
+          sendWsMessage({
+            id: msgId++,
+            type: "call_service",
+            domain: "climate",
+            service: "set_temperature",
+            service_data: {
+              entity_id: entityId,
+              temperature: newTarget
+            }
+          });
+
+          haRequest("POST", "/api/services/climate/set_temperature", {
+            entity_id: entityId,
+            temperature: newTarget
+          }, function (err) {
+            if (err && attemptsLeft > 1) {
+              console.warn("Climate temp attempt failed, retrying...", attemptsLeft);
+              setTimeout(function () {
+                sendTemperatureWithRetries(entityId, domainName, newTarget, attemptsLeft - 1);
+              }, 600);
+            }
+          });
+
+        } else if (domainName === "water_heater") {
+          // Dispatch water_heater set_temperature service
+          sendWsMessage({
+            id: msgId++,
+            type: "call_service",
+            domain: "water_heater",
+            service: "set_temperature",
+            service_data: {
+              entity_id: entityId,
+              temperature: newTarget
+            }
+          });
+
+          haRequest("POST", "/api/services/water_heater/set_temperature", {
+            entity_id: entityId,
+            temperature: newTarget
+          }, function (err) {
+            if (err && attemptsLeft > 1) {
+              console.warn("Water heater temp attempt failed, retrying...", attemptsLeft);
+              setTimeout(function () {
+                sendTemperatureWithRetries(entityId, domainName, newTarget, attemptsLeft - 1);
+              }, 600);
+            }
+          });
+        }
       }
 
       window.adjustTemp = function (entityId, delta) {
