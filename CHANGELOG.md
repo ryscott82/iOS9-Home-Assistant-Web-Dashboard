@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.31.0] - 2026-07-21
+- **Uniform 30px Card Title Font Scale**: Replaced length-based step scaling with a consistent, uniform `30px` bold title font across all Overview cards (using natural 1-2 line wrapping for title length).
+
 ## [v2.30.0] - 2026-07-21
 - **Fire Button State Toggle (100°F / 68°F)**: Fire button is muted gray when target != 100° (tapping sets target to 100°F) and glowing orange when target == 100° (tapping sets target to 68°F).
 - **Detailed Multi-Flame SVG**: Replaced simple fire icon with a detailed multi-flame SVG icon.

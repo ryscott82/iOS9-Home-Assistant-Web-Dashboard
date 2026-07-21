@@ -1741,7 +1741,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.30.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.31.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2092,14 +2092,13 @@
           stateControlHtml = '<div class="tile-state" style="font-size:16px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + escapeHtml(state) + '</div>';
         }
 
-        // Maximum card fill font scaling (34px max, 95% height / 100% length fill!)
-        var titleFontSize = "34px";
-        if (name.length > 20) titleFontSize = "22px";
-        else if (name.length > 12) titleFontSize = "28px";
+        // Uniform 30px font scale across all overview cards (natural wrapping handles title length)
+        var titleFontSize = "30px";
+        if (name.length > 26) titleFontSize = "24px";
 
         var h = '<div class="tile overview-big-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer;">';
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="width:42px; height:42px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div class="tile-icon" style="width:40px; height:40px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
         h += '<div class="tile-name" style="font-size:' + titleFontSize + '; font-weight:800; white-space:normal; word-break:break-word; line-height:1.1; letter-spacing:-0.5px;">' + name + '</div>';
         h += '</div>';
@@ -2141,9 +2140,8 @@
           }
         }
 
-        var titleFontSize = "34px";
-        if (speakerName.length > 20) titleFontSize = "22px";
-        else if (speakerName.length > 12) titleFontSize = "28px";
+        var titleFontSize = "30px";
+        if (speakerName.length > 26) titleFontSize = "24px";
 
         var trackSubtext = escapeHtml(title) + (artist ? ' • ' + escapeHtml(artist) : '');
 
