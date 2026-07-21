@@ -1146,6 +1146,14 @@
       line-height: 1.6;
     }
 
+    .thermostat-temp-val {
+      color: #1c1c1e;
+    }
+
+    body.dark-theme .thermostat-temp-val {
+      color: #ffffff;
+    }
+
     /* ======== FLOOR NAVIGATION BAR ======== */
     .floor-nav-bar {
       display: -webkit-flex;
@@ -1654,7 +1662,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.3.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.5.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2598,7 +2606,12 @@
             floorGroups[fl].push(ctrl);
           }
 
-          var floorOrder = { "upstairs": 1, "second": 1, "2nd": 1, "loft": 1, "main": 2, "1st": 2, "first": 2, "basement": 3, "outdoor": 4, "patio": 4, "pool": 4, "other": 5 };
+          var floorOrder = {
+            "outside": 1, "outdoor": 1, "backyard": 1, "patio": 1, "pool": 1, "deck": 1, "outside": 1,
+            "basement": 2,
+            "upstairs": 3, "second": 3, "2nd": 3, "loft": 3,
+            "main": 4, "first": 4, "1st": 4, "main floor": 4
+          };
           var floorKeys = [];
           for (var k in floorGroups) {
             if (floorGroups.hasOwnProperty(k)) {
@@ -3025,7 +3038,7 @@
         if (!unavailable) {
           h += '<div class="thermostat-controls" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:16px; margin: 8px 0 10px 0; border:none; padding:0; margin-top:10px;">';
           h += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
-          h += '<span style="font-size:20px; font-weight:700; min-width:70px; text-align:center; color:#1c1c1e;">' + escapeHtml(String(targetTemp)) + escapeHtml(unit) + '</span>';
+          h += '<span class="thermostat-temp-val" style="font-size:20px; font-weight:700; min-width:70px; text-align:center;">' + escapeHtml(String(targetTemp)) + escapeHtml(unit) + '</span>';
           h += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', 0.5)">+</button>';
           h += '</div>';
 
@@ -4075,7 +4088,7 @@
         if (!unavailable) {
           h += '<div class="thermostat-controls" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:16px; margin: 8px 0 10px 0; border:none; padding:0; margin-top:10px;">';
           h += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', -1)">&minus;</button>';
-          h += '<span style="font-size:20px; font-weight:700; min-width:70px; text-align:center; color:#1c1c1e;">' + escapeHtml(String(targetTemp)) + escapeHtml(unit) + '</span>';
+          h += '<span class="thermostat-temp-val" style="font-size:20px; font-weight:700; min-width:70px; text-align:center;">' + escapeHtml(String(targetTemp)) + escapeHtml(unit) + '</span>';
           h += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
           h += '</div>';
 
