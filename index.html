@@ -949,13 +949,13 @@
     .tile.overview-big-tile {
       -webkit-flex: 0 0 calc(50% - 12px);
       flex: 0 0 calc(50% - 12px);
-      min-height: 60px;
-      height: 60px;
-      padding: 4px 14px;
-      border-radius: 16px;
+      min-height: 84px;
+      height: 84px;
+      padding: 0 16px;
+      border-radius: 20px;
       background: #ffffff;
       margin: 6px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
       border: 2px solid rgba(0, 0, 0, 0.04);
       box-sizing: border-box;
       position: relative;
@@ -1805,7 +1805,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.43.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.44.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2132,16 +2132,16 @@
           var displayTarget = targetTemp !== "--" ? Math.round(parseFloat(targetTemp)) + unit : "--";
 
           if (!unavailable) {
-            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:4px; margin-left:8px; -webkit-flex-shrink:0; flex-shrink:0;">';
-            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:19px; margin:0; border-radius:9px;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', -1)">&minus;</button>';
-            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:44px;">';
-            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:17.5px; font-weight:800; line-height:1.1;">' + displayCurrent + '</span>';
-            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:12px; font-weight:700; color:#8e8e93; margin-top:1px;">Set ' + displayTarget + '</span>';
+            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
+            stateControlHtml += '<button class="thermostat-btn" style="width:54px; height:54px; line-height:54px; font-size:30px; margin:0; border-radius:12px;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', -1)">&minus;</button>';
+            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:54px;">';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:26px; font-weight:850; line-height:1.05;">' + displayCurrent + '</span>';
+            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:16px; font-weight:750; color:#8e8e93; margin-top:2px;">Set ' + displayTarget + '</span>';
             stateControlHtml += '</div>';
-            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:19px; margin:0; border-radius:9px;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', 1)">+</button>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:54px; height:54px; line-height:54px; font-size:30px; margin:0; border-radius:12px;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', 1)">+</button>';
             stateControlHtml += '</div>';
           } else {
-            stateControlHtml = '<div class="tile-state" style="font-size:16px; font-weight:700; margin-left:10px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + displayCurrent + '</div>';
+            stateControlHtml = '<div class="tile-state" style="font-size:22px; font-weight:850; margin-left:12px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + displayCurrent + '</div>';
           }
         } else if (domain === "water_heater") {
           var unit = attrs.unit_of_measurement || "°";
@@ -2152,7 +2152,7 @@
           if (!unavailable) {
             var isHotTub = (eid.indexOf("hot_tub") !== -1 || name.toLowerCase().indexOf("hot tub") !== -1);
             var is100 = (Math.round(parseFloat(targetTemp)) === 100);
-            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:4px; margin-left:8px; -webkit-flex-shrink:0; flex-shrink:0;">';
+            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
             
             if (isHotTub) {
               var btnBg = is100 ? "rgba(255,159,10,0.25)" : "rgba(142,142,147,0.15)";
@@ -2162,34 +2162,33 @@
               var btnTitle = is100 ? "Set Hot Tub to 68°F" : "Boost Hot Tub to 100°F";
               var fireBtnId = "btn_fire_" + eid.replace(/[^a-zA-Z0-9_-]/g, "_");
 
-              stateControlHtml += '<button id="' + fireBtnId + '" class="thermostat-btn" style="width:36px; height:36px; border-radius:9px; background:' + btnBg + '; border:' + btnBorder + '; margin-right:3px; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;" onclick="event.stopPropagation(); setHotTubMaxTemp(\'' + eid + '\', ' + targetToggle + ')" title="' + btnTitle + '">';
-              stateControlHtml += '<svg width="20" height="20" viewBox="0 0 24 24" fill="' + svgColor + '"><path d="M12 23c-4.97 0-9-4.03-9-9 0-4.17 2.84-7.67 6.72-8.66.52-.13 1.01.26 1.01.79 0 .42-.31.78-.73.87C7.02 7.6 5 10.53 5 14c0 3.87 3.13 7 7 7s7-3.13 7-7c0-1.85-.72-3.53-1.9-4.78a.8.8 0 01.12-1.21c.36-.26.86-.18 1.12.18C19.78 9.77 21 11.75 21 14c0 4.97-4.03 9-9 9zM12 7.5a6.5 6.5 0 00-6.5 6.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-1.57-.56-3.01-1.5-4.14a.75.75 0 00-1.12.16c-.23.32-.17.77.14 1.03C16.63 11.83 17 12.87 17 14c0 2.76-2.24 5-5 5s-5-2.24-5-5c0-2.31 1.57-4.26 3.73-4.83.41-.11.66-.52.56-.93-.11-.41-.52-.66-.93-.56A6.47 6.47 0 0012 7.5z"/></svg>';
+              stateControlHtml += '<button id="' + fireBtnId + '" class="thermostat-btn" style="width:54px; height:54px; border-radius:12px; background:' + btnBg + '; border:' + btnBorder + '; margin-right:4px; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;" onclick="event.stopPropagation(); setHotTubMaxTemp(\'' + eid + '\', ' + targetToggle + ')" title="' + btnTitle + '">';
+              stateControlHtml += '<svg width="28" height="28" viewBox="0 0 24 24" fill="' + svgColor + '"><path d="M12 23c-4.97 0-9-4.03-9-9 0-4.17 2.84-7.67 6.72-8.66.52-.13 1.01.26 1.01.79 0 .42-.31.78-.73.87C7.02 7.6 5 10.53 5 14c0 3.87 3.13 7 7 7s7-3.13 7-7c0-1.85-.72-3.53-1.9-4.78a.8.8 0 01.12-1.21c.36-.26.86-.18 1.12.18C19.78 9.77 21 11.75 21 14c0 4.97-4.03 9-9 9zM12 7.5a6.5 6.5 0 00-6.5 6.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-1.57-.56-3.01-1.5-4.14a.75.75 0 00-1.12.16c-.23.32-.17.77.14 1.03C16.63 11.83 17 12.87 17 14c0 2.76-2.24 5-5 5s-5-2.24-5-5c0-2.31 1.57-4.26 3.73-4.83.41-.11.66-.52.56-.93-.11-.41-.52-.66-.93-.56A6.47 6.47 0 0012 7.5z"/></svg>';
               stateControlHtml += '</button>';
             }
 
-            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:19px; margin:0; border-radius:9px;" onclick="event.stopPropagation(); adjustWaterHeaterTemp(\'' + eid + '\', -1)">&minus;</button>';
-            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:44px;">';
-            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:17.5px; font-weight:800; line-height:1.1;">' + displayCurrent + '</span>';
-            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:12px; font-weight:700; color:#8e8e93; margin-top:1px;">' + (targetTemp !== "--" ? "Set " + displayTarget : "--") + '</span>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:54px; height:54px; line-height:54px; font-size:30px; margin:0; border-radius:12px;" onclick="event.stopPropagation(); adjustWaterHeaterTemp(\'' + eid + '\', -1)">&minus;</button>';
+            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:54px;">';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:26px; font-weight:850; line-height:1.05;">' + displayCurrent + '</span>';
+            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:16px; font-weight:750; color:#8e8e93; margin-top:2px;">' + (targetTemp !== "--" ? "Set " + displayTarget : "--") + '</span>';
             stateControlHtml += '</div>';
-            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:19px; margin:0; border-radius:9px;" onclick="event.stopPropagation(); adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:54px; height:54px; line-height:54px; font-size:30px; margin:0; border-radius:12px;" onclick="event.stopPropagation(); adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
             stateControlHtml += '</div>';
           } else {
-            stateControlHtml = '<div class="tile-state" style="font-size:16px; font-weight:700; margin-left:10px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + displayCurrent + '</div>';
+            stateControlHtml = '<div class="tile-state" style="font-size:22px; font-weight:850; margin-left:12px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + displayCurrent + '</div>';
           }
         } else if (domain === "input_select") {
-          stateControlHtml = '<div class="tile-state" style="font-size:16px; font-weight:700; margin-left:10px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + escapeHtml(state) + '</div>';
+          stateControlHtml = '<div class="tile-state" style="font-size:22px; font-weight:850; margin-left:12px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + escapeHtml(state) + '</div>';
         }
 
-        // Uniform font size across all card titles for complete visual continuity
-        var titleFontSize = "22px";
-        var titleLineHeight = "1.15";
+        var titleFontSize = name.length > 14 ? "26px" : "36px";
+        var titleLineHeight = name.length > 14 ? "1.1" : "1.05";
 
         var h = '<div class="tile overview-big-tile' + activeClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer;">';
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="width:38px; height:38px; margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div class="tile-icon" style="width:60px; height:60px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-size:' + titleFontSize + '; font-weight:800; white-space:normal; word-break:break-word; line-height:' + titleLineHeight + '; max-height:2.3em; overflow:hidden; letter-spacing:-0.4px;">' + name + '</div>';
+        h += '<div class="tile-name" style="font-size:' + titleFontSize + '; font-weight:850; white-space:normal; word-break:break-word; line-height:' + titleLineHeight + '; max-height:2.3em; overflow:hidden; letter-spacing:-0.8px;">' + name + '</div>';
         h += '</div>';
         h += stateControlHtml;
         h += '</div>';
