@@ -2,6 +2,13 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.47.0] - 2026-07-21
+- **Green Active Highlight Color**: Configured green tint (`active-green`, `background: rgba(52, 199, 89, 0.14); border: 2px solid #34c759;`) for all non-light and non-heat feature cards.
+- **Playing-Only Media Card Highlight**: Media cards only display active green highlight when actively playing (`state === 'playing'`); unhighlighted when paused/idle.
+- **1-Tap Media Play/Pause Anywhere & Art Overlay**: Tapping anywhere on a media card triggers Play/Pause; moved Play/Pause SVG icon directly over top of enlarged album art (`64px x 64px`).
+- **Enlarged Skip Button**: Enlarged Next track skip button to `48px x 48px` with a `24px` icon for far-away visibility.
+- **Heater Power Button & Quick Preset Buttons**: Added dedicated On/Off power toggle buttons and quick heat buttons to heater cards (Pool: **68°** & **78°**; Hot Tub: **68°** & **100°** with Fire SVG).
+
 ## [v2.46.0] - 2026-07-21
 - **Full Width Climate & Heater Cards**: Expanded climate thermostats and water heater cards on the Home page to full width (`flex: 0 0 calc(100% - 12px)`), providing ample room for full 34px titles ("Upstairs", "Hot Tub", "Pool", "Main AC") alongside thermostat +/- buttons and boost fire controls without wrapping or truncating.
 - **Larger Centered Header Navigation Icon**: Increased header button to `48px x 48px` and SVG icon to `26px x 26px`, adding `style="display:block; margin:auto;"` for perfect flex alignment on iOS 9 Safari.

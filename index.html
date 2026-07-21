@@ -1805,7 +1805,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.46.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.47.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2116,11 +2116,9 @@
               activeClass = " active-red"; // Full red tint + outline when actively heating/cooling
             }
           } else if (domain === "light") {
-            activeClass = " active";
-          } else if (domain === "lock") {
-            activeClass = " active-green";
+            activeClass = " active"; // Yellow highlight for lights
           } else {
-            activeClass = " active-blue";
+            activeClass = " active-green"; // Green highlight for all non-light / non-heat features
           }
         }
 
@@ -2128,25 +2126,7 @@
         var icon = getSvg(iconName, isOn ? (domain === "climate" || domain === "water_heater" ? "#ff3b30" : getActiveSvgColor(domain, state)) : "");
 
         var stateControlHtml = "";
-        if (domain === "climate") {
-          var unit = attrs.unit_of_measurement || "°";
-          if (unit === "°F" || unit === "°C") unit = "°";
-          var displayCurrent = currentTemp !== "--" ? Math.round(parseFloat(currentTemp)) + unit : "--";
-          var displayTarget = targetTemp !== "--" ? Math.round(parseFloat(targetTemp)) + unit : "--";
-
-          if (!unavailable) {
-            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
-            stateControlHtml += '<button class="thermostat-btn" style="width:52px; height:52px; line-height:52px; font-size:28px; margin:0; border-radius:12px;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', -1)">&minus;</button>';
-            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:54px;">';
-            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:26px; font-weight:850; line-height:1.05;">' + displayCurrent + '</span>';
-            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:15px; font-weight:750; color:#8e8e93; margin-top:2px;">Set ' + displayTarget + '</span>';
-            stateControlHtml += '</div>';
-            stateControlHtml += '<button class="thermostat-btn" style="width:52px; height:52px; line-height:52px; font-size:28px; margin:0; border-radius:12px;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', 1)">+</button>';
-            stateControlHtml += '</div>';
-          } else {
-            stateControlHtml = '<div class="tile-state" style="font-size:22px; font-weight:850; margin-left:12px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + displayCurrent + '</div>';
-          }
-        } else if (domain === "water_heater") {
+        if (domain === "climate" || domain === "water_heater") {
           var unit = attrs.unit_of_measurement || "°";
           if (unit === "°F" || unit === "°C") unit = "°";
           var displayCurrent = currentTemp !== "--" ? Math.round(parseFloat(currentTemp)) + unit : "--";
@@ -2154,28 +2134,46 @@
 
           if (!unavailable) {
             var isHotTub = (eid.indexOf("hot_tub") !== -1 || name.toLowerCase().indexOf("hot tub") !== -1);
-            var is100 = (Math.round(parseFloat(targetTemp)) === 100);
+            var isPool = (eid.indexOf("pool") !== -1 || name.toLowerCase().indexOf("pool") !== -1);
+            var targetNum = Math.round(parseFloat(targetTemp));
+
+            // Power On/Off toggle button for heater
+            var powerBg = isOn ? "rgba(52,199,89,0.2)" : "rgba(142,142,147,0.15)";
+            var powerBorder = isOn ? "2px solid #34c759" : "1px solid rgba(142,142,147,0.3)";
+            var powerColor = isOn ? "#34c759" : "#8e8e93";
+
             stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
             
-            if (isHotTub) {
-              var btnBg = is100 ? "rgba(255,159,10,0.25)" : "rgba(142,142,147,0.15)";
-              var btnBorder = is100 ? "2px solid #ff9f0a" : "1px solid rgba(142,142,147,0.3)";
-              var svgColor = is100 ? "#ff9f0a" : "#8e8e93";
-              var targetToggle = is100 ? 68 : 100;
-              var btnTitle = is100 ? "Set Hot Tub to 68°F" : "Boost Hot Tub to 100°F";
-              var fireBtnId = "btn_fire_" + eid.replace(/[^a-zA-Z0-9_-]/g, "_");
+            // On/Off Power Button
+            stateControlHtml += '<button class="thermostat-btn" style="width:46px; height:46px; border-radius:12px; background:' + powerBg + '; border:' + powerBorder + '; color:' + powerColor + '; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;" onclick="event.stopPropagation(); toggleEntity(\'' + eid + '\', \'' + domain + '\')" title="Toggle Power">';
+            stateControlHtml += '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42A6.92 6.92 0 0119 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-1.93.78-3.68 2.05-4.95L5.63 5.63A8.96 8.96 0 003 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.49-1.01-4.74-2.64-6.37z"/></svg>';
+            stateControlHtml += '</button>';
 
-              stateControlHtml += '<button id="' + fireBtnId + '" class="thermostat-btn" style="width:52px; height:52px; border-radius:12px; background:' + btnBg + '; border:' + btnBorder + '; margin-right:4px; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;" onclick="event.stopPropagation(); setHotTubMaxTemp(\'' + eid + '\', ' + targetToggle + ')" title="' + btnTitle + '">';
-              stateControlHtml += '<svg width="28" height="28" viewBox="0 0 24 24" fill="' + svgColor + '"><path d="M12 23c-4.97 0-9-4.03-9-9 0-4.17 2.84-7.67 6.72-8.66.52-.13 1.01.26 1.01.79 0 .42-.31.78-.73.87C7.02 7.6 5 10.53 5 14c0 3.87 3.13 7 7 7s7-3.13 7-7c0-1.85-.72-3.53-1.9-4.78a.8.8 0 01.12-1.21c.36-.26.86-.18 1.12.18C19.78 9.77 21 11.75 21 14c0 4.97-4.03 9-9 9zM12 7.5a6.5 6.5 0 00-6.5 6.5c0 3.59 2.91 6.5 6.5 6.5s6.5-2.91 6.5-6.5c0-1.57-.56-3.01-1.5-4.14a.75.75 0 00-1.12.16c-.23.32-.17.77.14 1.03C16.63 11.83 17 12.87 17 14c0 2.76-2.24 5-5 5s-5-2.24-5-5c0-2.31 1.57-4.26 3.73-4.83.41-.11.66-.52.56-.93-.11-.41-.52-.66-.93-.56A6.47 6.47 0 0012 7.5z"/></svg>';
-              stateControlHtml += '</button>';
-            }
+            // Quick heat preset buttons (Hot Tub: 68 & 100 | Pool: 68 & 78)
+            var p1 = 68, p2 = isHotTub ? 100 : (isPool ? 78 : 72);
+            var p1Active = (targetNum === p1);
+            var p2Active = (targetNum === p2);
 
-            stateControlHtml += '<button class="thermostat-btn" style="width:52px; height:52px; line-height:52px; font-size:28px; margin:0; border-radius:12px;" onclick="event.stopPropagation(); adjustWaterHeaterTemp(\'' + eid + '\', -1)">&minus;</button>';
-            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:54px;">';
-            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:26px; font-weight:850; line-height:1.05;">' + displayCurrent + '</span>';
-            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:15px; font-weight:750; color:#8e8e93; margin-top:2px;">Set ' + displayTarget + '</span>';
+            var p1Bg = p1Active ? "rgba(0,122,255,0.25)" : "rgba(142,142,147,0.12)";
+            var p1Border = p1Active ? "2px solid #007aff" : "1px solid rgba(142,142,147,0.25)";
+            var p1Color = p1Active ? "#007aff" : "#636366";
+
+            stateControlHtml += '<button class="thermostat-btn" style="height:46px; padding:0 10px; font-size:16px; font-weight:800; border-radius:10px; background:' + p1Bg + '; border:' + p1Border + '; color:' + p1Color + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'setHotTubMaxTemp' : 'adjustTemp') + '(\'' + eid + '\', ' + p1 + ')" title="Set to ' + p1 + '°F">' + p1 + '°</button>';
+
+            var p2Bg = p2Active ? (isHotTub ? "rgba(255,159,10,0.25)" : "rgba(0,122,255,0.25)") : "rgba(142,142,147,0.12)";
+            var p2Border = p2Active ? (isHotTub ? "2px solid #ff9f0a" : "2px solid #007aff") : "1px solid rgba(142,142,147,0.25)";
+            var p2Color = p2Active ? (isHotTub ? "#ff9f0a" : "#007aff") : "#636366";
+            var p2Label = isHotTub ? '🔥 100°' : (p2 + '°');
+
+            stateControlHtml += '<button class="thermostat-btn" style="height:46px; padding:0 10px; font-size:16px; font-weight:800; border-radius:10px; background:' + p2Bg + '; border:' + p2Border + '; color:' + p2Color + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'setHotTubMaxTemp' : 'adjustTemp') + '(\'' + eid + '\', ' + p2 + ')" title="Set to ' + p2 + '°F">' + p2Label + '</button>';
+
+            // Adjust Temp - / +
+            stateControlHtml += '<button class="thermostat-btn" style="width:46px; height:46px; line-height:46px; font-size:24px; margin:0; border-radius:10px;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', -1)">&minus;</button>';
+            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:48px;">';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:22px; font-weight:850; line-height:1.05;">' + displayCurrent + '</span>';
+            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:14px; font-weight:750; color:#8e8e93; margin-top:2px;">Set ' + displayTarget + '</span>';
             stateControlHtml += '</div>';
-            stateControlHtml += '<button class="thermostat-btn" style="width:52px; height:52px; line-height:52px; font-size:28px; margin:0; border-radius:12px;" onclick="event.stopPropagation(); adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:46px; height:46px; line-height:46px; font-size:24px; margin:0; border-radius:10px;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', 1)">+</button>';
             stateControlHtml += '</div>';
           } else {
             stateControlHtml = '<div class="tile-state" style="font-size:22px; font-weight:850; margin-left:12px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + displayCurrent + '</div>';
@@ -2235,42 +2233,41 @@
           }
         }
 
-        var titleFontSize = speakerName.length > 14 ? "19px" : "26px";
-        var titleLineHeight = speakerName.length > 14 ? "1.15" : "1.1";
-
+        var activeClass = isPlaying ? " active-green" : "";
         var trackSubtext = escapeHtml(title) + (artist ? ' • ' + escapeHtml(artist) : '');
 
-        var h = '<div class="tile overview-big-tile active-blue" style="cursor:pointer;">';
+        var playOverlaySvg = isPlaying
+          ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
+          : '<svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M8 5v14l11-7z"/></svg>';
+
+        var h = '<div class="tile overview-big-tile' + activeClass + '" onclick="mediaPlayPause(\'' + eid + '\')" style="cursor:pointer;">';
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         
+        // Enlarged 64px x 64px Album Art with transparent Play/Pause overlay icon
+        h += '<div style="position:relative; width:64px; height:64px; border-radius:14px; overflow:hidden; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0; background:#f2f2f7;">';
         if (artUrl) {
-          h += '<img src="' + artUrl + '" style="width:42px; height:42px; border-radius:10px; object-fit:cover; margin-right:14px; background:#f2f2f7; -webkit-flex-shrink:0; flex-shrink:0;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
-          h += '<div style="display:none; width:42px; height:42px; border-radius:10px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:18px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
+          h += '<img src="' + artUrl + '" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display=\'none\'; this.nextSibling.style.display=\'-webkit-flex\';">';
+          h += '<div style="display:none; width:100%; height:100%; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:24px;">🎵</div>';
         } else {
-          h += '<div style="display:-webkit-flex; display:flex; width:42px; height:42px; border-radius:10px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:18px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
+          h += '<div style="display:-webkit-flex; display:flex; width:100%; height:100%; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:24px;">🎵</div>';
         }
+        h += '<div style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.35); display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;">';
+        h += playOverlaySvg;
+        h += '</div>';
+        h += '</div>';
 
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-size:' + titleFontSize + '; font-weight:800; white-space:normal; word-break:break-word; line-height:1.1; letter-spacing:-0.5px;">' + speakerName + '</div>';
-        h += '<div style="font-size:12.5px; font-weight:600; color:#8e8e93; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + trackSubtext + '</div>';
+        h += '<div class="tile-name" style="font-size:28px; font-weight:850; white-space:normal; word-break:break-word; line-height:1.05; letter-spacing:-0.6px;">' + speakerName + '</div>';
+        h += '<div style="font-size:14px; font-weight:650; color:#8e8e93; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + trackSubtext + '</div>';
         h += '</div>';
 
         if (!unavailable) {
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:8px; margin-left:14px; -webkit-flex-shrink:0; flex-shrink:0;">';
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin-left:14px; -webkit-flex-shrink:0; flex-shrink:0;">';
           
-          h += '<button class="media-ctrl-btn" onclick="mediaPlayPause(\'' + eid + '\')">';
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%;">';
-          if (isPlaying) {
-            h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-          } else {
-            h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-          }
-          h += '</div></button>';
-
-          h += '<button class="media-ctrl-btn" onclick="mediaNextTrack(\'' + eid + '\')">';
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%;">';
-          h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
-          h += '</div></button>';
+          // Enlarged Skip/Next button (48px x 48px with 24px icon) for far-away visibility
+          h += '<button class="media-ctrl-btn" style="width:48px; height:48px; border-radius:12px; background:rgba(142,142,147,0.18); border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0;" onclick="event.stopPropagation(); mediaNextTrack(\'' + eid + '\')" title="Next Track">';
+          h += '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+          h += '</button>';
 
           h += '</div>';
         }
