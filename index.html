@@ -965,18 +965,13 @@
       align-items: center;
     }
 
-    header.app-header {
-      display: -webkit-flex !important;
-      display: flex !important;
-    }
-
-    .menu-icon-btn {
-      display: -webkit-flex !important;
-      display: flex !important;
-    }
-
-    .tab-bar {
+    body.tab-overview .tab-bar {
       display: none !important;
+    }
+    body.tab-controls .tab-bar,
+    body.tab-chemicals .tab-bar {
+      display: -webkit-flex !important;
+      display: flex !important;
     }
 
     body.show-nav .tab-bar {
@@ -1746,7 +1741,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.20.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.21.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2043,28 +2038,34 @@
         if (domain === "climate") {
           var unit = attrs.unit_of_measurement || "°";
           if (unit === "°F" || unit === "°C") unit = "°";
-          var stateText = currentTemp + unit + " • Set " + targetTemp + unit;
           if (!unavailable) {
-            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:12px; -webkit-flex-shrink:0; flex-shrink:0;">';
-            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
-            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:15px; font-weight:800; min-width:85px; text-align:center;">' + stateText + '</span>';
-            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', 0.5)">+</button>';
+            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
+            stateControlHtml += '<button class="thermostat-btn" style="width:34px; height:34px; line-height:34px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
+            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:44px;">';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:16.5px; font-weight:800; line-height:1.1;">' + currentTemp + unit + '</span>';
+            stateControlHtml += '<span style="font-size:11px; font-weight:700; color:#8e8e93; margin-top:1px;">Set ' + targetTemp + unit + '</span>';
+            stateControlHtml += '</div>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:34px; height:34px; line-height:34px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', 0.5)">+</button>';
             stateControlHtml += '</div>';
           } else {
-            stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + stateText + '</div>';
+            stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + currentTemp + unit + '</div>';
           }
         } else if (domain === "water_heater") {
           var unit = attrs.unit_of_measurement || "°";
           if (unit === "°F" || unit === "°C") unit = "°";
-          var stateText = currentTemp + unit + (targetTemp !== "--" ? " • Set " + targetTemp + unit : "");
           if (!unavailable) {
-            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:12px; -webkit-flex-shrink:0; flex-shrink:0;">';
-            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', -1)">&minus;</button>';
-            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:15px; font-weight:800; min-width:75px; text-align:center;">' + stateText + '</span>';
-            stateControlHtml += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
+            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
+            stateControlHtml += '<button class="thermostat-btn" style="width:34px; height:34px; line-height:34px; font-size:18px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', -1)">&minus;</button>';
+            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:center; align-items:center; min-width:44px;">';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:16.5px; font-weight:800; line-height:1.1;">' + currentTemp + unit + '</span>';
+            if (targetTemp !== "--") {
+              stateControlHtml += '<span style="font-size:11px; font-weight:700; color:#8e8e93; margin-top:1px;">Set ' + targetTemp + unit + '</span>';
+            }
+            stateControlHtml += '</div>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:34px; height:34px; line-height:34px; font-size:18px; margin:0;" onclick="adjustWaterHeaterTemp(\'' + eid + '\', 1)">+</button>';
             stateControlHtml += '</div>';
           } else {
-            stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + stateText + '</div>';
+            stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + currentTemp + unit + '</div>';
           }
         } else if (domain === "input_select") {
           stateControlHtml = '<div class="tile-state" style="font-size:15px; font-weight:700; margin-left:14px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + escapeHtml(state) + '</div>';
@@ -2100,7 +2101,7 @@
         } else {
           names.push(friendlyName(primary));
         }
-        var name = escapeHtml(names.join(" & "));
+        var speakerName = escapeHtml(names.join(" & "));
         var eid = escapeHtml(primary.entity_id);
         var state = primary.state;
         var unavailable = state === "unavailable";
@@ -2114,6 +2115,12 @@
         var isIdle = (state !== "playing" && state !== "paused" && title !== "Skipping...");
         if (isIdle) return "";
 
+        var titleFontSize = "24px";
+        if (speakerName.length > 22) titleFontSize = "18px";
+        else if (speakerName.length > 14) titleFontSize = "21px";
+
+        var trackSubtext = escapeHtml(title) + (artist ? ' • ' + escapeHtml(artist) : '');
+
         var h = '<div class="tile overview-big-tile active-blue" style="cursor:pointer;">';
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         
@@ -2124,15 +2131,9 @@
           h += '<div style="display:-webkit-flex; display:flex; width:36px; height:36px; border-radius:10px; background:#f2f2f7; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:16px; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
         }
 
-        var titleFontSize = "25px";
-        if (title.length > 22) titleFontSize = "18px";
-        else if (title.length > 14) titleFontSize = "21px";
-
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        h += '<div class="tile-name" style="font-size:' + titleFontSize + '; font-weight:800; white-space:normal; word-break:break-word; line-height:1.15; letter-spacing:-0.4px;">' + escapeHtml(title) + '</div>';
-        if (artist || name) {
-          h += '<div style="font-size:11px; font-weight:700; color:#8e8e93; text-transform:uppercase; letter-spacing:0.6px; margin-top:3px;">' + (artist ? escapeHtml(artist) + ' • ' : '') + name + '</div>';
-        }
+        h += '<div class="tile-name" style="font-size:' + titleFontSize + '; font-weight:800; white-space:normal; word-break:break-word; line-height:1.15; letter-spacing:-0.4px;">' + speakerName + '</div>';
+        h += '<div style="font-size:12px; font-weight:600; color:#8e8e93; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + trackSubtext + '</div>';
         h += '</div>';
 
         if (!unavailable) {
