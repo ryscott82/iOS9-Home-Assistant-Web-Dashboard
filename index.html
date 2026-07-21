@@ -1805,7 +1805,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.48.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.49.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1830,6 +1830,7 @@
       function getNextMsgId() { return globalMsgId++; }
       var entities = {};
       var allowedEntityIds = {};
+      var homeEntityIds = {};
       var registryLoaded = false;
       var sensorHistory = {};
       var bannerDismissed = false;
@@ -2387,17 +2388,21 @@
 
               if (msg.id === entityRequestId && msg.success) {
                 allowedEntityIds = {};
+                homeEntityIds = {};
                 entityAreaMap = {};
                 for (var i = 0; i < res.length; i++) {
                   var entry = res[i];
                   if (entry.area_id) {
                     entityAreaMap[entry.entity_id] = entry.area_id;
                   }
-                  var labels = entry.labels || [];
+                  var labels = entry.labels || entry.tags || [];
                   for (var j = 0; j < labels.length; j++) {
-                    if (labels[j] === "ipaddashboard") {
+                    var lbl = String(labels[j]).toLowerCase();
+                    if (lbl === "ipaddashboard") {
                       allowedEntityIds[entry.entity_id] = true;
-                      break;
+                    }
+                    if (lbl === "ipadhomescreen") {
+                      homeEntityIds[entry.entity_id] = true;
                     }
                   }
                 }
@@ -2482,6 +2487,24 @@
           refreshAll();
         });
       };
+
+      function isHomeScreenEntity(entity) {
+        if (!entity || !entity.entity_id) return false;
+        var eid = entity.entity_id;
+        if (homeEntityIds[eid]) return true;
+
+        var attrs = entity.attributes || {};
+        var labels = attrs.labels || attrs.tags || attrs.label || [];
+        if (typeof labels === "string") labels = [labels];
+        for (var l = 0; l < labels.length; l++) {
+          if (String(labels[l]).toLowerCase() === "ipadhomescreen") return true;
+        }
+
+        var name = (friendlyName(entity) || "").toLowerCase();
+        if (name.indexOf("ipadhomescreen") !== -1 || eid.indexOf("ipadhomescreen") !== -1) return true;
+
+        return false;
+      }
 
       function isMasterSwitch(entity) {
         if (!entity) return false;
@@ -2787,7 +2810,7 @@
         document.body.className = (themeOverride === "dark" || isNight ? "dark-theme " : "") + "tab-" + activeTab;
 
         if (activeTab === "home") {
-          // Render Media Players + Home entities grid
+          // Render Media Players + Home entities grid filtered by 'ipadhomescreen' tag
           var mediaGroups = [];
           var songGroups = {};
           for (i = 0; i < mediaPlayers.length; i++) {
@@ -2806,7 +2829,15 @@
             }
           }
 
-          var homeEntities = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
+          var rawHomeList = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
+          var homeEntities = [];
+          var hasHomeTagDefined = (Object.keys(homeEntityIds).length > 0);
+          for (i = 0; i < rawHomeList.length; i++) {
+            if (!hasHomeTagDefined || isHomeScreenEntity(rawHomeList[i])) {
+              homeEntities.push(rawHomeList[i]);
+            }
+          }
+
           if (mediaGroups.length > 0 || homeEntities.length > 0) {
             html += '<div class="tile-grid">';
             for (i = 0; i < mediaGroups.length; i++) {
@@ -4784,7 +4815,14 @@
           if (chosen) {
             title = chosen.title;
             artist = chosen.artist || "Unknown Artist";
-            artUrl = chosen.entity_picture ? HA_URL + chosen.entity_picture : "";
+            if (chosen.entity_picture) {
+              var basePic = (chosen.entity_picture.indexOf("http") === 0) ? chosen.entity_picture : (HA_URL + chosen.entity_picture);
+              var sep = basePic.indexOf("?") !== -1 ? "&" : "?";
+              var trackHash = encodeURIComponent(title + "_" + artist).replace(/[^a-zA-Z0-9]/g, "");
+              artUrl = basePic + sep + "_v=" + trackHash + "_" + Date.now();
+            } else {
+              artUrl = "";
+            }
             isPlaying = chosen.state === "playing";
           }
         }

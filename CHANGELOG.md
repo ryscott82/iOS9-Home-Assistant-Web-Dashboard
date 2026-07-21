@@ -2,6 +2,11 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.49.0] - 2026-07-21
+- **Album Art Live Refresh**: Appended dynamic cache-busting version parameter (`_v=` + track title hash + timestamp) to album art URLs so Safari on iOS 9 instantly re-renders new artwork on track changes.
+- **`ipadhomescreen` Tag Filtering for Home Tab**: Added `homeEntityIds` parsing and `isHomeScreenEntity()` helper. Only devices tagged with `ipadhomescreen` appear on the Home tab.
+- **`ipaddashboard` Tag Filtering for Controls Menu**: Devices with `ipaddashboard` tag continue to appear on the Controls menu screen.
+
 ## [v2.48.0] - 2026-07-21
 - **Clean 100° Button Label**: Replaced the fire emoji with clean text `100°` on the Hot Tub quick heat preset button.
 - **Muted Orange Heater Controls**: Unified all heater power buttons and preset buttons to a cohesive, muted orange palette (`rgba(255, 159, 10, ...)`).
