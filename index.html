@@ -965,13 +965,21 @@
       align-items: center;
     }
 
-    body.tab-overview header.app-header,
+    body.tab-overview header.app-header {
+      display: -webkit-flex !important;
+      display: flex !important;
+    }
+    body.tab-overview .tab-bar {
+      display: none !important;
+    }
+    body.tab-overview footer.app-footer {
+      display: none !important;
+    }
+
     body.tab-controls header.app-header,
     body.tab-chemicals header.app-header {
       display: none !important;
     }
-
-    body.tab-overview .tab-bar,
     body.tab-controls .tab-bar,
     body.tab-chemicals .tab-bar {
       display: -webkit-flex !important;
@@ -1712,10 +1720,17 @@
   <!-- APP -->
   <main class="app-content" id="appContent" style="display:none; padding-top: 30px;">
 
-    <!-- HEADER CONTROLS (Welcome Message & Date/Time) -->
-    <header class="app-header">
-      <div id="headerWelcome" class="header-welcome">Welcome Home</div>
-      <div id="headerDateTime" class="header-datetime"></div>
+    <!-- HEADER CONTROLS (Welcome Message & Date/Time & 3-Line Menu Button) -->
+    <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-bottom:12px; padding:0 6px;">
+      <div>
+        <div id="headerWelcome" class="header-welcome">Welcome Home</div>
+        <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; margin-top:2px;">
+          <div id="headerDateTime" class="header-datetime" style="margin:0;"></div>
+          <button class="menu-icon-btn" onclick="switchTab('controls')" title="More Controls" style="width:32px; height:32px; border-radius:8px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+          </button>
+        </div>
+      </div>
     </header>
 
     <div id="entityContainer">
@@ -1731,7 +1746,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.13.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.14.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
