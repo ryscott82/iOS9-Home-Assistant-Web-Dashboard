@@ -572,8 +572,8 @@
 
     @media (min-width: 768px) {
       .tile.media-tile {
-        -webkit-flex: 0 0 calc(33.333% - 10px);
-        flex: 0 0 calc(33.333% - 10px);
+        -webkit-flex: 0 0 calc(33.333% - 10px) !important;
+        flex: 0 0 calc(33.333% - 10px) !important;
         /* 3 cards wide in landscape */
       }
     }
@@ -1141,6 +1141,52 @@
       line-height: 1.6;
     }
 
+    /* ======== FLOOR NAVIGATION BAR ======== */
+    .floor-nav-bar {
+      display: -webkit-flex;
+      display: flex;
+      background: rgba(250, 250, 250, 0.85);
+      padding: 6px 10px;
+      border-radius: 12px;
+      margin: 4px 5px 14px;
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      position: -webkit-sticky;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    body.dark-theme .floor-nav-bar {
+      background: rgba(30, 30, 30, 0.85);
+      border-color: rgba(255, 255, 255, 0.05);
+    }
+    .floor-nav-btn {
+      background: transparent;
+      border: none;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #007aff;
+      border-radius: 8px;
+      margin-right: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-transition: background 0.15s;
+      transition: background 0.15s;
+    }
+    .floor-nav-btn:active {
+      background: rgba(0, 122, 255, 0.1);
+    }
+    body.dark-theme .floor-nav-btn {
+      color: #0a84ff;
+    }
+    body.dark-theme .floor-nav-btn:active {
+      background: rgba(10, 132, 255, 0.15);
+    }
+
     /* ======== DARK THEME OVERRIDES ======== */
     body.dark-theme {
       background: #0d1117;
@@ -1194,7 +1240,7 @@
 
     body.dark-theme .heater-tile .tile-name,
     body.dark-theme .heater-tile .tile-state {
-      color: #ffffff !important;
+      color: #ffffff;
     }
 
     body.dark-theme .tile-name {
@@ -1203,6 +1249,14 @@
 
     body.dark-theme .tile-state {
       color: #8b949e;
+    }
+
+    body.dark-theme .tile.active .tile-state,
+    body.dark-theme .tile.active-green .tile-state,
+    body.dark-theme .tile.active-blue .tile-state,
+    body.dark-theme .tile.active-orange .tile-state,
+    body.dark-theme .tile.active-red .tile-state {
+      color: #e6edf3 !important;
     }
 
     body.dark-theme .tile-icon {
@@ -1270,7 +1324,7 @@
     body.dark-theme .tile.active-blue .tile-state,
     body.dark-theme .tile.active-orange .tile-state,
     body.dark-theme .tile.active-red .tile-state {
-      color: #8b949e;
+      color: #e6edf3;
     }
 
     body.dark-theme .tile.active .tile-icon,
@@ -1595,7 +1649,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.2.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.3.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -1851,6 +1905,20 @@
         }
       }
 
+      var idleTimer = null;
+      window.resetIdleTimer = function () {
+        if (idleTimer) {
+          clearTimeout(idleTimer);
+        }
+        idleTimer = setTimeout(function () {
+          if (activeTab !== "overview") {
+            switchTab("overview");
+          }
+          window.scrollTo(0, 0);
+          showToast("Returned to Overview due to inactivity");
+        }, 15 * 60 * 1000); // 15 minutes
+      };
+
       // ======== INIT ========
       function init() {
         hideSetup();
@@ -1858,6 +1926,9 @@
         startMediaTickers();
         updateClock();
         setInterval(updateClock, 10000);
+        resetIdleTimer();
+        document.addEventListener("click", resetIdleTimer);
+        document.addEventListener("touchstart", resetIdleTimer);
       }
 
       // ======== ENTITY REGISTRY (WebSocket) ========
@@ -2514,6 +2585,16 @@
             return a.localeCompare(b);
           });
 
+          if (floorKeys.length > 0) {
+            html += '<div class="floor-nav-bar">';
+            for (var f = 0; f < floorKeys.length; f++) {
+              var fName = floorKeys[f];
+              var fClean = fName.replace(/\s+/g, "_");
+              html += '<button class="floor-nav-btn" onclick="var el = document.getElementById(\'sec_' + fClean + '\'); if (el) el.scrollIntoView();">' + escapeHtml(fName) + '</button>';
+            }
+            html += '</div>';
+          }
+
           for (var f = 0; f < floorKeys.length; f++) {
             var floorName = floorKeys[f];
             var floorEntities = floorGroups[floorName];
@@ -2528,7 +2609,8 @@
                 return valA - valB;
               });
 
-              html += '<div class="section"><div class="section-title">' + floorName + '</div>';
+              var fClean = floorName.replace(/\s+/g, "_");
+              html += '<div class="section" id="sec_' + fClean + '"><div class="section-title">' + floorName + '</div>';
               html += '<div class="tile-grid">';
               for (var j = 0; j < floorEntities.length; j++) {
                 var ent = floorEntities[j];
@@ -2782,15 +2864,21 @@
         var hvacModes = attrs.hvac_modes || ["off", "heat", "cool", "auto"];
         var unit = attrs.unit_of_measurement || "\u00B0F";
         var unavailable = entity.state === "unavailable";
-        var isActive = hvacMode !== "off" && !unavailable;
+
+        var isTargetEqualsCurrent = false;
+        if (targetTemp !== "--" && currentTemp !== "--" && parseFloat(targetTemp) === parseFloat(currentTemp)) {
+          isTargetEqualsCurrent = true;
+        }
+
+        var isActive = hvacMode !== "off" && !unavailable && !isTargetEqualsCurrent;
         var activeClass = "";
-        if (hvacMode === "heat") activeClass = " active-orange";
-        else if (hvacMode === "cool") activeClass = " active-blue";
+        if (hvacMode === "heat" && !isTargetEqualsCurrent) activeClass = " active-orange";
+        else if (hvacMode === "cool" && !isTargetEqualsCurrent) activeClass = " active-blue";
         else if (isActive) activeClass = " active-green";
 
         var icon = getSvg("climate", isActive ? getActiveSvgColor("climate", hvacMode) : "");
 
-        var h = '<div class="tile tile-full' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
+        var h = '<div class="tile' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
         h += '<div class="tile-top" style="margin-bottom: 6px;">';
         h += '<div class="tile-icon">' + icon + '</div>';
         h += '</div>';
@@ -2817,6 +2905,22 @@
             h += '<button class="mode-btn' + mActive + '" style="padding:4px 6px; font-size:10px;" onclick="setHvacMode(\'' + eid + '\', \'' + escapeHtml(mode) + '\')">' + escapeHtml(mode) + '</button>';
           }
           h += '</div>';
+
+          var lowerEid = eid.toLowerCase();
+          var lowerName = name.toLowerCase();
+          var isPool = (lowerEid.indexOf("pool") !== -1 || lowerName.indexOf("pool") !== -1);
+          var isHotTub = (lowerEid.indexOf("hot_tub") !== -1 || lowerEid.indexOf("hottub") !== -1 || lowerEid.indexOf("spa") !== -1 || lowerName.indexOf("hot tub") !== -1 || lowerName.indexOf("spa") !== -1);
+
+          if (isPool || isHotTub) {
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; gap:8px; margin-top:8px; border-top:1px solid rgba(128,128,128,0.12); padding-top:8px;">';
+            h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 68)">68&deg;</button>';
+            if (isHotTub) {
+              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 100)">100&deg;</button>';
+            } else if (isPool) {
+              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 76)">76&deg;</button>';
+            }
+            h += '</div>';
+          }
         }
 
         h += '</div>';
@@ -3805,11 +3909,17 @@
         var minTemp = attrs.min_temp || 60;
         var maxTemp = attrs.max_temp || 104;
         var unavailable = entity.state === "unavailable";
-        var isActive = opMode !== "off" && opMode !== "Off" && !unavailable;
+
+        var isTargetEqualsCurrent = false;
+        if (targetTemp !== "--" && currentTemp !== "--" && parseFloat(targetTemp) === parseFloat(currentTemp)) {
+          isTargetEqualsCurrent = true;
+        }
+
+        var isActive = opMode !== "off" && opMode !== "Off" && !unavailable && !isTargetEqualsCurrent;
         var activeClass = isActive ? " active-red" : "";
         var icon = getSvg("water_heater", isActive ? "#ff3b30" : "");
 
-        var h = '<div class="tile tile-full' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
+        var h = '<div class="tile' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
         h += '<div class="tile-top" style="margin-bottom: 6px;">';
         h += '<div class="tile-icon">' + icon + '</div>';
         h += '</div>';
@@ -3838,11 +3948,42 @@
             }
             h += '</div>';
           }
+
+          var lowerEid = eid.toLowerCase();
+          var lowerName = name.toLowerCase();
+          var isPool = (lowerEid.indexOf("pool") !== -1 || lowerName.indexOf("pool") !== -1);
+          var isHotTub = (lowerEid.indexOf("hot_tub") !== -1 || lowerEid.indexOf("hottub") !== -1 || lowerEid.indexOf("spa") !== -1 || lowerName.indexOf("hot tub") !== -1 || lowerName.indexOf("spa") !== -1);
+
+          if (isPool || isHotTub) {
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; gap:8px; margin-top:8px; border-top:1px solid rgba(128,128,128,0.12); padding-top:8px;">';
+            h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 68)">68&deg;</button>';
+            if (isHotTub) {
+              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 100)">100&deg;</button>';
+            } else if (isPool) {
+              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 76)">76&deg;</button>';
+            }
+            h += '</div>';
+          }
         }
 
         h += '</div>';
         return h;
       }
+
+      window.setClimateTemp = function (entityId, temp) {
+        showToast("Setting target to " + temp + "...");
+        haRequest("POST", "/api/services/climate/set_temperature", {
+          entity_id: entityId,
+          temperature: temp
+        }, function (err) {
+          if (err) {
+            showToast("Error: " + err, true);
+          } else {
+            showToast("Target set to " + temp);
+            setTimeout(refreshAll, 500);
+          }
+        });
+      };
 
       // ======== ACTIONS ========
       window.toggleEntity = function (entityId, domain) {
