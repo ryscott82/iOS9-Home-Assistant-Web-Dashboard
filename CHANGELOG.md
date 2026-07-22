@@ -2,6 +2,11 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.56.0] - 2026-07-21
+- **Mutually Exclusive Header Chemical Button**: Moved chemical actions into the top header next to date/time. Displays `Chemical Alert !` badge in red/yellow when alerts exist, or `Log Chemicals` button in blue when no alerts are active (mutually exclusive).
+- **Side-by-Side 36px Temperature Display**: Placed Current Temp (`36px` extra-large bold) and Set Temp (`20px` bold) side-by-side horizontally for enhanced readability.
+- **Card Tap Power Toggle**: Tapping anywhere on the heater card toggles heater power On/Off, removing the redundant internal power button icon.
+
 ## [v2.55.0] - 2026-07-21
 - **Chemical Alert Exclamation Badge (`!`)**: Added dynamic red/yellow exclamation button (`!`) on Hot Tub and Pool cards whenever chemical recommendations are active. Tapping the badge opens the Chemicals page directly.
 - **Log Chem Shortcut Button**: Added a dedicated `Log Chem` button inside Hot Tub and Pool Home cards for 1-tap navigation to chemical logging.
