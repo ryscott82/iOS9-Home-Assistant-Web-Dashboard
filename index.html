@@ -3926,17 +3926,26 @@
             return bags.toFixed(1) + " bags of salt (" + lbs.toFixed(0) + " lbs)";
           }
 
-          // Muriatic Acid (31.5% liquid) -> measure in Gallons when >= 0.25 gal (32 fl oz)
-          if (isMuriaticAcid) {
-            if (oz >= 32.0) { // 32 fl oz = 0.25 gallons
+          // Muriatic Acid or Liquid Chemical -> measure in Gallons when >= 32 fl oz (4 cups)
+          if (isMuriaticAcid || (isLiquid && oz >= 32.0)) {
+            if (oz >= 32.0) { // 32 fl oz = 0.25 gallons (4 cups)
               var gal = oz / 128.0; // 128 fl oz per gallon
               var roundedGal = Math.round(gal * 4) / 4;
               if (roundedGal === 0.25) return "1/4 gal (32 fl oz)";
               if (roundedGal === 0.5) return "1/2 gal (64 fl oz)";
               if (roundedGal === 0.75) return "3/4 gal (96 fl oz)";
               if (roundedGal === 1.0) return "1 gal (128 fl oz)";
-              if (roundedGal > 1.0) {
-                return roundedGal.toFixed(2) + " gal";
+              if (roundedGal === 1.25) return "1 1/4 gal";
+              if (roundedGal === 1.5) return "1 1/2 gal";
+              if (roundedGal === 1.75) return "1 3/4 gal";
+              if (roundedGal >= 2.0) {
+                var wholeGal = Math.floor(roundedGal);
+                var remFrac = roundedGal - wholeGal;
+                var fracLabel = "";
+                if (remFrac === 0.25) fracLabel = " 1/4";
+                else if (remFrac === 0.5) fracLabel = " 1/2";
+                else if (remFrac === 0.75) fracLabel = " 3/4";
+                return wholeGal + fracLabel + " gal";
               }
               return gal.toFixed(2) + " gal";
             }
@@ -4017,26 +4026,6 @@
           return tsp.toFixed(1) + " tsp";
         }
 
-        // pH Calculations
-        if (phVal !== null) {
-          if (phVal < 7.2) {
-            var diff = 7.2 - phVal; // Target bottom limit (7.2) to prevent overshoot
-            var doseOz = (diff / 0.1) * 3 * volRatio;
-            var severity = (phVal < 7.0) ? "red" : "yellow";
-            recList.push({
-              severity: severity,
-              text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Soda Ash to increase pH from " + phVal + " to 7.2."
-            });
-          } else if (phVal > 7.6) {
-            var diff = phVal - 7.6; // Target top limit (7.6) to prevent overshoot
-            var doseOz = (diff / 0.1) * 10 * volRatio;
-            var severity = (phVal > 7.8) ? "red" : "yellow";
-            recList.push({
-              severity: severity,
-              text: "Add <strong>" + formatDose(doseOz, true) + "</strong> of Muriatic Acid to decrease pH from " + phVal + " to 7.6."
-            });
-          }
-        }
 
         // Order of Treatment (Chronological water balancing order):
         // 1. Salt (must be >= 3000 ppm to generate chlorine) - ALWAYS TOP
