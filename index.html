@@ -1108,22 +1108,7 @@
       box-sizing: border-box !important;
     }
 
-    /* Standard iPad Mini & Tablet Viewports: 2-column grid with full-width heater/climate cards */
-    @media (max-width: 900px) {
-      .controls-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 10px !important;
-      }
 
-      .card-1x1 {
-        grid-column: span 1 !important;
-      }
-
-      .card-2x1,
-      .card-2x2 {
-        grid-column: span 2 !important;
-      }
-    }
 
     @media (max-width: 600px) {
       /* Force 1 Card Per Row on Mobile Home Page */
@@ -1944,7 +1929,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.60.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.61.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2283,9 +2268,9 @@
             var isPool = (eid.indexOf("pool") !== -1 || name.toLowerCase().indexOf("pool") !== -1);
             var targetNum = Math.round(parseFloat(targetTemp));
 
-            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:8px; margin-left:10px; -webkit-flex-shrink:0; flex-shrink:0;">';
+            stateControlHtml = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-left:8px; -webkit-flex-shrink:0; flex-shrink:0;">';
 
-            // Muted orange quick heat preset buttons with expanded width & padding (Hot Tub: 68 & 100 | Pool: 68 & 78)
+            // Muted orange quick heat preset buttons (Hot Tub: 68 & 100 | Pool: 68 & 78)
             var p1 = 68, p2 = isHotTub ? 100 : (isPool ? 78 : 72);
             var p1Active = (targetNum === p1);
             var p2Active = (targetNum === p2);
@@ -2294,22 +2279,22 @@
             var p1Border = p1Active ? "2px solid #ff9f0a" : "1px solid rgba(255,159,10,0.25)";
             var p1Color = p1Active ? "#d97706" : "#c76a00";
 
-            stateControlHtml += '<button class="thermostat-btn" style="height:56px; min-width:64px; padding:0 18px; font-size:22px; font-weight:850; border-radius:12px; background:' + p1Bg + '; border:' + p1Border + '; color:' + p1Color + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'setHotTubMaxTemp' : 'adjustTemp') + '(\'' + eid + '\', ' + p1 + ')" title="Set to ' + p1 + '°F">' + p1 + '°</button>';
+            stateControlHtml += '<button class="thermostat-btn" style="height:48px; min-width:48px; padding:0 10px; font-size:18px; font-weight:850; border-radius:10px; background:' + p1Bg + '; border:' + p1Border + '; color:' + p1Color + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'setHotTubMaxTemp' : 'adjustTemp') + '(\'' + eid + '\', ' + p1 + ')" title="Set to ' + p1 + '°F">' + p1 + '°</button>';
 
             var p2Bg = p2Active ? "rgba(255,159,10,0.28)" : "rgba(255,159,10,0.12)";
             var p2Border = p2Active ? "2px solid #ff9f0a" : "1px solid rgba(255,159,10,0.25)";
             var p2Color = p2Active ? "#d97706" : "#c76a00";
             var p2Label = p2 + '°';
 
-            stateControlHtml += '<button class="thermostat-btn" style="height:56px; min-width:64px; padding:0 18px; font-size:22px; font-weight:850; border-radius:12px; background:' + p2Bg + '; border:' + p2Border + '; color:' + p2Color + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'setHotTubMaxTemp' : 'adjustTemp') + '(\'' + eid + '\', ' + p2 + ')" title="Set to ' + p2 + '°F">' + p2Label + '</button>';
+            stateControlHtml += '<button class="thermostat-btn" style="height:48px; min-width:48px; padding:0 10px; font-size:18px; font-weight:850; border-radius:10px; background:' + p2Bg + '; border:' + p2Border + '; color:' + p2Color + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'setHotTubMaxTemp' : 'adjustTemp') + '(\'' + eid + '\', ' + p2 + ')" title="Set to ' + p2 + '°F">' + p2Label + '</button>';
 
-            // Enlarged Adjust Temp - / + Stepper & Side-by-Side Readout
-            stateControlHtml += '<button class="thermostat-btn" style="width:56px; height:56px; line-height:56px; font-size:32px; font-weight:850; margin:0; border-radius:12px;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', -1)">&minus;</button>';
-            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:row; flex-direction:row; -webkit-align-items:baseline; align-items:baseline; gap:6px; margin:0 4px;">';
-            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:34px; font-weight:850; line-height:1;">' + displayCurrent + '</span>';
-            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:22px; font-weight:850; color:#8e8e93; line-height:1;">Set ' + displayTarget + '</span>';
+            // Compact Adjust Temp - / + Stepper & Side-by-Side Readout
+            stateControlHtml += '<button class="thermostat-btn" style="width:48px; height:48px; line-height:48px; font-size:26px; font-weight:850; margin:0; border-radius:10px;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', -1)">&minus;</button>';
+            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:row; flex-direction:row; -webkit-align-items:baseline; align-items:baseline; gap:4px; margin:0 2px;">';
+            stateControlHtml += '<span class="thermostat-temp-val" style="font-size:26px; font-weight:850; line-height:1;">' + displayCurrent + '</span>';
+            stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:16px; font-weight:850; color:#8e8e93; line-height:1;">Set ' + displayTarget + '</span>';
             stateControlHtml += '</div>';
-            stateControlHtml += '<button class="thermostat-btn" style="width:56px; height:56px; line-height:56px; font-size:32px; font-weight:850; margin:0; border-radius:12px;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', 1)">+</button>';
+            stateControlHtml += '<button class="thermostat-btn" style="width:48px; height:48px; line-height:48px; font-size:26px; font-weight:850; margin:0; border-radius:10px;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', 1)">+</button>';
             stateControlHtml += '</div>';
           } else {
             stateControlHtml = '<div class="tile-state" style="font-size:22px; font-weight:850; margin-left:12px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0;">' + displayCurrent + '</div>';

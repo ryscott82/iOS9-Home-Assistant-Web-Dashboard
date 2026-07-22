@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.61.0] - 2026-07-21
+- **Half-Width (2-Across) Card Layout Restoration**: Removed 2-column full-width override to restore the 4-column grid layout where climate, water heater, and 2x2 cards span 2 columns (**exactly half width = 2 cards per row** on iPad).
+- **Proportional Control Button Scaling**: Scaled heater card control buttons to `48px` height with `18px` font size and `26px` steppers to ensure half-width cards fit side-by-side with zero overflow or right-edge clipping.
+
 ## [v2.60.0] - 2026-07-21
 - **Controls Grid Width & Overflow Elimination**: Set `@media (max-width: 900px)` for iPad Mini & tablet viewports to use a 2-column grid (`repeat(2, 1fr)`), expanding climate and water heater cards (`card-2x1`) to full grid width (`span 2`).
 - **Flex Wrap Mode Selector Buttons**: Enabled flex wrap (`flex-wrap: wrap; gap: 4px`) and compact sizing (`padding: 6px 10px; font-size: 11px`) on `.mode-selector` buttons so climate and thermostat mode rows never force cards past the right display boundary.
