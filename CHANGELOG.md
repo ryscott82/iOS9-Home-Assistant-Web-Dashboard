@@ -2,6 +2,11 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.57.0] - 2026-07-21
+- **Room Name Subtext on Controls Section Cards**: Added room name subtext (`tile-room`) to all feature cards on the Controls page when a room is assigned (leaves blank if unassigned).
+- **Strict Dimmer Control Filtering**: Restricted `-` / `+` brightness stepper controls exclusively to lights that explicitly support dimming / brightness functions.
+- **Horizontal Overflow Prevention on Controls Grid**: Enforced `width: 100%`, `max-width: 100%`, and `overflow-x: hidden` across `.controls-grid` and section containers so tiles fit the exact width of the display without horizontal scrolling.
+
 ## [v2.56.0] - 2026-07-21
 - **Light Card 2x2 vs 1x1 Classification Fix**: Fixed light classification so standard lights and dimmers without effects or RGB color controls stay as compact **1x1 cards (`card-1x1`)**. Only lights with effects or RGB color controls expand to 2x2.
 - **Mobile Home Page 1 Card Per Row**: Enforced 1 card per row (`100%` width) for all Home page tiles under `@media (max-width: 600px)`.

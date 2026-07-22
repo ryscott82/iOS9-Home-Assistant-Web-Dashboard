@@ -1057,7 +1057,9 @@
       grid-auto-flow: dense !important;
       gap: 12px !important;
       width: 100% !important;
+      max-width: 100% !important;
       box-sizing: border-box !important;
+      overflow-x: hidden !important;
     }
 
     .card-1x1 {
@@ -1900,7 +1902,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.56.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.57.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -3222,14 +3224,22 @@
       function renderLight(entity) {
         var name = escapeHtml(friendlyName(entity));
         var eid = escapeHtml(entity.entity_id);
+        var room = escapeHtml(getRoomName(entity));
         var attrs = entity.attributes || {};
         var isOn = entity.state === "on";
         var unavailable = entity.state === "unavailable";
-        var hasBrightness = typeof attrs.brightness !== "undefined" || (attrs.supported_color_modes && attrs.supported_color_modes.length > 0);
+        var colorModes = attrs.supported_color_modes || [];
+        var hasBrightness = typeof attrs.brightness !== "undefined" ||
+          colorModes.indexOf("brightness") !== -1 ||
+          colorModes.indexOf("rgb") !== -1 ||
+          colorModes.indexOf("hs") !== -1 ||
+          colorModes.indexOf("xy") !== -1 ||
+          colorModes.indexOf("rgbw") !== -1 ||
+          colorModes.indexOf("rgbww") !== -1 ||
+          colorModes.indexOf("white") !== -1;
         var hasEffects = attrs.effect_list && attrs.effect_list.length > 0;
         var effectList = attrs.effect_list || [];
         var currentEffect = attrs.effect || "";
-        var colorModes = attrs.supported_color_modes || [];
         var hasRgb = typeof attrs.rgb_color !== "undefined" ||
           colorModes.indexOf("rgb") !== -1 ||
           colorModes.indexOf("hs") !== -1 ||
@@ -3249,14 +3259,16 @@
         
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')" style="padding:14px 16px;">';
         
-        // Compact side-by-side left-align layout with larger text
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        if (room) {
+          h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
+        }
         h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         var stateText = escapeHtml(entity.state);
         if (isOn && currentEffect) stateText += ' &middot; ' + escapeHtml(currentEffect);
-        else if (isOn && pct > 0) stateText += ' &middot; ' + pct + '%';
+        else if (isOn && hasBrightness && pct > 0) stateText += ' &middot; ' + pct + '%';
         h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + stateText + '</div>';
         h += '</div>';
         h += '</div>';
@@ -3305,6 +3317,7 @@
         var isOn = entity.state === "on";
         var name = escapeHtml(friendlyName(entity));
         var eid = escapeHtml(entity.entity_id);
+        var room = escapeHtml(getRoomName(entity));
         var unavailable = entity.state === "unavailable";
         var iconName = getEntityIcon(entity, domain);
         var activeClass = (domain === "fan" || iconName === "hottub" || iconName === "waterfall" || iconName === "bubbles") ? " active-blue" : " active-green";
@@ -3313,10 +3326,12 @@
         var tileClass = "tile card-1x1" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="padding:14px 16px;">';
         
-        // Compact side-by-side left-align layout with larger text
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        if (room) {
+          h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
+        }
         h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
@@ -3329,6 +3344,7 @@
       function renderClimate(entity) {
         var name = escapeHtml(friendlyName(entity));
         var eid = escapeHtml(entity.entity_id);
+        var room = escapeHtml(getRoomName(entity));
         var attrs = entity.attributes || {};
         var currentTemp = attrs.current_temperature || "--";
         var targetTemp = attrs.temperature || "--";
@@ -3353,10 +3369,12 @@
 
         var h = '<div class="tile card-2x1' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
         
-        // Compact side-by-side left-align layout
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        if (room) {
+          h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
+        }
         h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         var stateText = escapeHtml(hvacMode);
         if (!unavailable) {
@@ -3405,6 +3423,7 @@
       function renderCover(entity) {
         var name = escapeHtml(friendlyName(entity));
         var eid = escapeHtml(entity.entity_id);
+        var room = escapeHtml(getRoomName(entity));
         var unavailable = entity.state === "unavailable";
         var isOpen = entity.state === "open";
 
@@ -3417,6 +3436,9 @@
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left; margin-right:8px;">';
+        if (room) {
+          h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
+        }
         h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
@@ -3437,6 +3459,7 @@
       function renderLock(entity) {
         var name = escapeHtml(friendlyName(entity));
         var eid = escapeHtml(entity.entity_id);
+        var room = escapeHtml(getRoomName(entity));
         var isLocked = entity.state === "locked";
         var unavailable = entity.state === "unavailable";
 
@@ -3447,10 +3470,12 @@
 
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'lock\')" style="padding:14px 16px;">';
         
-        // Compact side-by-side left-align layout
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        if (room) {
+          h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
+        }
         h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
@@ -4402,6 +4427,7 @@
       function renderWaterHeater(entity) {
         var name = escapeHtml(friendlyName(entity));
         var eid = escapeHtml(entity.entity_id);
+        var room = escapeHtml(getRoomName(entity));
         var attrs = entity.attributes || {};
         var currentTemp = attrs.current_temperature || "--";
         var targetTemp = attrs.temperature || "--";
@@ -4432,6 +4458,9 @@
         h += '<div class="tile-icon">' + icon + '</div>';
         h += '</div>';
         h += '<div class="tile-bottom">';
+        if (room) {
+          h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
+        }
         h += '<div class="tile-name">' + name + '</div>';
         var stateText = escapeHtml(opMode);
         if (!unavailable) {
