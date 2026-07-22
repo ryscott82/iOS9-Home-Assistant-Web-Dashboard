@@ -4126,10 +4126,13 @@
                     text: "Superchlorinate Pentair Salt Cell (IC40) for <strong>" + displayHrs + " hrs</strong> (burn chloramines)."
                   });
                 } else {
+                  // Potassium Monopersulfate (MPS) dosing for Pool (20,000 gal): 2 oz dry MPS per 10k gal per 1 ppm combined chlorine
+                  var diff = totClVal - clVal;
+                  var mpsOz = diff * 2 * volRatio;
                   recList.push({
                     id: "manual_shock_cc",
                     severity: "yellow",
-                    text: "Add liquid chlorine shock (salt cell disabled: salt < 3000 ppm)."
+                    text: "Add <strong>" + formatDose(mpsOz, false) + "</strong> Potassium Monopersulfate (MPS) shock (salt cell disabled: salt < 3000 ppm)."
                   });
                 }
               } else { // Hot Tub
@@ -4144,10 +4147,13 @@
                       text: "Superchlorinate IC20 for <strong>" + displayMins + " mins</strong> (burn chloramines)."
                     });
                   } else {
+                    // MPS dosing for Hot Tub (600 gal): ~0.24 oz (~1.5 tbsp) MPS per 1 ppm combined chlorine
+                    var diff = totClVal - clVal;
+                    var mpsOz = diff * 2 * volRatio;
                     recList.push({
                       id: "manual_shock_cc",
                       severity: "yellow",
-                      text: "Add liquid chlorine shock (salt cell disabled: salt < 3000 ppm)."
+                      text: "Add <strong>" + formatDose(mpsOz, false) + "</strong> Potassium Monopersulfate (MPS) shock (salt cell disabled: salt < 3000 ppm)."
                     });
                   }
                 }
@@ -4171,11 +4177,13 @@
                     text: "Superchlorinate Pentair Salt Cell (IC40) for <strong>" + hrs + " hrs</strong> (raise FC to 2.0 ppm)."
                   });
                 } else {
+                  var diff = 2.0 - clVal;
+                  var mpsOz = diff * 2 * volRatio;
                   var severity = (clVal < 0.5) ? "red" : "yellow";
                   recList.push({
                     id: "manual_shock_fc",
                     severity: severity,
-                    text: "Add liquid chlorine shock (salt cell disabled: salt < 3000 ppm)."
+                    text: "Add <strong>" + formatDose(mpsOz, false) + "</strong> Potassium Monopersulfate (MPS) shock (salt cell disabled: salt < 3000 ppm)."
                   });
                 }
               }
@@ -4206,10 +4214,13 @@
                       text: "Superchlorinate IC20 for <strong>" + displayMins + " mins</strong> (raise FC to " + targetFC.toFixed(1) + " ppm)."
                     });
                   } else {
+                    var targetFC = clVal < 2.0 ? 3.0 : 4.0;
+                    var diff = targetFC - clVal;
+                    var mpsOz = diff * 2 * volRatio;
                     recList.push({
                       id: "manual_shock_fc",
                       severity: severity,
-                      text: "Add liquid chlorine shock (salt cell disabled: salt < 3000 ppm)."
+                      text: "Add <strong>" + formatDose(mpsOz, false) + "</strong> Potassium Monopersulfate (MPS) shock (salt cell disabled: salt < 3000 ppm)."
                     });
                   }
                 }
