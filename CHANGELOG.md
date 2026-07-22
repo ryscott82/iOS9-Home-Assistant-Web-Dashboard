@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.62.0] - 2026-07-21
+- **Mobile Temperature Readout Vertical Stacking**: Configured `.thermostat-readout-box` under `@media (max-width: 600px)` to stack current and set target temperatures vertically (`flex-direction: column; align-items: center`), ensuring all Home page heater card controls fit comfortably on mobile screens.
+- **Controls Grid Track & Overflow Overhaul**: Capped all grid column tracks with `minmax(0, 1fr)` and set `overflow: hidden; min-width: 0;` on `.controls-grid .tile` to guarantee cards never expand beyond their assigned columns or cut off on the right edge of the screen.
+
 ## [v2.61.0] - 2026-07-21
 - **Half-Width (2-Across) Card Layout Restoration**: Removed 2-column full-width override to restore the 4-column grid layout where climate, water heater, and 2x2 cards span 2 columns (**exactly half width = 2 cards per row** on iPad).
 - **Proportional Control Button Scaling**: Scaled heater card control buttons to `48px` height with `18px` font size and `26px` steppers to ensure half-width cards fit side-by-side with zero overflow or right-edge clipping.

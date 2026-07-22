@@ -1059,10 +1059,10 @@
       display: flex !important;
     }
 
-    /* ======== CONTROLS GRID & RESPONSIVE BREAKPOINTS ======== */
+    /* ======== REDESIGNED CONTROLS GRID LOGIC ======== */
     .controls-grid {
       display: grid !important;
-      grid-template-columns: repeat(4, 1fr) !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
       grid-auto-flow: dense !important;
       gap: 12px !important;
       width: 100% !important;
@@ -1079,7 +1079,9 @@
       margin: 0 !important;
       width: 100% !important;
       max-width: 100% !important;
+      min-width: 0 !important;
       box-sizing: border-box !important;
+      overflow: hidden !important;
       -webkit-flex: none !important;
       flex: none !important;
     }
@@ -1120,6 +1122,26 @@
         width: 100% !important;
         max-width: 100% !important;
         box-sizing: border-box !important;
+      }
+
+      /* Stack current & set temperatures vertically on mobile Home page */
+      .thermostat-readout-box {
+        -webkit-flex-direction: column !important;
+        flex-direction: column !important;
+        -webkit-align-items: center !important;
+        align-items: center !important;
+        gap: 0px !important;
+      }
+
+      .thermostat-readout-box .thermostat-temp-val {
+        font-size: 22px !important;
+        line-height: 1 !important;
+      }
+
+      .thermostat-readout-box [id^="set_temp_"] {
+        font-size: 13px !important;
+        line-height: 1 !important;
+        margin-top: 1px !important;
       }
 
       /* Responsive text scaling for Home page card titles on Mobile */
@@ -1929,7 +1951,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.61.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.62.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -2288,9 +2310,9 @@
 
             stateControlHtml += '<button class="thermostat-btn" style="height:48px; min-width:48px; padding:0 10px; font-size:18px; font-weight:850; border-radius:10px; background:' + p2Bg + '; border:' + p2Border + '; color:' + p2Color + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'setHotTubMaxTemp' : 'adjustTemp') + '(\'' + eid + '\', ' + p2 + ')" title="Set to ' + p2 + '°F">' + p2Label + '</button>';
 
-            // Compact Adjust Temp - / + Stepper & Side-by-Side Readout
+            // Compact Adjust Temp - / + Stepper & Side-by-Side Readout (Stacking on Mobile)
             stateControlHtml += '<button class="thermostat-btn" style="width:48px; height:48px; line-height:48px; font-size:26px; font-weight:850; margin:0; border-radius:10px;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', -1)">&minus;</button>';
-            stateControlHtml += '<div style="display:-webkit-flex; display:flex; -webkit-flex-direction:row; flex-direction:row; -webkit-align-items:baseline; align-items:baseline; gap:4px; margin:0 2px;">';
+            stateControlHtml += '<div class="thermostat-readout-box" style="display:-webkit-flex; display:flex; -webkit-flex-direction:row; flex-direction:row; -webkit-align-items:baseline; align-items:baseline; gap:4px; margin:0 2px;">';
             stateControlHtml += '<span class="thermostat-temp-val" style="font-size:26px; font-weight:850; line-height:1;">' + displayCurrent + '</span>';
             stateControlHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:16px; font-weight:850; color:#8e8e93; line-height:1;">Set ' + displayTarget + '</span>';
             stateControlHtml += '</div>';
