@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.55.0] - 2026-07-21
+- **Chemical Alert Exclamation Badge (`!`)**: Added dynamic red/yellow exclamation button (`!`) on Hot Tub and Pool cards whenever chemical recommendations are active. Tapping the badge opens the Chemicals page directly.
+- **Log Chem Shortcut Button**: Added a dedicated `Log Chem` button inside Hot Tub and Pool Home cards for 1-tap navigation to chemical logging.
+
 ## [v2.54.0] - 2026-07-21
 - **Enlarged Home Page Temperature Controls**: Increased button touch target sizes (`52px x 52px`), preset font sizes (`20px` bold), and temperature display font sizes (`28px` current temp, `16px` set target) on Home page climate and water heater cards for effortless visibility on iPad Mini displays while keeping card container dimensions unchanged.
 
