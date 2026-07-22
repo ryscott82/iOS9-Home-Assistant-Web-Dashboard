@@ -1059,7 +1059,9 @@
       width: 100% !important;
       max-width: 100% !important;
       box-sizing: border-box !important;
-      overflow-x: hidden !important;
+      overflow: visible !important;
+      height: auto !important;
+      max-height: none !important;
     }
 
     .card-1x1 {
@@ -1390,6 +1392,10 @@
     .floor-nav-bar {
       display: -webkit-flex;
       display: flex;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+      -webkit-justify-content: center;
+      justify-content: center;
       background: rgba(250, 250, 250, 0.85);
       padding: 6px 10px;
       border-radius: 12px;
@@ -1397,8 +1403,7 @@
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(0, 0, 0, 0.05);
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible !important;
       position: -webkit-sticky;
       position: sticky;
       top: 0;
@@ -1902,7 +1907,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.57.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.58.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>

@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.58.0] - 2026-07-21
+- **Removed Internal Floor Scrolling**: Set `overflow: visible`, `height: auto`, and `max-height: none` on `.controls-grid` and section containers. Converted `.floor-nav-bar` to flex wrap (`flex-wrap: wrap; overflow: visible`) so all floor controls flow naturally in a continuous grid without inner sub-scrolling.
+
 ## [v2.57.0] - 2026-07-21
 - **Room Name Subtext on Controls Section Cards**: Added room name subtext (`tile-room`) to all feature cards on the Controls page when a room is assigned (leaves blank if unassigned).
 - **Strict Dimmer Control Filtering**: Restricted `-` / `+` brightness stepper controls exclusively to lights that explicitly support dimming / brightness functions.
