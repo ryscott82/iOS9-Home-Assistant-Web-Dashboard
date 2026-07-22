@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.54.0] - 2026-07-21
+- **Enlarged Home Page Temperature Controls**: Increased button touch target sizes (`52px x 52px`), preset font sizes (`20px` bold), and temperature display font sizes (`28px` current temp, `16px` set target) on Home page climate and water heater cards for effortless visibility on iPad Mini displays while keeping card container dimensions unchanged.
+
 ## [v2.53.0] - 2026-07-21
 - **Controls Page 4-Column CSS Grid Overhaul**: Overhauled Controls page layout into a clean, standardized 4-column CSS Grid (`repeat(4, 1fr)`) with `grid-auto-flow: dense` for automated gap packing.
 - **Standardized Card Unit Dimensions**:
