@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.55.0] - 2026-07-21
+- **Expanded Preset Temperature Buttons**: Expanded horizontal padding (`padding: 0 18px`), font size (`22px` bold), and minimum width (`64px`) on preset buttons (`68°`, `78°`, `100°`) so temperature numbers fit cleanly without clipping.
+- **Side-by-Side Temperature Display**: Replaced vertical column layout with a side-by-side row (`align-items: baseline`) displaying Current Temp in `34px` bold and Set Target Temp in `22px` bold (`Set 78°`).
+
 ## [v2.54.0] - 2026-07-21
 - **Enlarged Home Page Heater Controls**: Scaled up font sizes and button sizes for temperature controls on Home page heater cards (stepper buttons `56px x 56px`, `32px` font; preset buttons `56px` height, `20px` font; current temp `28px` bold; target temp `16px`). Card container outer size remains unchanged.
 - **Card-Tap Heater Power Toggle**: Removed the dedicated power toggle button inside the control row; pressing anywhere on the heater card toggles heater power on/off (with `event.stopPropagation()` on stepper/preset buttons).
