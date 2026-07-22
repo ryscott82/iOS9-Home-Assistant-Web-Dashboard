@@ -2915,14 +2915,37 @@
           }
         }
 
-        var hasRedWarning = htRedRecs.length > 0 || poolRedRecs.length > 0;
+        // Check 2-hour alert snooze window (after chemicals checked or recommendation checkbox ticked)
+        var isAlertSnoozed = false;
+        try {
+          var alertSnoozedTime = localStorage.getItem("ha_chem_alert_snoozed_time");
+          if (alertSnoozedTime) {
+            var elapsed = Date.now() - parseInt(alertSnoozedTime, 10);
+            if (elapsed < 2 * 60 * 60 * 1000) { // 2 hours
+              isAlertSnoozed = true;
+            } else {
+              localStorage.removeItem("ha_chem_alert_snoozed_time");
+            }
+          }
+        } catch (e) { }
+
+        // Also check if any recommendation checkbox has been checked
+        var hasTickedCheckbox = false;
+        for (var k in checkedRecItems) {
+          if (checkedRecItems[k] === true) {
+            hasTickedCheckbox = true;
+            break;
+          }
+        }
+
+        var hasRedWarning = (htRedRecs.length > 0 || poolRedRecs.length > 0) && !isAlertSnoozed && !hasTickedCheckbox;
 
         var chemBanner = document.getElementById("headerChemBanner");
         if (chemBanner) {
           if (hasRedWarning) {
             chemBanner.innerHTML = "Chemical Alert";
             chemBanner.style.display = "block";
-          } else if (!chemicalsCheckedToday) {
+          } else if (!chemicalsCheckedToday && !isAlertSnoozed && !hasTickedCheckbox) {
             chemBanner.innerHTML = "Check Chemicals";
             chemBanner.style.display = "block";
           } else {
@@ -4027,115 +4050,166 @@
           }
         }
 
-        // Salt Calculations
+        // Order of Treatment (Chronological water balancing order):
+        // 1. Salt (must be >= 3000 ppm to generate chlorine)
+        // 2. Alkalinity (TA anchors pH)
+        // 3. pH (determines chlorine effectiveness)
+        // 4. Chlorine / Sanitizer
+        // 5. Hardness / Calcium
+        // 6. Stabilizer / CYA
+
+        // 1. Salt Calculations
+        var isSaltLow = false;
         if (saltVal !== null) {
-          if (saltVal < 3500) {
-            var diff = 3500 - saltVal; // Target bottom limit (3500)
+          if (saltVal < 3000) {
+            isSaltLow = true;
+            var diff = 3500 - saltVal;
             var doseOz = (diff / 10) * 13 * volRatio;
-            var severity = "yellow";
             recList.push({
-              severity: severity,
-              text: "Add <strong>" + formatDose(doseOz, false, true) + "</strong> of pool salt to increase salt from " + saltVal + " ppm to 3500 ppm."
+              id: "salt_low",
+              severity: "red",
+              text: "Add <strong>" + formatDose(doseOz, false, true) + "</strong> pool salt (salt is " + saltVal + " ppm; min 3000 ppm needed for cell)."
+            });
+          } else if (saltVal < 3500) {
+            var diff = 3500 - saltVal;
+            var doseOz = (diff / 10) * 13 * volRatio;
+            recList.push({
+              id: "salt_low",
+              severity: "yellow",
+              text: "Add <strong>" + formatDose(doseOz, false, true) + "</strong> pool salt (raise to 3500 ppm)."
             });
           } else if (saltVal > 3600) {
-            var severity = "yellow";
             recList.push({
-              severity: severity,
-              text: "Dilute water to decrease salt from " + saltVal + " ppm to 3600 ppm."
+              id: "salt_high",
+              severity: "yellow",
+              text: "Partially drain and refill water (lower salt to 3600 ppm)."
             });
           }
         }
 
-        // Alkalinity Calculations
+        // 2. Alkalinity Calculations
         if (alkVal !== null) {
           if (alkVal < 80) {
-            var diff = 80 - alkVal; // Target bottom limit (80)
+            var diff = 80 - alkVal;
             var doseOz = (diff / 10) * 24 * volRatio;
             recList.push({
+              id: "alk_low",
               severity: "yellow",
-              text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Sodium Bicarbonate to increase alkalinity from " + alkVal + " ppm to 80 ppm."
+              text: "Add <strong>" + formatDose(doseOz, false) + "</strong> Baking Soda (raise TA to 80 ppm)."
             });
           } else if (alkVal > 120) {
-            var diff = alkVal - 120; // Target top limit (120)
-            var doseOz = (diff / 10) * 26 * volRatio; // ~26 fl oz Muriatic Acid per 10 ppm decrease per 10k gal
+            var diff = alkVal - 120;
+            var doseOz = (diff / 10) * 26 * volRatio;
             recList.push({
+              id: "alk_high",
               severity: "yellow",
-              text: "Add <strong>" + formatDose(doseOz, true) + "</strong> of Muriatic Acid to decrease alkalinity from " + alkVal + " ppm to 120 ppm."
+              text: "Add <strong>" + formatDose(doseOz, true) + "</strong> Muriatic Acid (lower TA to 120 ppm)."
             });
           }
         }
 
-        // Total Chlorine Calculations
-        if (totClVal !== null) {
-          if (totClVal < 1.0) {
+        // 3. pH Calculations
+        if (phVal !== null) {
+          if (phVal < 7.2) {
+            var diff = 7.2 - phVal;
+            var doseOz = (diff / 0.1) * 3 * volRatio;
+            var severity = (phVal < 7.0) ? "red" : "yellow";
             recList.push({
-              severity: "yellow",
-              text: "Total chlorine is low (" + totClVal + " ppm). Add sanitizer to increase to 1.0 ppm."
+              id: "ph_low",
+              severity: severity,
+              text: "Add <strong>" + formatDose(doseOz, false) + "</strong> Soda Ash (raise pH from " + phVal + " to 7.2)."
             });
-          } else if (totClVal > 5.0) {
+          } else if (phVal > 7.6) {
+            var diff = phVal - 7.6;
+            var doseOz = (diff / 0.1) * 10 * volRatio;
+            var severity = (phVal > 7.8) ? "red" : "yellow";
             recList.push({
-              severity: "yellow",
-              text: "Total chlorine is high (" + totClVal + " ppm). Allow to drift down or add neutralizer to 5.0 ppm."
+              id: "ph_high",
+              severity: severity,
+              text: "Add <strong>" + formatDose(doseOz, true) + "</strong> Muriatic Acid (lower pH from " + phVal + " to 7.6)."
             });
           }
         }
 
-        // Combined Chlorine Calculations
+        // 4. Combined & Free Chlorine Calculations
+        var isOrpTooHigh = (orpVal !== null && orpVal > 800);
         if (totClVal !== null && clVal !== null) {
           var combinedCl = totClVal - clVal;
           if (combinedCl >= 0.5) {
             var clGood = (volumeType === "pool" ? clVal >= 1.0 : clVal >= 3.0);
-            var isOrpTooHigh = (orpVal !== null && orpVal > 800);
             if (clGood && !isOrpTooHigh) {
               if (volumeType === "pool") {
-                var diff = totClVal - clVal;
-                var hrs = diff * 2;
-                var displayHrs = Math.max(2, Math.min(8, Math.round(hrs)));
-                recList.push({
-                  severity: "yellow",
-                  text: "Combined chlorine is high (" + combinedCl.toFixed(2) + " ppm). Turn on superchlorinate on the Pentair Salt Cell (IC40) for <strong>" + displayHrs + " hours</strong> to increase free chlorine by " + diff.toFixed(2) + " ppm to match total chlorine and burn off chloramines."
-                });
+                if (!isSaltLow) {
+                  var diff = totClVal - clVal;
+                  var hrs = diff * 2;
+                  var displayHrs = Math.max(2, Math.min(8, Math.round(hrs)));
+                  recList.push({
+                    id: "superchlor_cc",
+                    severity: "yellow",
+                    text: "Superchlorinate Pentair Salt Cell (IC40) for <strong>" + displayHrs + " hrs</strong> (burn chloramines)."
+                  });
+                } else {
+                  recList.push({
+                    id: "manual_shock_cc",
+                    severity: "yellow",
+                    text: "Add liquid chlorine shock (salt cell disabled: salt < 3000 ppm)."
+                  });
+                }
               } else { // Hot Tub
                 if (!isTimerActive) {
-                  var diff = totClVal - clVal;
-                  var mins = (diff / 5.84) * 60;
-                  var displayMins = Math.max(15, Math.min(90, Math.round(mins)));
-                  recList.push({
-                    severity: "yellow",
-                    text: "Combined chlorine is high (" + combinedCl.toFixed(2) + " ppm). Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine by " + diff.toFixed(2) + " ppm to match total chlorine and burn off chloramines."
-                  });
+                  if (!isSaltLow) {
+                    var diff = totClVal - clVal;
+                    var mins = (diff / 5.84) * 60;
+                    var displayMins = Math.max(15, Math.min(90, Math.round(mins)));
+                    recList.push({
+                      id: "superchlor_cc",
+                      severity: "yellow",
+                      text: "Superchlorinate IC20 for <strong>" + displayMins + " mins</strong> (burn chloramines)."
+                    });
+                  } else {
+                    recList.push({
+                      id: "manual_shock_cc",
+                      severity: "yellow",
+                      text: "Add liquid chlorine shock (salt cell disabled: salt < 3000 ppm)."
+                    });
+                  }
                 }
               }
             }
           }
         }
 
-        // Chlorine Calculations (Free Chlorine)
         if (clVal !== null) {
-          var isOrpTooHigh = (orpVal !== null && orpVal > 800);
           if (volumeType === "pool") {
             if (clVal < 1.0) {
               var orpGood = (orpVal !== null && orpVal >= 650);
               if (!orpGood && !isOrpTooHigh) {
-                var diff = 2.0 - clVal; // Target mid-range (2.0)
-                var severity = (clVal < 0.5) ? "red" : "yellow";
-                // IC40 Super Chlorinate Math: scale diff (usually 2-6 hrs)
-                var hrs = diff * 2;
-                if (hrs < 2) hrs = 2;
-                if (hrs > 6) hrs = 6;
-                var displayHrs = Math.round(hrs);
-                recList.push({
-                  severity: severity,
-                  text: "Turn on superchlorinate on the Pentair Salt Cell (IC40) for <strong>" + displayHrs + " hours</strong> to increase free chlorine from " + clVal + " ppm to 2.0 ppm."
-                });
+                if (!isSaltLow) {
+                  var diff = 2.0 - clVal;
+                  var hrs = Math.round(Math.max(2, Math.min(6, diff * 2)));
+                  var severity = (clVal < 0.5) ? "red" : "yellow";
+                  recList.push({
+                    id: "superchlor_fc",
+                    severity: severity,
+                    text: "Superchlorinate Pentair Salt Cell (IC40) for <strong>" + hrs + " hrs</strong> (raise FC to 2.0 ppm)."
+                  });
+                } else {
+                  var severity = (clVal < 0.5) ? "red" : "yellow";
+                  recList.push({
+                    id: "manual_shock_fc",
+                    severity: severity,
+                    text: "Add liquid chlorine shock (salt cell disabled: salt < 3000 ppm)."
+                  });
+                }
               }
             } else if (clVal > 3.0) {
-              var diff = clVal - 3.0; // Target top limit (3.0)
+              var diff = clVal - 3.0;
               var doseOz = diff * 10.66 * volRatio;
               var severity = (clVal > 6.0) ? "red" : "yellow";
               recList.push({
+                id: "lower_fc",
                 severity: severity,
-                text: "Add <strong>" + formatDose(doseOz, true) + "</strong> of Hydrogen Peroxide (12%) to decrease free chlorine from " + clVal + " ppm to 3.0 ppm."
+                text: "Add <strong>" + formatDose(doseOz, true) + "</strong> Hydrogen Peroxide (12%) (lower FC to 3.0 ppm)."
               });
             }
           } else { // Hot Tub
@@ -4143,79 +4217,129 @@
               if (!isTimerActive) {
                 var orpGood = (orpVal !== null && orpVal >= 650);
                 if (!orpGood && !isOrpTooHigh) {
-                  var targetFC = clVal < 2.0 ? 3.0 : 4.0;
-                  var diff = targetFC - clVal;
                   var severity = (clVal < 1.0) ? "red" : "yellow";
-                  // IC20 Super Chlorinate Math: produces 0.467 oz/hr, raises hot tub (600 gal) FC by 5.84 ppm/hr
-                  var mins = (diff / 5.84) * 60;
-                  var displayMins = Math.max(15, Math.min(90, Math.round(mins)));
-                  recList.push({
-                    severity: severity,
-                    text: "Turn on superchlorinate on the Pentair Salt Cell (IC20) for <strong>" + displayMins + " minutes</strong> to increase free chlorine from " + clVal + " ppm to " + targetFC.toFixed(1) + " ppm."
-                  });
+                  if (!isSaltLow) {
+                    var targetFC = clVal < 2.0 ? 3.0 : 4.0;
+                    var diff = targetFC - clVal;
+                    var mins = (diff / 5.84) * 60;
+                    var displayMins = Math.max(15, Math.min(90, Math.round(mins)));
+                    recList.push({
+                      id: "superchlor_fc",
+                      severity: severity,
+                      text: "Superchlorinate IC20 for <strong>" + displayMins + " mins</strong> (raise FC to " + targetFC.toFixed(1) + " ppm)."
+                    });
+                  } else {
+                    recList.push({
+                      id: "manual_shock_fc",
+                      severity: severity,
+                      text: "Add liquid chlorine shock (salt cell disabled: salt < 3000 ppm)."
+                    });
+                  }
                 }
               }
             } else if (clVal > 5.0) {
-              var diff = clVal - 5.0; // Target top limit (5.0)
+              var diff = clVal - 5.0;
               var doseOz = diff * 10.66 * volRatio;
               var severity = (clVal > 8.0) ? "red" : "yellow";
               recList.push({
+                id: "lower_fc",
                 severity: severity,
-                text: "Add <strong>" + formatDose(doseOz, true) + "</strong> of Hydrogen Peroxide (12%) to decrease free chlorine from " + clVal + " ppm to 5.0 ppm."
+                text: "Add <strong>" + formatDose(doseOz, true) + "</strong> Hydrogen Peroxide (12%) (lower FC to 5.0 ppm)."
               });
             }
           }
         }
 
-        // Hardness Calculations
-        if (calVal !== null) {
-          if (calVal < 250) {
-            var diff = 375 - calVal; // Target mid-range (375)
-            var doseOz = (diff / 10) * 19.2 * volRatio;
-            var severity = "yellow";
+        // ORP Informational
+        if (orpVal !== null) {
+          var suppressOrp = (volumeType === "hottub" && phVal !== null && (phVal < 7.0 || phVal > 7.8));
+          if (suppressOrp) {
             recList.push({
-              severity: severity,
-              text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Calcium Chloride to increase hardness from " + calVal + " ppm to 375 ppm."
+              id: "orp_suppressed",
+              severity: "yellow",
+              text: "Skip ORP adjustments (pH " + phVal + " is out of range)."
             });
-          } else if (calVal > 500) {
-            var severity = "yellow";
+          } else if (orpVal < 650) {
+            var severity = (orpVal < 500) ? "red" : "yellow";
+            var clGood = (volumeType === "pool" ? (clVal !== null && clVal >= 1.0) : (clVal !== null && clVal >= 3.0));
+            if (!clGood && (volumeType !== "hottub" || !isTimerActive)) {
+              recList.push({
+                id: "orp_low",
+                severity: severity,
+                text: "Add sanitizer (raise ORP from " + orpVal + " mV to 650 mV)."
+              });
+            }
+          } else if (orpVal > 800) {
+            var severity = (orpVal > 900) ? "red" : "yellow";
             recList.push({
+              id: "orp_high",
               severity: severity,
-              text: "Hardness is high (" + calVal + " ppm). Dilute water to decrease to 500 ppm."
+              text: "Expose water to air (lower ORP from " + orpVal + " mV to 800 mV)."
             });
           }
         }
 
-        // Stabilizer (CYA) Calculations
+        // 5. Hardness / Calcium Calculations
+        if (calVal !== null) {
+          if (calVal < 250) {
+            var diff = 375 - calVal;
+            var doseOz = (diff / 10) * 19.2 * volRatio;
+            recList.push({
+              id: "cal_low",
+              severity: "yellow",
+              text: "Add <strong>" + formatDose(doseOz, false) + "</strong> Calcium Chloride (raise CH to 375 ppm)."
+            });
+          } else if (calVal > 500) {
+            recList.push({
+              id: "cal_high",
+              severity: "yellow",
+              text: "Dilute water (lower Hardness from " + calVal + " ppm to 500 ppm)."
+            });
+          }
+        }
+
+        // 6. Stabilizer (CYA) Calculations
         if (cyaVal !== null) {
           if (volumeType === "hottub") {
             if (cyaVal > 30) {
-              var severity = "yellow";
               recList.push({
-                severity: severity,
-                text: "Partially drain and refill water to decrease CYA from " + cyaVal + " ppm to 30 ppm."
+                id: "cya_high",
+                severity: "yellow",
+                text: "Partially drain and refill water (lower CYA to 30 ppm)."
               });
             }
           } else { // Pool
             if (cyaVal < 15) {
-              var diff = 50 - cyaVal; // Target mid-range (50)
+              var diff = 50 - cyaVal;
               var doseOz = (diff / 10) * 13 * volRatio;
-              var severity = "yellow";
               recList.push({
-                severity: severity,
-                text: "Add <strong>" + formatDose(doseOz, false) + "</strong> of Cyanuric Acid to increase CYA from " + cyaVal + " ppm to 50 ppm."
+                id: "cya_low",
+                severity: "yellow",
+                text: "Add <strong>" + formatDose(doseOz, false) + "</strong> Cyanuric Acid (raise CYA to 50 ppm)."
               });
             } else if (cyaVal > 100) {
-              var severity = "yellow";
               recList.push({
-                severity: severity,
-                text: "Partially drain and refill water to decrease CYA from " + cyaVal + " ppm to 100 ppm."
+                id: "cya_high",
+                severity: "yellow",
+                text: "Partially drain and refill water (lower CYA to 100 ppm)."
               });
             }
           }
         }
 
         return recList;
+      }
+
+      var checkedRecItems = {};
+
+      function toggleRecCheckbox(recId) {
+        checkedRecItems[recId] = !checkedRecItems[recId];
+        try {
+          localStorage.setItem("ha_chem_alert_snoozed_time", Date.now());
+        } catch (e) { }
+        if (typeof render === "function") {
+          render();
+        }
       }
 
       function renderRecommendationsCard(allStates) {
@@ -4226,18 +4350,26 @@
           h += '<div style="color:#34c759; font-weight:600; font-size:15px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center;">';
           h += '<span style="font-size:20px; margin-right:8px;">✨</span> Water Chemistry looks perfect! No action needed.</div>';
         } else {
-          h += '<ul style="margin: 0; padding-left: 20px; font-size: 13.5px; line-height: 1.6;">';
+          h += '<div style="display:flex; flex-direction:column; gap:10px;">';
           for (var r = 0; r < recs.length; r++) {
-            h += '<li style="margin-bottom: 8px;">' + recs[r].text + '</li>';
+            var item = recs[r];
+            var itemKey = selectedRecVolume + "_" + (item.id || r);
+            var isChecked = !!checkedRecItems[itemKey];
+            var textStyle = isChecked ? "text-decoration: line-through; opacity: 0.4;" : "";
+            
+            h += '<div style="display:flex; align-items:flex-start; gap:10px; font-size:13.5px; line-height:1.4;">';
+            h += '<input type="checkbox" id="chk_' + itemKey + '" ' + (isChecked ? 'checked' : '') + ' onclick="toggleRecCheckbox(\'' + itemKey + '\')" style="margin-top:2px; width:18px; height:18px; cursor:pointer; flex-shrink:0;">';
+            h += '<label for="chk_' + itemKey + '" style="cursor:pointer; ' + textStyle + '">' + item.text + '</label>';
+            h += '</div>';
           }
-          h += '</ul>';
+          h += '</div>';
         }
 
         // Add "Fix Hot Tub Chlorine Levels" button if Hot Tub is active and superchlorinate recommendation is active
         if (selectedRecVolume === "hottub") {
           var hasSuperchlorinateRec = false;
           for (var r = 0; r < recs.length; r++) {
-            if (recs[r].text.indexOf("Turn on superchlorinate") !== -1) {
+            if (recs[r].text.indexOf("Superchlorinate") !== -1) {
               hasSuperchlorinateRec = true;
               break;
             }
@@ -5697,7 +5829,10 @@
 
       window.dismissCheckedToday = function (goToTab) {
         checkedTodayAlertDismissed = true;
-        try { localStorage.setItem("ha_chem_prompt_dismissed_time", Date.now()); } catch (e) { }
+        try { 
+          localStorage.setItem("ha_chem_prompt_dismissed_time", Date.now()); 
+          localStorage.setItem("ha_chem_alert_snoozed_time", Date.now());
+        } catch (e) { }
 
         var overlayEl = document.getElementById("checkedTodayOverlay");
         if (overlayEl) {
