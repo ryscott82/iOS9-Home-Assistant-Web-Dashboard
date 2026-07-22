@@ -1085,8 +1085,53 @@
     }
 
     @media (max-width: 600px) {
+      /* Force 1 Card Per Row on Mobile Home Page */
+      .tile-grid .tile,
+      .tile.overview-tile,
+      .tile.overview-big-tile {
+        -webkit-flex: 0 0 100% !important;
+        flex: 0 0 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Responsive text scaling for Home page card titles on Mobile */
+      .tile.overview-big-tile .tile-name {
+        font-size: 22px !important;
+        line-height: 1.1 !important;
+      }
+
+      /* Scale down temperature control buttons & text on Mobile */
+      .tile.overview-big-tile .thermostat-btn {
+        height: 48px !important;
+        min-width: 48px !important;
+        padding: 0 10px !important;
+        font-size: 18px !important;
+      }
+
+      .tile.overview-big-tile .thermostat-temp-val {
+        font-size: 24px !important;
+      }
+
+      .tile.overview-big-tile [id^="set_temp_"] {
+        font-size: 16px !important;
+      }
+
+      /* Mobile Controls Page Grid */
       .controls-grid {
         grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+
+      .card-1x1 {
+        grid-column: span 1 !important;
+        grid-row: span 1 !important;
+      }
+
+      .card-2x1,
+      .card-2x2 {
+        grid-column: span 2 !important;
       }
     }
 
@@ -1855,7 +1900,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.55.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.56.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -3196,7 +3241,7 @@
         var brightness = attrs.brightness || 0;
         var pct = Math.round((brightness / 255) * 100);
 
-        var is2x2Card = hasEffects || hasBrightness || hasRgb;
+        var is2x2Card = hasEffects || hasRgb;
         var spanClass = is2x2Card ? " card-2x2" : " card-1x1";
         var tileClass = "tile" + spanClass + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
         var iconName = getEntityIcon(entity, "light");

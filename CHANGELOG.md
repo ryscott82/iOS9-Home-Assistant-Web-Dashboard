@@ -2,6 +2,11 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.56.0] - 2026-07-21
+- **Light Card 2x2 vs 1x1 Classification Fix**: Fixed light classification so standard lights and dimmers without effects or RGB color controls stay as compact **1x1 cards (`card-1x1`)**. Only lights with effects or RGB color controls expand to 2x2.
+- **Mobile Home Page 1 Card Per Row**: Enforced 1 card per row (`100%` width) for all Home page tiles under `@media (max-width: 600px)`.
+- **Responsive Mobile Text & Control Scaling**: Dynamically scaled down title font sizes (`22px`) and temperature control buttons (`48px` height, `18px` font) on mobile screens so all controls fit cleanly without overflowing.
+
 ## [v2.55.0] - 2026-07-21
 - **Expanded Preset Temperature Buttons**: Expanded horizontal padding (`padding: 0 18px`), font size (`22px` bold), and minimum width (`64px`) on preset buttons (`68°`, `78°`, `100°`) so temperature numbers fit cleanly without clipping.
 - **Side-by-Side Temperature Display**: Replaced vertical column layout with a side-by-side row (`align-items: baseline`) displaying Current Temp in `34px` bold and Set Target Temp in `22px` bold (`Set 78°`).
