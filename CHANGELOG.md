@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.59.0] - 2026-07-21
+- **Controls Grid Right-Edge Clipping Fix**: Reset legacy `margin: 5px` and flex properties on `.controls-grid .tile` to `margin: 0 !important; width: 100% !important; flex: none !important;` so CSS Grid `gap: 12px` sizes cards precisely to fit inside the viewport without clipping off the right edge.
+
 ## [v2.58.0] - 2026-07-21
 - **Removed Internal Floor Scrolling**: Set `overflow: visible`, `height: auto`, and `max-height: none` on `.controls-grid` and section containers. Converted `.floor-nav-bar` to flex wrap (`flex-wrap: wrap; overflow: visible`) so all floor controls flow naturally in a continuous grid without inner sub-scrolling.
 
