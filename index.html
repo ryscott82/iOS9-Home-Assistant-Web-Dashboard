@@ -644,23 +644,32 @@
 
 
     .mode-selector {
-      display: -webkit-flex;
-      display: flex;
-      -webkit-justify-content: center;
-      justify-content: center;
-      margin-top: 12px;
+      display: -webkit-flex !important;
+      display: flex !important;
+      -webkit-flex-wrap: wrap !important;
+      flex-wrap: wrap !important;
+      -webkit-justify-content: center !important;
+      justify-content: center !important;
+      gap: 4px !important;
+      margin-top: 10px;
+      max-width: 100% !important;
+      box-sizing: border-box !important;
     }
 
     .mode-btn {
       background: #f2f2f7;
       border: 1px solid #e5e5ea;
       color: #8e8e93;
-      font-size: 13px;
-      padding: 8px 16px;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 8px !important;
       cursor: pointer;
       -webkit-appearance: none;
       -webkit-transition: all 0.15s;
       transition: all 0.15s;
+      max-width: 100%;
+      white-space: nowrap;
+      margin: 2px 0;
     }
 
     .mode-btn:first-child {
@@ -1050,7 +1059,7 @@
       display: flex !important;
     }
 
-    /* ======== 4-COLUMN CONTROLS GRID ======== */
+    /* ======== CONTROLS GRID & RESPONSIVE BREAKPOINTS ======== */
     .controls-grid {
       display: grid !important;
       grid-template-columns: repeat(4, 1fr) !important;
@@ -1059,7 +1068,7 @@
       width: 100% !important;
       max-width: 100% !important;
       box-sizing: border-box !important;
-      overflow: visible !important;
+      overflow: hidden !important;
       height: auto !important;
       max-height: none !important;
       margin: 0 !important;
@@ -1097,6 +1106,23 @@
       min-height: 180px !important;
       height: 100% !important;
       box-sizing: border-box !important;
+    }
+
+    /* Standard iPad Mini & Tablet Viewports: 2-column grid with full-width heater/climate cards */
+    @media (max-width: 900px) {
+      .controls-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+      }
+
+      .card-1x1 {
+        grid-column: span 1 !important;
+      }
+
+      .card-2x1,
+      .card-2x2 {
+        grid-column: span 2 !important;
+      }
     }
 
     @media (max-width: 600px) {
@@ -1918,7 +1944,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.59.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.60.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
