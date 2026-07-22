@@ -1124,6 +1124,17 @@
         box-sizing: border-box !important;
       }
 
+      /* Hide date and time on mobile in favor of a bigger welcome message */
+      .header-datetime {
+        display: none !important;
+      }
+
+      .header-welcome {
+        font-size: 28px !important;
+        font-weight: 850 !important;
+        line-height: 1.1 !important;
+      }
+
       /* Stack current & set temperatures vertically on mobile Home page */
       .thermostat-readout-box {
         -webkit-flex-direction: column !important;
@@ -1951,7 +1962,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.62.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.63.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>

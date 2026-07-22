@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v2.63.0] - 2026-07-21
+- **Mobile Header Optimization**: Hidden date and time display (`.header-datetime`) under `@media (max-width: 600px)` and enlarged the main welcome message font size to `28px` bold (`850` weight).
+
 ## [v2.62.0] - 2026-07-21
 - **Mobile Temperature Readout Vertical Stacking**: Configured `.thermostat-readout-box` under `@media (max-width: 600px)` to stack current and set target temperatures vertically (`flex-direction: column; align-items: center`), ensuring all Home page heater card controls fit comfortably on mobile screens.
 - **Controls Grid Track & Overflow Overhaul**: Capped all grid column tracks with `minmax(0, 1fr)` and set `overflow: hidden; min-width: 0;` on `.controls-grid .tile` to guarantee cards never expand beyond their assigned columns or cut off on the right edge of the screen.
