@@ -3673,8 +3673,8 @@
             else if (val < 650 || val > 800) alertClass = " alert-yellow";
             else valueStyle = "color: #34c759; font-weight: 700;";
           } else if (isSalt) {
-            if (val < 3000 || val > 4500) alertClass = " alert-red";
-            else if (val < 3500 || val > 3600) alertClass = " alert-yellow";
+            if (val < 3000) alertClass = " alert-red";
+            else if (val > 4500) alertClass = " alert-yellow";
             else valueStyle = "color: #34c759; font-weight: 700;";
           }
         }
@@ -3704,7 +3704,7 @@
         var idealRange = "";
         if (isPH) idealRange = "Ideal: 7.2 - 7.6";
         else if (isORP) idealRange = "Ideal: 650 - 800";
-        else if (isSalt) idealRange = "Ideal: 3500 - 3600";
+        else if (isSalt) idealRange = "Ideal: 3000 - 4500";
         if (idealRange) {
           h += '<div style="font-size:10.5px;color:#8e8e93;margin-top:4px;font-weight:500;">' + idealRange + '</div>';
         }
@@ -4096,19 +4096,11 @@
               severity: "red",
               text: "Add <strong>" + formatDose(doseOz, false, true) + "</strong> pool salt (salt is " + saltVal + " ppm; min 3000 ppm needed for cell)."
             });
-          } else if (saltVal < 3500) {
-            var diff = 3500 - saltVal;
-            var doseOz = (diff / 10) * 13 * volRatio;
-            recList.push({
-              id: "salt_low",
-              severity: "yellow",
-              text: "Add <strong>" + formatDose(doseOz, false, true) + "</strong> pool salt (raise to 3500 ppm)."
-            });
-          } else if (saltVal > 3600) {
+          } else if (saltVal > 4500) {
             recList.push({
               id: "salt_high",
               severity: "yellow",
-              text: "Partially drain and refill water (lower salt to 3600 ppm)."
+              text: "Partially drain and refill water (lower salt to 4500 ppm)."
             });
           }
         }
