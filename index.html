@@ -3036,11 +3036,14 @@
         document.body.className = (themeOverride === "dark" || isNight ? "dark-theme " : "") + "tab-" + activeTab;
 
         if (activeTab === "home") {
+          var hasHomeTagDefined = (Object.keys(homeEntityIds).length > 0);
           // Render Media Players + Home entities grid filtered by 'ipadhomescreen' tag
           var mediaGroups = [];
           var songGroups = {};
           for (i = 0; i < mediaPlayers.length; i++) {
             var mp = mediaPlayers[i];
+            if (hasHomeTagDefined && !isHomeScreenEntity(mp)) continue;
+
             if (mp.state === "playing" || mp.state === "paused") {
               var key = getMediaGroupKey(mp);
               if (key) {
@@ -3057,7 +3060,6 @@
 
           var rawHomeList = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
           var homeEntities = [];
-          var hasHomeTagDefined = (Object.keys(homeEntityIds).length > 0);
           for (i = 0; i < rawHomeList.length; i++) {
             if (!hasHomeTagDefined || isHomeScreenEntity(rawHomeList[i])) {
               homeEntities.push(rawHomeList[i]);
