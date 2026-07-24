@@ -1519,6 +1519,49 @@
       background: #161b22 !important;
     }
 
+    .rec-item-text {
+      font-size: 13.5px;
+      line-height: 1.45;
+      color: #1c1c1e;
+    }
+
+    .rec-item-text.checked {
+      text-decoration: line-through;
+      opacity: 0.4;
+    }
+
+    .rec-checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid #8e8e93;
+      background: transparent;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      margin-right: 12px;
+      margin-top: 1px;
+      flex-shrink: 0;
+      -webkit-transition: all 0.15s ease;
+      transition: all 0.15s ease;
+    }
+
+    .rec-checkbox.checked {
+      border-color: #34c759;
+      background: #34c759;
+    }
+
+    body.dark-theme .rec-item-text {
+      color: #e6edf3 !important;
+    }
+
+    body.dark-theme .rec-divider {
+      border-top-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
     body.dark-theme .tile.media-tile div[style*="color:#1c1c1e"] {
       color: #e6edf3 !important;
     }
@@ -4343,15 +4386,14 @@
             var item = recs[r];
             var itemKey = selectedRecVolume + "_" + (item.id || r);
             var isChecked = !!checkedRecItems[itemKey];
-            var textStyle = isChecked ? "text-decoration: line-through; opacity: 0.4;" : "";
             
             h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:flex-start; align-items:flex-start; margin-bottom:10px; cursor:pointer;" onclick="toggleRecCheckbox(\'' + itemKey + '\')">';
-            h += '<div style="width:20px; height:20px; border-radius:6px; border:2px solid ' + (isChecked ? '#34c759' : '#8e8e93') + '; background:' + (isChecked ? '#34c759' : 'transparent') + '; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin-right:12px; margin-top:1px; flex-shrink:0; -webkit-transition:all 0.15s ease;">';
+            h += '<div class="rec-checkbox' + (isChecked ? ' checked' : '') + '">';
             if (isChecked) {
               h += '<svg style="width:12px; height:12px; fill:#ffffff;" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
             }
             h += '</div>';
-            h += '<div style="font-size:13.5px; line-height:1.45; color:#1c1c1e;' + textStyle + '">' + item.text + '</div>';
+            h += '<div class="rec-item-text' + (isChecked ? ' checked' : '') + '">' + item.text + '</div>';
             h += '</div>';
           }
           h += '</div>';
@@ -4368,7 +4410,7 @@
           }
 
           if (hasSuperchlorinateRec) {
-            h += '<div style="margin-top: 14px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;">';
+            h += '<div class="rec-divider" style="margin-top: 14px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); padding-top: 12px;">';
             h += '<button class="confirm-btn" style="background:#007aff; color:#ffffff; font-size:13px; font-weight:700; padding:10px 16px; border-radius:10px; margin:0;" onclick="fixHotTubChlorine()">Fix Hot Tub Chlorine Levels</button>';
             h += '</div>';
           }
@@ -5666,6 +5708,10 @@
       };
 
       window.setInputNumber = function (entityId, value) {
+        // Reset checkbox tracking for fresh evaluation & snooze alert since chemicals were updated
+        checkedRecItems = {};
+        try { localStorage.setItem("ha_chem_alert_snoozed_time", Date.now()); } catch (e) { }
+
         haRequest("POST", "/api/services/input_number/set_value", {
           entity_id: entityId,
           value: parseFloat(value)
