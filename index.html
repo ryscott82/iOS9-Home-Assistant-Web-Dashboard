@@ -453,17 +453,14 @@
     }
 
     .tile-name {
-      font-size: 13.5px;
+      font-size: 16.5px;
       font-weight: 700;
       color: #1c1c1e;
       margin-bottom: 2px;
-      line-height: 1.25;
-      word-break: break-word;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
+      line-height: 1.2;
       overflow: hidden;
-      white-space: normal;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .tile-state {
@@ -1065,8 +1062,7 @@
     /* ======== REDESIGNED CONTROLS GRID LOGIC ======== */
     .controls-grid {
       display: grid !important;
-      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-      grid-auto-flow: dense !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
       gap: 12px !important;
       width: 100% !important;
       max-width: 100% !important;
@@ -1076,20 +1072,7 @@
       max-height: none !important;
       margin: 0 !important;
       padding: 0 !important;
-    }
-
-    @media (max-width: 1024px) {
-      .controls-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-        gap: 10px !important;
-      }
-    }
-
-    @media (max-width: 680px) {
-      .controls-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 8px !important;
-      }
+      align-items: start !important;
     }
 
     .controls-grid .tile {
@@ -1099,6 +1082,7 @@
       min-width: 0 !important;
       box-sizing: border-box !important;
       overflow: hidden !important;
+      align-self: start !important;
       -webkit-flex: none !important;
       flex: none !important;
     }
@@ -1106,32 +1090,28 @@
     .card-1x1 {
       grid-column: span 1 !important;
       grid-row: span 1 !important;
-      min-height: 80px !important;
-      height: 100% !important;
+      min-height: 84px !important;
+      height: auto !important;
+      align-self: start !important;
       box-sizing: border-box !important;
     }
 
     .card-2x1 {
       grid-column: span 2 !important;
       grid-row: span 1 !important;
-      min-height: 80px !important;
-      height: 100% !important;
+      min-height: 84px !important;
+      height: auto !important;
+      align-self: start !important;
       box-sizing: border-box !important;
     }
 
     .card-2x2 {
       grid-column: span 2 !important;
-      grid-row: span 2 !important;
-      min-height: 170px !important;
-      height: 100% !important;
+      grid-row: span 1 !important;
+      min-height: 140px !important;
+      height: auto !important;
+      align-self: start !important;
       box-sizing: border-box !important;
-    }
-
-    @media (max-width: 680px) {
-      .card-2x1,
-      .card-2x2 {
-        grid-column: span 2 !important;
-      }
     }
 
 
@@ -2004,7 +1984,7 @@
 
     <!-- UNIFIED HEADER (Top Left: Welcome Message | Top Right: Date/Time + 3-Line Hamburger Menu Button) -->
     <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-bottom:14px; padding:0 4px;">
-      <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:clamp(18px, 3.2vw, 32px); font-weight:800; white-space:normal; word-break:break-word; line-height:1.1; padding-right:12px;">Welcome Home <span class="version-badge" style="font-size:11px; font-weight:700; color:#007aff; background:rgba(0,122,255,0.12); padding:2px 7px; border-radius:6px; margin-left:6px; display:inline-block; vertical-align:middle;">v2.64.0</span></div>
+      <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:clamp(18px, 3.2vw, 32px); font-weight:800; white-space:normal; word-break:break-word; line-height:1.1; padding-right:12px;">Welcome Home</div>
       <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; -webkit-flex-shrink:0; flex-shrink:0;">
         <div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:flex-end; align-items:flex-end;">
           <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:clamp(14px, 2.4vw, 24px); font-weight:700; white-space:nowrap;"></div>
@@ -2029,7 +2009,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.64.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.63.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:12px;">
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
@@ -3403,32 +3383,25 @@
         var brightness = attrs.brightness || 0;
         var pct = Math.round((brightness / 255) * 100);
 
-        var spanClass = " card-1x1";
-        if (isOn && !unavailable) {
-          if (hasRgb || hasEffects) {
-            spanClass = " card-2x2";
-          } else if (hasBrightness) {
-            spanClass = " card-2x1";
-          }
-        }
-
+        var is2x2Card = hasEffects || hasRgb;
+        var spanClass = is2x2Card ? " card-2x2" : " card-1x1";
         var tileClass = "tile" + spanClass + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
         var iconName = getEntityIcon(entity, "light");
         var icon = getSvg(iconName, isOn ? getActiveSvgColor("light", entity.state) : "");
         
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')" style="padding:12px 14px;">';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')" style="padding:14px 16px;">';
         
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:10px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
         if (room) {
           h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
         }
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; line-height:1.25; word-break:break-word; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">' + name + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         var stateText = escapeHtml(entity.state);
         if (isOn && currentEffect) stateText += ' &middot; ' + escapeHtml(currentEffect);
         else if (isOn && hasBrightness && pct > 0) stateText += ' &middot; ' + pct + '%';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:12.5px; font-weight:500;">' + stateText + '</div>';
+        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + stateText + '</div>';
         h += '</div>';
         h += '</div>';
 
@@ -3483,16 +3456,16 @@
         var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state) : "");
 
         var tileClass = "tile card-1x1" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="padding:12px 14px;">';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="padding:14px 16px;">';
         
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:10px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
         if (room) {
           h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
         }
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; line-height:1.25; word-break:break-word; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:12.5px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
+        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
         h += '</div>';
         
@@ -3529,12 +3502,12 @@
         var h = '<div class="tile card-2x1' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
         
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:10px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
         if (room) {
           h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
         }
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; line-height:1.25; word-break:break-word; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">' + name + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         var stateText = escapeHtml(hvacMode);
         if (!unavailable) {
           stateText += ' &middot; Current: ' + escapeHtml(String(currentTemp)) + escapeHtml(unit);
@@ -3590,16 +3563,16 @@
         var iconName = getEntityIcon(entity, "cover");
         var icon = getSvg(iconName, isOpen ? getActiveSvgColor("cover", entity.state) : "");
 
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'cover\')" style="padding:12px 14px;">';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'cover\')" style="padding:14px 16px;">';
         
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:10px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
-        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left; margin-right:6px;">';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left; margin-right:8px;">';
         if (room) {
           h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
         }
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; line-height:1.25; word-break:break-word; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:12.5px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
+        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
         
         if (!unavailable) {
@@ -3627,16 +3600,16 @@
         var actualIcon = isLocked ? iconName : (iconName === "lock" ? "unlock" : iconName);
         var icon = getSvg(actualIcon, isLocked ? getActiveSvgColor("lock", "locked") : "");
 
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'lock\')" style="padding:12px 14px;">';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'lock\')" style="padding:14px 16px;">';
         
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:10px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
+        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
         if (room) {
           h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
         }
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; line-height:1.25; word-break:break-word; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:12.5px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
+        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
         h += '</div>';
         
