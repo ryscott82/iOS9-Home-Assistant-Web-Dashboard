@@ -1202,6 +1202,90 @@
       display: none !important;
     }
 
+    /* ======== SLEEP MODE STYLES ======== */
+    .sleep-mode-container {
+      width: 100%;
+      max-width: 650px;
+      margin: 12px auto 0 auto;
+      padding: 0 4px;
+      box-sizing: border-box;
+    }
+
+    .sleep-mode-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      width: 100%;
+    }
+
+    .sleep-pill-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 36px;
+      padding: 28px 16px;
+      min-height: 110px;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-transition: all 0.2s ease;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      color: #e6edf3;
+      outline: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body:not(.dark-theme) .sleep-pill-btn {
+      background: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      color: #1c1c1e;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .sleep-pill-btn:active {
+      -webkit-transform: scale(0.97);
+      transform: scale(0.97);
+      opacity: 0.85;
+    }
+
+    .sleep-pill-btn.sleep-pill-full {
+      grid-column: span 2;
+      min-height: 90px;
+      margin-top: 4px;
+    }
+
+    .sleep-pill-text {
+      font-size: 24px;
+      font-weight: 800;
+      line-height: 1.15;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+
+    .sleep-pill-large-text {
+      font-size: 32px;
+      font-weight: 850;
+      letter-spacing: -0.8px;
+    }
+
+    .sleep-btn-active {
+      background: #007aff !important;
+      border-color: #007aff !important;
+      color: #ffffff !important;
+      box-shadow: 0 0 16px rgba(0, 122, 255, 0.5) !important;
+    }
+
+    .sleep-btn-active-yellow {
+      background: #ffcc00 !important;
+      border-color: #ffcc00 !important;
+      color: #1c1c1e !important;
+      box-shadow: 0 0 16px rgba(255, 204, 0, 0.4) !important;
+    }
+
     @media (min-width: 768px) {
       .tile.overview-tile {
         -webkit-flex: 0 0 calc(25% - 10px);
@@ -2400,6 +2484,88 @@
         h += '</div>';
         h += '</div>';
         return h;
+      function renderSleepModeGrid(allStates) {
+        var basementState = "";
+        var backyardState = "";
+        var kitchenOn = false;
+
+        for (var i = 0; i < allStates.length; i++) {
+          var s = allStates[i];
+          var eid = (s.entity_id || "").toLowerCase();
+          if (eid === "input_select.basement_state") {
+            basementState = (s.state || "").toLowerCase();
+          } else if (eid === "input_select.backyard_state") {
+            backyardState = (s.state || "").toLowerCase();
+          } else if (eid.indexOf("light.") === 0) {
+            var name = (friendlyName(s) || "").toLowerCase();
+            if ((eid.indexOf("kitchen") !== -1 || name.indexOf("kitchen") !== -1) && s.state === "on") {
+              kitchenOn = true;
+            }
+          }
+        }
+
+        // Basement sleep mode lights up when state is "sleep"
+        var isBasementSleepLit = (basementState === "sleep");
+        // Backyard off lights up if state is anything other than "off" or "auto"
+        var isBackyardLit = (backyardState !== "off" && backyardState !== "auto");
+
+        var basementClass = isBasementSleepLit ? " sleep-btn-active" : "";
+        var kitchenClass = kitchenOn ? " sleep-btn-active-yellow" : "";
+        var backyardClass = isBackyardLit ? " sleep-btn-active" : "";
+
+        var h = '<div class="sleep-mode-container">';
+        h += '<div class="sleep-mode-grid">';
+
+        // 1. Basement Sleep Mode
+        h += '<button class="sleep-pill-btn' + basementClass + '" onclick="toggleBasementSleepMode()">';
+        h += '<div class="sleep-pill-text">Basement<br>Sleep Mode</div>';
+        h += '</button>';
+
+        // 2. Kitchen Lights
+        h += '<button class="sleep-pill-btn' + kitchenClass + '" onclick="toggleKitchenLights()">';
+        h += '<div class="sleep-pill-text">Kitchen Lights</div>';
+        h += '</button>';
+
+        // 3. Backyard Off
+        h += '<button class="sleep-pill-btn' + backyardClass + '" onclick="setBackyardStateOff()">';
+        h += '<div class="sleep-pill-text">Backyard Off</div>';
+        h += '</button>';
+
+        // 4. Media Controls
+        h += '<button class="sleep-pill-btn" onclick="switchTab(\'media\')">';
+        h += '<div class="sleep-pill-text">Media Controls</div>';
+        h += '</button>';
+
+        // 5. All Off (Full Width)
+        h += '<button class="sleep-pill-btn sleep-pill-full" onclick="turnAllOff()">';
+        h += '<div class="sleep-pill-text sleep-pill-large-text">All Off</div>';
+        h += '</button>';
+
+        h += '</div>';
+        h += '</div>';
+
+        return h;
+      }
+
+      function renderMediaPage(allStates) {
+        var h = '<div class="section"><div class="section-title">Media Controls</div>';
+        var mediaPlayers = [];
+        for (var i = 0; i < allStates.length; i++) {
+          if (allStates[i].entity_id.indexOf("media_player.") === 0) {
+            mediaPlayers.push(allStates[i]);
+          }
+        }
+        if (mediaPlayers.length > 0) {
+          h += '<div class="tile-grid">';
+          for (var j = 0; j < mediaPlayers.length; j++) {
+            h += renderMediaPlayer(mediaPlayers[j], false);
+          }
+          h += '</div>';
+        } else {
+          h += '<div class="tile tile-full" style="padding:32px 16px; text-align:center; font-size:16px; font-weight:600; color:#8e8e93;">🎵 Media Page Coming Soon</div>';
+        }
+        h += '</div>';
+        return h;
       }
 
       function renderHomeMediaPlayerCard(group) {
@@ -3004,8 +3170,12 @@
 
         // Render Tab Segmented control
         html += '<div class="tab-bar">';
+        var hActive = activeTab === "home" ? " active" : "";
         var cActive = activeTab === "controls" ? " active" : "";
         var chActive = activeTab === "chemicals" ? " active" : "";
+        var mActive = activeTab === "media" ? " active" : "";
+
+        html += '<button class="tab-btn' + hActive + '" onclick="switchTab(\'home\')">Home</button>';
         html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">Controls</button>';
         if (hasRedWarning) {
           if (activeTab === "chemicals") {
@@ -3020,8 +3190,9 @@
             html += '<button class="tab-btn alert-yellow-muted" onclick="switchTab(\'chemicals\')">Check Chemicals</button>';
           }
         } else {
-          html += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals & Sensors</button>';
+          html += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals</button>';
         }
+        html += '<button class="tab-btn' + mActive + '" onclick="switchTab(\'media\')">Media</button>';
         html += '</div>';
 
         // Update header navigation icon based on active tab
@@ -3040,47 +3211,67 @@
         document.body.className = (themeOverride === "dark" || isNight ? "dark-theme " : "") + "tab-" + activeTab;
 
         if (activeTab === "home") {
-          var hasHomeTagDefined = (Object.keys(homeEntityIds).length > 0);
-          // Render Media Players + Home entities grid filtered by 'ipadhomescreen' tag
-          var mediaGroups = [];
-          var songGroups = {};
-          for (i = 0; i < mediaPlayers.length; i++) {
-            var mp = mediaPlayers[i];
-            if (hasHomeTagDefined && !isHomeScreenEntity(mp)) continue;
+          // Check if Sleep Mode is active:
+          // Condition: input_select.time_of_day is "night" AND current time is after 11:30 PM (11:30 PM - 5:00 AM)
+          var timeOfDayState = "";
+          for (i = 0; i < allStates.length; i++) {
+            if (allStates[i].entity_id === "input_select.time_of_day") {
+              timeOfDayState = (allStates[i].state || "").toLowerCase();
+              break;
+            }
+          }
+          var now = new Date();
+          var currentMinOfDay = now.getHours() * 60 + now.getMinutes();
+          // 11:30 PM is 1410 minutes. Sleep window: 11:30 PM (1410 min) to 5:00 AM (300 min)
+          var isAfter1130PM = (currentMinOfDay >= 1410 || currentMinOfDay < 300);
+          var isSleepModeActive = (timeOfDayState === "night") && isAfter1130PM;
 
-            if (mp.state === "playing" || mp.state === "paused") {
-              var key = getMediaGroupKey(mp);
-              if (key) {
-                if (!songGroups[key]) {
-                  songGroups[key] = [];
-                  mediaGroups.push(songGroups[key]);
+          if (isSleepModeActive) {
+            html += renderSleepModeGrid(allStates);
+          } else {
+            var hasHomeTagDefined = (Object.keys(homeEntityIds).length > 0);
+            // Render Media Players + Home entities grid filtered by 'ipadhomescreen' tag
+            var mediaGroups = [];
+            var songGroups = {};
+            for (i = 0; i < mediaPlayers.length; i++) {
+              var mp = mediaPlayers[i];
+              if (hasHomeTagDefined && !isHomeScreenEntity(mp)) continue;
+
+              if (mp.state === "playing" || mp.state === "paused") {
+                var key = getMediaGroupKey(mp);
+                if (key) {
+                  if (!songGroups[key]) {
+                    songGroups[key] = [];
+                    mediaGroups.push(songGroups[key]);
+                  }
+                  songGroups[key].push(mp);
+                } else {
+                  mediaGroups.push([mp]);
                 }
-                songGroups[key].push(mp);
-              } else {
-                mediaGroups.push([mp]);
               }
             }
-          }
 
-          var rawHomeList = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
-          var homeEntities = [];
-          for (i = 0; i < rawHomeList.length; i++) {
-            if (!hasHomeTagDefined || isHomeScreenEntity(rawHomeList[i])) {
-              homeEntities.push(rawHomeList[i]);
+            var rawHomeList = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
+            var homeEntities = [];
+            for (i = 0; i < rawHomeList.length; i++) {
+              if (!hasHomeTagDefined || isHomeScreenEntity(rawHomeList[i])) {
+                homeEntities.push(rawHomeList[i]);
+              }
+            }
+
+            if (mediaGroups.length > 0 || homeEntities.length > 0) {
+              html += '<div class="tile-grid">';
+              for (i = 0; i < mediaGroups.length; i++) {
+                html += renderHomeMediaPlayerCard(mediaGroups[i]);
+              }
+              for (i = 0; i < homeEntities.length; i++) {
+                html += renderHomeCard(homeEntities[i]);
+              }
+              html += '</div>';
             }
           }
-
-          if (mediaGroups.length > 0 || homeEntities.length > 0) {
-            html += '<div class="tile-grid">';
-            for (i = 0; i < mediaGroups.length; i++) {
-              html += renderHomeMediaPlayerCard(mediaGroups[i]);
-            }
-            for (i = 0; i < homeEntities.length; i++) {
-              html += renderHomeCard(homeEntities[i]);
-            }
-            html += '</div>';
-          }
-
+        } else if (activeTab === "media") {
+          html += renderMediaPage(allStates);
         } else if (activeTab === "controls") {
           document.body.className = (themeOverride === "dark" || isNight ? "dark-theme" : "");
           // 1. Group controls by floor first
@@ -5885,6 +6076,83 @@
         if (lastStatesCache.length > 0) {
           renderDashboard(lastStatesCache);
         }
+      };
+
+      window.toggleBasementSleepMode = function () {
+        var basementSelect = null;
+        for (var i = 0; i < lastStatesCache.length; i++) {
+          if (lastStatesCache[i].entity_id === "input_select.basement_state") {
+            basementSelect = lastStatesCache[i];
+            break;
+          }
+        }
+        var isSleep = basementSelect && ((basementSelect.state || "").toLowerCase() === "sleep");
+        var newOption = isSleep ? "auto" : "sleep";
+        haRequest("POST", "/api/services/input_select/select_option", {
+          entity_id: "input_select.basement_state",
+          option: newOption
+        }, function (err) {
+          if (err) {
+            showToast("Error: " + err, true);
+          } else {
+            showToast("Basement set to " + newOption);
+          }
+          setTimeout(refreshAll, 500);
+        });
+      };
+
+      window.setBackyardStateOff = function () {
+        haRequest("POST", "/api/services/input_select/select_option", {
+          entity_id: "input_select.backyard_state",
+          option: "off"
+        }, function (err) {
+          if (err) {
+            showToast("Error: " + err, true);
+          } else {
+            showToast("Backyard set to off");
+          }
+          setTimeout(refreshAll, 500);
+        });
+      };
+
+      window.toggleKitchenLights = function () {
+        var kitchenEntities = [];
+        for (var i = 0; i < lastStatesCache.length; i++) {
+          var s = lastStatesCache[i];
+          var eid = s.entity_id.toLowerCase();
+          var name = (friendlyName(s) || "").toLowerCase();
+          if ((eid.indexOf("kitchen") !== -1 || name.indexOf("kitchen") !== -1) && eid.indexOf("light.") === 0) {
+            kitchenEntities.push(s);
+          }
+        }
+        if (kitchenEntities.length === 0) {
+          haRequest("POST", "/api/services/light/toggle", { entity_id: "light.kitchen_lights" }, function () {
+            setTimeout(refreshAll, 500);
+          });
+          return;
+        }
+        var anyOn = false;
+        for (var j = 0; j < kitchenEntities.length; j++) {
+          if (kitchenEntities[j].state === "on") { anyOn = true; break; }
+        }
+        var service = anyOn ? "turn_off" : "turn_on";
+        for (var k = 0; k < kitchenEntities.length; k++) {
+          haRequest("POST", "/api/services/light/" + service, { entity_id: kitchenEntities[k].entity_id }, function () { });
+        }
+        setTimeout(refreshAll, 500);
+      };
+
+      window.turnAllOff = function () {
+        haRequest("POST", "/api/services/light/turn_off", { entity_id: "all" }, function () { });
+        for (var i = 0; i < lastStatesCache.length; i++) {
+          var s = lastStatesCache[i];
+          if ((s.entity_id.indexOf("light.") === 0 || s.entity_id.indexOf("switch.") === 0) && s.state === "on") {
+            var dom = s.entity_id.split(".")[0];
+            haRequest("POST", "/api/services/" + dom + "/turn_off", { entity_id: s.entity_id }, function () { });
+          }
+        }
+        showToast("All lights & switches turned off");
+        setTimeout(refreshAll, 500);
       };
 
       var keypadEntityId = "";
