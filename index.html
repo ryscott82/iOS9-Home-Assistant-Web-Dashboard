@@ -1030,26 +1030,11 @@
       border: 2px solid #ff9f0a !important;
     }
 
-    body.tab-home .tab-bar {
-      display: none !important;
-    }
-
-    body.show-nav .tab-bar {
-      display: -webkit-flex !important;
-      display: flex !important;
-    }
-
-    body.tab-overview footer.app-footer {
-      display: none !important;
-    }
-
+    .tab-bar,
+    body.tab-home .tab-bar,
     body.tab-controls .tab-bar,
-    body.tab-chemicals .tab-bar {
-      display: -webkit-flex !important;
-      display: flex !important;
-    }
-
-    body.show-nav .tab-bar {
+    body.tab-chemicals .tab-bar,
+    body.tab-media .tab-bar {
       display: -webkit-flex !important;
       display: flex !important;
     }
@@ -2087,10 +2072,10 @@
 
     <!-- UNIFIED HEADER (Top Left: Welcome Message | Top Right: Date/Time + 3-Line Hamburger Menu Button) -->
     <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-bottom:14px; padding:0 4px;">
-      <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:clamp(18px, 3.2vw, 32px); font-weight:800; white-space:normal; word-break:break-word; line-height:1.1; padding-right:12px;">Welcome Home</div>
+      <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:28px; font-weight:800; white-space:normal; word-break:break-word; line-height:1.1; padding-right:12px;">Welcome Home</div>
       <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; -webkit-flex-shrink:0; flex-shrink:0;">
         <div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:flex-end; align-items:flex-end;">
-          <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:clamp(14px, 2.4vw, 24px); font-weight:700; white-space:nowrap;"></div>
+          <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:20px; font-weight:700; white-space:nowrap;"></div>
           <div id="headerChemBanner" onclick="switchTab('chemicals')" style="display:none; cursor:pointer; margin-top:2px; font-size:11.5px; font-weight:700; color:#ff3b30; background:rgba(255,59,48,0.12); border:1px solid rgba(255,59,48,0.35); padding:2px 8px; border-radius:6px; white-space:nowrap;">Check Chemicals</div>
         </div>
         <button id="headerNavBtn" class="menu-icon-btn" onclick="toggleMainNavigation(event)" title="Menu" style="width:48px; height:48px; border-radius:12px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0; box-sizing:border-box; text-align:center;">
@@ -2112,7 +2097,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.64.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.65.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -3262,12 +3247,12 @@
             document.body.classList.add("is-sleep-mode");
             if (appFooterEl) appFooterEl.style.display = "none";
             if (headerWelcomeEl) {
-              headerWelcomeEl.style.fontSize = "clamp(36px, 5.5vw, 60px)";
+              headerWelcomeEl.style.fontSize = "52px";
               headerWelcomeEl.style.fontWeight = "900";
               headerWelcomeEl.style.letterSpacing = "-1px";
             }
             if (headerDateTimeEl) {
-              headerDateTimeEl.style.fontSize = "clamp(36px, 5.5vw, 60px)";
+              headerDateTimeEl.style.fontSize = "52px";
               headerDateTimeEl.style.fontWeight = "900";
               headerDateTimeEl.style.letterSpacing = "-1px";
             }
