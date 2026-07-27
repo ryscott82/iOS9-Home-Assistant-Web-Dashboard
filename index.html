@@ -1218,6 +1218,8 @@
     }
 
     .sleep-pill-btn {
+      -webkit-appearance: none;
+      appearance: none;
       -webkit-flex: 0 0 calc(50% - 10px);
       flex: 0 0 calc(50% - 10px);
       width: calc(50% - 10px);
@@ -1226,15 +1228,18 @@
       background: rgba(255, 255, 255, 0.08);
       border: 2px solid rgba(255, 255, 255, 0.15);
       border-radius: 44px;
-      padding: 32px 16px;
+      padding: 24px 12px;
       min-height: 150px;
       box-sizing: border-box;
       display: -webkit-flex;
       display: flex;
-      -webkit-align-items: center;
-      align-items: center;
+      -webkit-box-pack: center;
       -webkit-justify-content: center;
       justify-content: center;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+      align-items: center;
+      text-align: center !important;
       cursor: pointer;
       -webkit-transition: all 0.2s ease;
       transition: all 0.2s ease;
@@ -1242,6 +1247,7 @@
       color: #e6edf3;
       outline: none;
       -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
 
     body:not(.dark-theme) .sleep-pill-btn {
@@ -1268,16 +1274,20 @@
     }
 
     .sleep-pill-text {
+      width: 100%;
+      margin: auto;
       font-size: 34px;
-      font-weight: 850;
-      line-height: 1.12;
-      text-align: center;
+      font-weight: 900 !important;
+      line-height: 1.15;
+      text-align: center !important;
       letter-spacing: -0.6px;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
     }
 
     .sleep-pill-large-text {
       font-size: 46px;
-      font-weight: 900;
+      font-weight: 900 !important;
       letter-spacing: -1px;
     }
 
@@ -2530,29 +2540,29 @@
         h += '<div class="sleep-mode-grid">';
 
         // 1. Basement Sleep Mode
-        h += '<button class="sleep-pill-btn' + basementClass + '" onclick="toggleBasementSleepMode()">';
+        h += '<div class="sleep-pill-btn' + basementClass + '" role="button" onclick="toggleBasementSleepMode()">';
         h += '<div class="sleep-pill-text">Basement<br>Sleep Mode</div>';
-        h += '</button>';
+        h += '</div>';
 
         // 2. Kitchen Lights
-        h += '<button class="sleep-pill-btn' + kitchenClass + '" onclick="toggleKitchenLights()">';
+        h += '<div class="sleep-pill-btn' + kitchenClass + '" role="button" onclick="toggleKitchenLights()">';
         h += '<div class="sleep-pill-text">Kitchen Lights</div>';
-        h += '</button>';
+        h += '</div>';
 
         // 3. Backyard Off
-        h += '<button class="sleep-pill-btn' + backyardClass + '" onclick="setBackyardStateOff()">';
+        h += '<div class="sleep-pill-btn' + backyardClass + '" role="button" onclick="setBackyardStateOff()">';
         h += '<div class="sleep-pill-text">Backyard Off</div>';
-        h += '</button>';
+        h += '</div>';
 
         // 4. Media Controls
-        h += '<button class="sleep-pill-btn" onclick="switchTab(\'media\')">';
+        h += '<div class="sleep-pill-btn" role="button" onclick="switchTab(\'media\')">';
         h += '<div class="sleep-pill-text">Media Controls</div>';
-        h += '</button>';
+        h += '</div>';
 
         // 5. All Off (Full Width)
-        h += '<button class="sleep-pill-btn sleep-pill-full" onclick="turnAllOff()">';
+        h += '<div class="sleep-pill-btn sleep-pill-full" role="button" onclick="turnAllOff()">';
         h += '<div class="sleep-pill-text sleep-pill-large-text">All Off</div>';
-        h += '</button>';
+        h += '</div>';
 
         h += '</div>';
         h += '</div>';
