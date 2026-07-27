@@ -2346,7 +2346,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.68.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.69.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -2792,9 +2792,9 @@
         h += '<div class="sleep-pill-text">Backyard</div>';
         h += '</div>';
 
-        // 4. Media Controls
-        h += '<div class="sleep-pill-btn" role="button" onclick="switchTab(\'media\')">';
-        h += '<div class="sleep-pill-text">Media Controls</div>';
+        // 4. Dinner Scene
+        h += '<div class="sleep-pill-btn" role="button" onclick="activateDinnerScene()">';
+        h += '<div class="sleep-pill-text">Dinner</div>';
         h += '</div>';
 
         // 5. All Off (Full Width)
@@ -2807,6 +2807,19 @@
 
         return h;
       }
+
+      window.activateDinnerScene = function () {
+        haRequest("POST", "/api/services/scene/turn_on", {
+          entity_id: "scene.kitchen_dinner"
+        }, function (err) {
+          if (err) {
+            showToast("Error: " + err, true);
+          } else {
+            showToast("Dinner Scene Activated 🍽️");
+          }
+          setTimeout(refreshAll, 500);
+        });
+      };
 
       function renderMediaCardLayout(group) {
         var primary = group[0] || group;
@@ -6511,6 +6524,23 @@
         }
         activeTab = tabName;
         try { localStorage.setItem("ha_active_tab", tabName); } catch (e) { }
+
+        // Immediately shrink header fonts when clicking off Sleep Mode page
+        var hWelcome = document.getElementById("headerWelcome");
+        var hDateTime = document.getElementById("headerDateTime");
+        var hNavBtn = document.getElementById("headerNavBtn");
+        if (hWelcome) {
+          hWelcome.style.fontSize = "28px";
+          hWelcome.style.fontWeight = "800";
+          hWelcome.style.letterSpacing = "";
+        }
+        if (hDateTime) {
+          hDateTime.style.fontSize = "20px";
+          hDateTime.style.fontWeight = "700";
+          hDateTime.style.letterSpacing = "";
+        }
+        if (hNavBtn) hNavBtn.style.display = "";
+
         if (lastStatesCache.length > 0) {
           renderDashboard(lastStatesCache);
         }
