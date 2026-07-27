@@ -2689,7 +2689,11 @@
 
         var el = document.getElementById("headerDateTime");
         if (el) {
-          el.textContent = dateStr + " • " + timeStr;
+          if (document.body.classList.contains("is-sleep-mode")) {
+            el.textContent = timeStr;
+          } else {
+            el.textContent = dateStr + " • " + timeStr;
+          }
         }
       }
 
@@ -3199,7 +3203,7 @@
         var mActive = activeTab === "media" ? " active" : "";
 
         html += '<button class="tab-btn' + hActive + '" onclick="switchTab(\'home\')">Home</button>';
-        html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">Controls</button>';
+        html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">All Controls</button>';
         if (hasRedWarning) {
           if (activeTab === "chemicals") {
             html += '<button class="tab-btn active" style="background:#ff3b30; color:#ffffff; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">Chemical Alert</button>';
@@ -3249,9 +3253,44 @@
           var isAfter1130PM = (currentMinOfDay >= 1410 || currentMinOfDay < 300);
           var isSleepModeActive = forceSleepModeOverride || ((timeOfDayState === "night") && isAfter1130PM);
 
+          // Header & Footer styling for Sleep Mode
+          var appFooterEl = document.querySelector("footer.app-footer");
+          var headerWelcomeEl = document.getElementById("headerWelcome");
+          var headerDateTimeEl = document.getElementById("headerDateTime");
+
           if (isSleepModeActive) {
+            document.body.classList.add("is-sleep-mode");
+            if (appFooterEl) appFooterEl.style.display = "none";
+            if (headerWelcomeEl) {
+              headerWelcomeEl.style.fontSize = "clamp(36px, 5.5vw, 60px)";
+              headerWelcomeEl.style.fontWeight = "900";
+              headerWelcomeEl.style.letterSpacing = "-1px";
+            }
+            if (headerDateTimeEl) {
+              headerDateTimeEl.style.fontSize = "clamp(36px, 5.5vw, 60px)";
+              headerDateTimeEl.style.fontWeight = "900";
+              headerDateTimeEl.style.letterSpacing = "-1px";
+            }
+            if (navBtn) navBtn.style.display = "none";
+            updateClock();
+
             html += renderSleepModeGrid(allStates);
           } else {
+            document.body.classList.remove("is-sleep-mode");
+            if (appFooterEl) appFooterEl.style.display = "";
+            if (headerWelcomeEl) {
+              headerWelcomeEl.style.fontSize = "";
+              headerWelcomeEl.style.fontWeight = "";
+              headerWelcomeEl.style.letterSpacing = "";
+            }
+            if (headerDateTimeEl) {
+              headerDateTimeEl.style.fontSize = "";
+              headerDateTimeEl.style.fontWeight = "";
+              headerDateTimeEl.style.letterSpacing = "";
+            }
+            if (navBtn) navBtn.style.display = "";
+            updateClock();
+
             var hasHomeTagDefined = (Object.keys(homeEntityIds).length > 0);
             // Render Media Players + Home entities grid filtered by 'ipadhomescreen' tag
             var mediaGroups = [];
