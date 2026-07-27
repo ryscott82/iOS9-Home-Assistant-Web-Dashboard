@@ -1212,9 +1212,9 @@
       margin-bottom: 20px;
       background: rgba(255, 255, 255, 0.08);
       border: 2px solid rgba(255, 255, 255, 0.15);
-      border-radius: 44px;
-      padding: 24px 12px;
-      min-height: 150px;
+      border-radius: 48px;
+      padding: 28px 16px;
+      min-height: 190px;
       box-sizing: border-box;
       display: -webkit-flex;
       display: flex;
@@ -1228,7 +1228,7 @@
       cursor: pointer;
       -webkit-transition: all 0.2s ease;
       transition: all 0.2s ease;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
       color: #e6edf3;
       outline: none;
       -webkit-tap-highlight-color: transparent;
@@ -1253,27 +1253,27 @@
       flex: 0 0 100%;
       width: 100%;
       max-width: 100%;
-      min-height: 130px;
+      min-height: 150px;
       margin-top: 4px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .sleep-pill-text {
       width: 100%;
       margin: auto;
-      font-size: 34px;
+      font-size: 42px;
       font-weight: 900 !important;
-      line-height: 1.15;
+      line-height: 1.12;
       text-align: center !important;
-      letter-spacing: -0.6px;
+      letter-spacing: -0.8px;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
 
     .sleep-pill-large-text {
-      font-size: 46px;
+      font-size: 56px;
       font-weight: 900 !important;
-      letter-spacing: -1px;
+      letter-spacing: -1.2px;
     }
 
     .sleep-btn-active {
@@ -2346,7 +2346,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.67.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.68.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -2743,17 +2743,20 @@
       }
 
       function renderSleepModeGrid(allStates) {
-        var basementState = "";
         var backyardState = "";
+        var gameRoomOn = false;
+        var theaterOn = false;
         var kitchenOn = false;
 
         for (var i = 0; i < allStates.length; i++) {
           var s = allStates[i];
           var eid = (s.entity_id || "").toLowerCase();
-          if (eid === "input_select.basement_state") {
-            basementState = (s.state || "").toLowerCase();
-          } else if (eid === "input_select.backyard_state") {
+          if (eid === "input_select.backyard_state") {
             backyardState = (s.state || "").toLowerCase();
+          } else if (eid === "light.game_room_overheads" && s.state === "on") {
+            gameRoomOn = true;
+          } else if (eid === "light.theater_overheads" && s.state === "on") {
+            theaterOn = true;
           } else if (eid.indexOf("light.") === 0) {
             var name = (friendlyName(s) || "").toLowerCase();
             if ((eid.indexOf("kitchen") !== -1 || name.indexOf("kitchen") !== -1) && s.state === "on") {
@@ -2762,21 +2765,21 @@
           }
         }
 
-        // Basement sleep mode lights up when state is "sleep"
-        var isBasementSleepLit = (basementState === "sleep");
-        // Backyard off lights up if state is anything other than "off" or "auto"
-        var isBackyardLit = (backyardState !== "off" && backyardState !== "auto");
+        // Basement is lit up if game_room_overheads or theater_overheads is on
+        var isBasementLit = gameRoomOn || theaterOn;
+        // Backyard is lit up if backyard_state is not "off"
+        var isBackyardLit = (backyardState !== "off");
 
-        var basementClass = isBasementSleepLit ? " sleep-btn-active" : "";
+        var basementClass = isBasementLit ? " sleep-btn-active-yellow" : "";
         var kitchenClass = kitchenOn ? " sleep-btn-active-yellow" : "";
         var backyardClass = isBackyardLit ? " sleep-btn-active" : "";
 
         var h = '<div class="sleep-mode-container">';
         h += '<div class="sleep-mode-grid">';
 
-        // 1. Basement Sleep Mode
-        h += '<div class="sleep-pill-btn' + basementClass + '" role="button" onclick="toggleBasementSleepMode()">';
-        h += '<div class="sleep-pill-text">Basement<br>Sleep Mode</div>';
+        // 1. Basement
+        h += '<div class="sleep-pill-btn' + basementClass + '" role="button" onclick="toggleBasementLights()">';
+        h += '<div class="sleep-pill-text">Basement</div>';
         h += '</div>';
 
         // 2. Kitchen Lights
@@ -2784,9 +2787,9 @@
         h += '<div class="sleep-pill-text">Kitchen Lights</div>';
         h += '</div>';
 
-        // 3. Backyard Off
+        // 3. Backyard
         h += '<div class="sleep-pill-btn' + backyardClass + '" role="button" onclick="setBackyardStateOff()">';
-        h += '<div class="sleep-pill-text">Backyard Off</div>';
+        h += '<div class="sleep-pill-text">Backyard</div>';
         h += '</div>';
 
         // 4. Media Controls
@@ -6537,27 +6540,19 @@
         }
       };
 
-      window.toggleBasementSleepMode = function () {
-        var basementSelect = null;
+      window.toggleBasementLights = function () {
+        var gameRoomOn = false;
+        var theaterOn = false;
         for (var i = 0; i < lastStatesCache.length; i++) {
-          if (lastStatesCache[i].entity_id === "input_select.basement_state") {
-            basementSelect = lastStatesCache[i];
-            break;
-          }
+          var s = lastStatesCache[i];
+          if (s.entity_id === "light.game_room_overheads" && s.state === "on") gameRoomOn = true;
+          if (s.entity_id === "light.theater_overheads" && s.state === "on") theaterOn = true;
         }
-        var isSleep = basementSelect && ((basementSelect.state || "").toLowerCase() === "sleep");
-        var newOption = isSleep ? "auto" : "sleep";
-        haRequest("POST", "/api/services/input_select/select_option", {
-          entity_id: "input_select.basement_state",
-          option: newOption
-        }, function (err) {
-          if (err) {
-            showToast("Error: " + err, true);
-          } else {
-            showToast("Basement set to " + newOption);
-          }
-          setTimeout(refreshAll, 500);
-        });
+        var service = (gameRoomOn || theaterOn) ? "turn_off" : "turn_on";
+        haRequest("POST", "/api/services/light/" + service, { entity_id: "light.game_room_overheads" }, function () { });
+        haRequest("POST", "/api/services/light/" + service, { entity_id: "light.theater_overheads" }, function () { });
+        showToast("Basement lights turned " + (service === "turn_off" ? "off" : "on"));
+        setTimeout(refreshAll, 500);
       };
 
       window.setBackyardStateOff = function () {
