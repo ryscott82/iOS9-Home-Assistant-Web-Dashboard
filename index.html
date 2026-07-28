@@ -1216,6 +1216,32 @@
         font-size: 16px !important;
       }
 
+      /* Double height heater strips on mobile phone viewports (< 767px) */
+      .tile.overview-big-tile.is-heater-tile {
+        min-height: 210px !important;
+        height: auto !important;
+        padding: 16px 20px !important;
+      }
+      .tile.overview-big-tile.is-heater-tile > div {
+        -webkit-flex-direction: column !important;
+        flex-direction: column !important;
+        -webkit-align-items: center !important;
+        align-items: center !important;
+        gap: 12px !important;
+      }
+      .tile.overview-big-tile.is-heater-tile .feature-btn,
+      .tile.overview-big-tile.is-heater-tile .preset-btn {
+        height: 54px !important;
+        font-size: 20px !important;
+        padding: 0 18px !important;
+      }
+      .tile.overview-big-tile.is-heater-tile .stepper-btn {
+        height: 54px !important;
+        width: 54px !important;
+        line-height: 54px !important;
+        font-size: 26px !important;
+      }
+
       /* Mobile Controls Page Grid */
       .controls-grid {
         grid-template-columns: repeat(2, 1fr) !important;
@@ -2414,7 +2440,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.82.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.83.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -2682,18 +2708,29 @@
       }
 
       function findFeatureEntity(type) {
+        var targetId = "";
+        if (type === "waterfall") targetId = "switch.pool_waterfall";
+        else if (type === "jets") targetId = "switch.scott_jets_high";
+        else if (type === "air") targetId = "switch.hot_tub_air_blower";
+
+        if (targetId && entities[targetId]) return entities[targetId];
+
         var all = lastStatesCache || [];
         for (var i = 0; i < all.length; i++) {
-          var ent = all[i];
-          var eid = (ent.entity_id || "").toLowerCase();
-          var fname = (friendlyName(ent) || "").toLowerCase();
+          if (all[i].entity_id === targetId) return all[i];
+        }
+
+        for (var j = 0; j < all.length; j++) {
+          var e = all[j];
+          var eid = (e.entity_id || "").toLowerCase();
+          var fname = (friendlyName(e) || "").toLowerCase();
 
           if (type === "waterfall") {
-            if (eid.indexOf("waterfall") !== -1 || fname.indexOf("waterfall") !== -1) return ent;
+            if (eid.indexOf("waterfall") !== -1 || fname.indexOf("waterfall") !== -1) return e;
           } else if (type === "jets") {
-            if (eid.indexOf("jets") !== -1 || fname.indexOf("jets") !== -1 || eid.indexOf("jet") !== -1 || fname.indexOf("jet") !== -1) return ent;
+            if (eid.indexOf("scott_jets") !== -1 || eid.indexOf("jets_high") !== -1 || eid.indexOf("jets") !== -1 || fname.indexOf("jets") !== -1) return e;
           } else if (type === "air") {
-            if (eid.indexOf("air_blower") !== -1 || eid.indexOf("blower") !== -1 || fname.indexOf("air blower") !== -1 || fname.indexOf("blower") !== -1 || fname.indexOf("air") !== -1 || eid.indexOf("air") !== -1) return ent;
+            if (eid.indexOf("air_blower") !== -1 || eid.indexOf("blower") !== -1 || fname.indexOf("air blower") !== -1 || fname.indexOf("blower") !== -1) return e;
           }
         }
         return null;
@@ -2815,7 +2852,7 @@
               featureButtonsHtml = '<button class="feature-btn" style="background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
             } else if (isHotTub) {
               var jEnt = findFeatureEntity("jets");
-              var jEid = jEnt ? jEnt.entity_id : "switch.hot_tub_jets";
+              var jEid = jEnt ? jEnt.entity_id : "switch.scott_jets_high";
               var jDom = jEid.split('.')[0];
               var jOn = jEnt ? (jEnt.state === "on" || jEnt.state === "On") : false;
               var jBg = jOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
@@ -3474,7 +3511,7 @@
         // Suppress standalone waterfall, jets, and air blower tiles from general home grid
         // because they are now cleanly embedded inside the Pool & Hot Tub heater cards!
         if (eid === "switch.pool_waterfall" || fname.indexOf("waterfall") !== -1) return false;
-        if (eid === "switch.hot_tub_jets" || fname.indexOf("jets") !== -1 || fname === "jets high" || fname.indexOf("jets high") !== -1) return false;
+        if (eid === "switch.scott_jets_high" || eid === "switch.hot_tub_jets" || fname.indexOf("jets") !== -1 || fname === "jets high" || fname.indexOf("jets high") !== -1) return false;
         if (eid === "switch.hot_tub_air_blower" || fname.indexOf("air blower") !== -1 || fname === "air blower") return false;
 
         if (homeEntityIds[entity.entity_id]) return true;
