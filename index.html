@@ -1034,7 +1034,6 @@
       display: none !important;
     }
 
-    .tab-bar,
     body.tab-controls .tab-bar,
     body.tab-chemicals .tab-bar,
     body.tab-media .tab-bar {
@@ -1305,7 +1304,7 @@
     .media-page-card {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 26px;
+      border-radius: 28px;
       padding: 24px;
       margin-bottom: 24px;
       display: -webkit-flex;
@@ -1314,7 +1313,7 @@
       flex-direction: row;
       -webkit-align-items: flex-start;
       align-items: flex-start;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
       box-sizing: border-box;
     }
 
@@ -1324,95 +1323,15 @@
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
     }
 
-    /* Single Card Mode Styles (Image 2: Medium-Large Art + Volume Below Controls) */
-    .media-single-card .media-art-container {
-      width: 220px;
-      height: 220px;
-      min-width: 220px;
-      max-width: 220px;
-      border-radius: 20px;
-      margin-right: 24px;
-    }
-
-    .media-single-card .media-page-track-title {
-      font-size: 26px;
-      font-weight: 900;
-      letter-spacing: -0.5px;
-      margin-bottom: 4px;
-    }
-
-    .media-single-card .media-page-artist-name {
-      font-size: 17px;
-      font-weight: 600;
-      color: #8e8e93;
-      margin-bottom: 14px;
-    }
-
-    .media-single-card .media-page-ctrl-btn {
-      width: 48px;
-      height: 48px;
-    }
-
-    .media-single-card .media-page-play-btn {
-      width: 58px;
-      height: 58px;
-    }
-
-    /* Multi Card Mode Styles (Image 1: 1/4 Page Width Art + Volume on Right) */
-    .media-multi-card {
-      padding: 18px 20px;
-      border-radius: 22px;
-      margin-bottom: 18px;
-    }
-
-    .media-multi-card .media-art-container {
-      width: 180px;
-      height: 180px;
-      min-width: 180px;
-      max-width: 180px;
-      border-radius: 18px;
-      margin-right: 20px;
-    }
-
-    .media-multi-card .media-page-details-middle {
-      -webkit-flex: 1.2;
-      flex: 1.2;
-      min-width: 0;
-      padding-right: 20px;
-    }
-
-    .media-multi-card .media-page-details-right {
-      -webkit-flex: 1;
-      flex: 1;
-      min-width: 0;
-      border-left: 1px solid rgba(120, 120, 128, 0.15);
-      padding-left: 20px;
-    }
-
-    .media-multi-card .media-page-track-title {
-      font-size: 22px;
-      font-weight: 850;
-      margin-bottom: 4px;
-    }
-
-    .media-multi-card .media-page-artist-name {
-      font-size: 15px;
-      margin-bottom: 12px;
-    }
-
-    .media-multi-card .media-page-ctrl-btn {
-      width: 44px;
-      height: 44px;
-    }
-
-    .media-multi-card .media-page-play-btn {
-      width: 52px;
-      height: 52px;
-    }
-
     .media-page-art-container {
-      background: rgba(120, 120, 128, 0.12);
+      width: 320px;
+      height: 320px;
+      min-width: 320px;
+      max-width: 320px;
+      border-radius: 24px;
       overflow: hidden;
+      margin-right: 28px;
+      background: rgba(120, 120, 128, 0.12);
       display: -webkit-flex;
       display: flex;
       -webkit-align-items: center;
@@ -1429,6 +1348,7 @@
       height: 100%;
       object-fit: cover;
       display: block;
+      border-radius: 24px;
     }
 
     .media-page-art-placeholder {
@@ -1452,10 +1372,21 @@
     }
 
     .media-page-track-title {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: -0.6px;
       line-height: 1.15;
       color: currentColor;
+      margin-bottom: 6px;
       white-space: normal;
       word-break: break-word;
+    }
+
+    .media-page-artist-name {
+      font-size: 20px;
+      font-weight: 600;
+      color: #8e8e93;
+      margin-bottom: 18px;
     }
 
     .media-page-controls-row {
@@ -1463,11 +1394,13 @@
       display: flex;
       -webkit-align-items: center;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 16px;
+      gap: 16px;
+      margin-bottom: 20px;
     }
 
     .media-page-ctrl-btn {
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
       background: rgba(120, 120, 128, 0.16);
       border: none;
@@ -1475,25 +1408,17 @@
       cursor: pointer;
       display: -webkit-flex;
       display: flex;
-      -webkit-box-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      -webkit-box-align: center;
       -webkit-align-items: center;
       align-items: center;
-      text-align: center;
+      -webkit-justify-content: center;
+      justify-content: center;
       outline: none;
       -webkit-tap-highlight-color: transparent;
-      box-sizing: border-box;
-      padding: 0;
-    }
-
-    .media-page-ctrl-btn svg {
-      display: block;
-      margin: auto;
     }
 
     .media-page-play-btn {
+      width: 64px;
+      height: 64px;
       background: #007aff;
       color: #ffffff;
       box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
@@ -1501,7 +1426,7 @@
 
     .media-page-progress-container {
       width: 100%;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
     }
 
     .media-page-progress-bar {
@@ -2423,7 +2348,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.72.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.71.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -2898,7 +2823,7 @@
         });
       };
 
-      function renderMediaCardLayout(group, isMultiCard) {
+      function renderMediaCardLayout(group) {
         var primary = group[0] || group;
         var attrs = primary.attributes || {};
         var state = primary.state;
@@ -2928,13 +2853,10 @@
         var posStr = fmtTime(mediaPosition);
         var durStr = mediaDuration > 0 ? fmtTime(mediaDuration) : "--:--";
 
-        var cardClass = isMultiCard ? "media-page-card media-multi-card" : "media-page-card media-single-card";
-        var artClass = isMultiCard ? "media-page-art-container media-art-compact" : "media-page-art-container media-art-large";
+        var h = '<div class="media-page-card">';
 
-        var h = '<div class="' + cardClass + '">';
-
-        // LEFT COLUMN: ALBUM ART
-        h += '<div class="' + artClass + '">';
+        // LEFT COLUMN: ALBUM ART (Large rounded box)
+        h += '<div class="media-page-art-container">';
         if (artSrc) {
           h += '<img class="media-page-art" src="' + escapeHtml(artSrc) + '" alt="Album Art" />';
         } else {
@@ -2944,73 +2866,65 @@
         }
         h += '</div>';
 
-        // Playback Controls HTML block
-        var primaryEid = escapeHtml(primary.entity_id);
-        var controlsHtml = '<div class="media-page-controls-row">';
-        controlsHtml += '<div class="media-page-ctrl-btn" role="button" onclick="mediaPrevious(\'' + primaryEid + '\')" title="Previous"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></div>';
+        // RIGHT COLUMN: TRACK INFO + CONTROLS + DURATION + VOLUMES
+        h += '<div class="media-page-details">';
+
+        // Track Title & Artist
+        h += '<div class="media-page-track-title">' + title + '</div>';
+        h += '<div class="media-page-artist-name">' + artist + '</div>';
+
+        // Playback Controls (Previous, Play/Pause, Next)
+        var primaryEid = primary.entity_id;
+        h += '<div class="media-page-controls-row">';
+        h += '<button class="media-page-ctrl-btn" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>';
+
         if (isPlaying) {
-          controlsHtml += '<div class="media-page-ctrl-btn media-page-play-btn" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></div>';
+          h += '<button class="media-page-ctrl-btn media-page-play-btn" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>';
         } else {
-          controlsHtml += '<div class="media-page-ctrl-btn media-page-play-btn" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>';
+          h += '<button class="media-page-ctrl-btn media-page-play-btn" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>';
         }
-        controlsHtml += '<div class="media-page-ctrl-btn" role="button" onclick="mediaNext(\'' + primaryEid + '\')" title="Next"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></div>';
-        controlsHtml += '</div>';
 
-        // Progress Bar HTML block
-        var progressHtml = '';
+        h += '<button class="media-page-ctrl-btn" onclick="mediaNextTrack(\'' + primaryEid + '\')" title="Next"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>';
+        h += '</div>';
+
+        // Progress / Duration Bar
         if (mediaDuration > 0) {
-          progressHtml += '<div class="media-page-progress-container">';
-          progressHtml += '<div class="media-page-progress-bar"><div class="media-page-progress-fill" style="width:' + posPct + '%;"></div></div>';
-          progressHtml += '<div class="media-page-progress-times"><span>' + posStr + '</span><span>' + durStr + '</span></div>';
-          progressHtml += '</div>';
+          h += '<div class="media-page-progress-container">';
+          h += '<div class="media-page-progress-bar"><div class="media-page-progress-fill" style="width:' + posPct + '%;"></div></div>';
+          h += '<div class="media-page-progress-times"><span>' + posStr + '</span><span>' + durStr + '</span></div>';
+          h += '</div>';
         }
 
-        // Speaker Volume Controls HTML block
-        var speakersHtml = '<div class="media-page-speakers-section">';
+        // Speaker Volume Controls
+        h += '<div class="media-page-speakers-section">';
         for (var g = 0; g < group.length; g++) {
           var m = group[g];
           var mName = escapeHtml(friendlyName(m));
-          speakersHtml += '<div class="media-page-speaker-row">';
-          speakersHtml += '<div class="media-page-speaker-name">' + mName + '</div>';
-          speakersHtml += '<div class="media-page-speaker-vol">' + renderVolumeControls([m], true) + '</div>';
-          speakersHtml += '</div>';
-        }
-        speakersHtml += '</div>';
-
-        if (isMultiCard) {
-          // Multi Card Mode (Image 1): Middle = Title, Artist, Controls, Duration | Right = Volume Controls
-          h += '<div class="media-page-details-middle">';
-          h += '<div class="media-page-track-title">' + title + '</div>';
-          h += '<div class="media-page-artist-name">' + artist + '</div>';
-          h += controlsHtml;
-          h += progressHtml;
-          h += '</div>';
-
-          h += '<div class="media-page-details-right">';
-          h += speakersHtml;
-          h += '</div>';
-        } else {
-          // Single Card Mode (Image 2): Details = Title, Artist, Controls, Duration, Volume Controls Below
-          h += '<div class="media-page-details">';
-          h += '<div class="media-page-track-title">' + title + '</div>';
-          h += '<div class="media-page-artist-name">' + artist + '</div>';
-          h += controlsHtml;
-          h += progressHtml;
-          h += speakersHtml;
+          h += '<div class="media-page-speaker-row" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; align-items:flex-start; margin-bottom:12px;">';
+          h += '<div class="media-page-speaker-name" style="font-size:15px; font-weight:800; margin-bottom:4px; color:currentColor;">' + mName + '</div>';
+          h += '<div class="media-page-speaker-vol" style="width:100%; max-width:100%;">' + renderVolumeControls([m], true) + '</div>';
           h += '</div>';
         }
+        h += '</div>';
 
+        h += '</div>'; // end media-page-details
         h += '</div>'; // end media-page-card
         return h;
       }
 
       function renderMediaPage(allStates) {
-        var mediaPlayers = [];
+        var allMediaPlayers = [];
+        var taggedMediaPlayers = [];
         for (var i = 0; i < allStates.length; i++) {
           if (allStates[i].entity_id.indexOf("media_player.") === 0) {
-            mediaPlayers.push(allStates[i]);
+            allMediaPlayers.push(allStates[i]);
+            if (isIpadDashboardMedia(allStates[i])) {
+              taggedMediaPlayers.push(allStates[i]);
+            }
           }
         }
+
+        var mediaPlayers = (taggedMediaPlayers.length > 0) ? taggedMediaPlayers : allMediaPlayers;
 
         if (mediaPlayers.length === 0) {
           return '<div class="media-page-container"><div class="media-idle-section" style="text-align:center; padding:32px;"><div class="media-idle-title">No Media Players Found</div></div></div>';
@@ -3045,26 +2959,26 @@
 
         // 1. ACTIVE PLAYING / PAUSED MEDIA CARDS
         if (activeGroups.length > 0) {
-          var isMultiCard = activeGroups.length > 1;
           for (var k = 0; k < activeGroups.length; k++) {
-            h += renderMediaCardLayout(activeGroups[k], isMultiCard);
+            h += renderMediaCardLayout(activeGroups[k]);
           }
         } else {
           // If no media is active
           h += '<div class="media-idle-section" style="text-align:center; padding:36px 20px; margin-bottom:20px;">';
           h += '<div style="font-size:24px; font-weight:800; margin-bottom:6px;">🎵 No Media Playing</div>';
-          h += '<div style="font-size:15px; color:#8e8e93; font-weight:500;">Select music from your media app or Sonos to begin playback.</div>';
+          h += '<div style="font-size:15px; color:#8e8e93; font-weight:500;">Tap any speaker below to turn it on, or start playback in your media app.</div>';
           h += '</div>';
         }
 
         // 2. IDLE / STOPPED MEDIA PLAYERS AT BOTTOM
         if (idlePlayers.length > 0) {
           h += '<div class="media-idle-section">';
-          h += '<div class="media-idle-title">Idle / Off Speakers</div>';
+          h += '<div class="media-idle-title">Idle / Off Speakers (Tap to Play)</div>';
           h += '<div class="media-idle-list">';
           for (var m = 0; m < idlePlayers.length; m++) {
             var idleName = escapeHtml(friendlyName(idlePlayers[m]));
-            h += '<div class="media-idle-pill">' + idleName + '</div>';
+            var idleEid = escapeHtml(idlePlayers[m].entity_id);
+            h += '<div class="media-idle-pill" style="cursor:pointer;" onclick="mediaPlayPause(\'' + idleEid + '\')" title="Play / Power On">' + idleName + '</div>';
           }
           h += '</div>';
           h += '</div>';
@@ -3383,11 +3297,35 @@
         var labels = attrs.labels || attrs.tags || attrs.label || [];
         if (typeof labels === "string") labels = [labels];
         for (var l = 0; l < labels.length; l++) {
-          if (String(labels[l]).toLowerCase() === "ipadhomescreen") return true;
+          var lbl = String(labels[l]).toLowerCase();
+          if (lbl === "ipadhomescreen" || lbl === "ipaddashboard") return true;
         }
 
         var name = (friendlyName(entity) || "").toLowerCase();
-        if (name.indexOf("ipadhomescreen") !== -1 || eid.indexOf("ipadhomescreen") !== -1) return true;
+        if (name.indexOf("ipadhomescreen") !== -1 || eid.indexOf("ipadhomescreen") !== -1 ||
+            name.indexOf("ipaddashboard") !== -1 || eid.indexOf("ipaddashboard") !== -1) return true;
+
+        return false;
+      }
+
+      function isIpadDashboardMedia(entity) {
+        if (!entity || !entity.entity_id) return false;
+        var eid = entity.entity_id;
+        if (homeEntityIds[eid]) return true;
+
+        var attrs = entity.attributes || {};
+        var labels = attrs.labels || attrs.tags || attrs.label || [];
+        if (typeof labels === "string") labels = [labels];
+        for (var l = 0; l < labels.length; l++) {
+          var lbl = String(labels[l]).toLowerCase();
+          if (lbl === "ipaddashboard" || lbl === "ipadhomescreen") return true;
+        }
+
+        var name = (friendlyName(entity) || "").toLowerCase();
+        if (name.indexOf("ipaddashboard") !== -1 || eid.indexOf("ipaddashboard") !== -1 ||
+            name.indexOf("ipadhomescreen") !== -1 || eid.indexOf("ipadhomescreen") !== -1) {
+          return true;
+        }
 
         return false;
       }
@@ -5837,6 +5775,26 @@
         }
       };
 
+      window.mediaNextTrack = function (entityId) {
+        haRequest("POST", "/api/services/media_player/media_next_track", {
+          entity_id: entityId
+        }, function (err) {
+          if (err) showToast("Error skipping track: " + err, true);
+          setTimeout(refreshAll, 600);
+          setTimeout(refreshAll, 2000);
+        });
+      };
+
+      window.mediaPrevTrack = function (entityId) {
+        haRequest("POST", "/api/services/media_player/media_previous_track", {
+          entity_id: entityId
+        }, function (err) {
+          if (err) showToast("Error going to previous track: " + err, true);
+          setTimeout(refreshAll, 600);
+          setTimeout(refreshAll, 2000);
+        });
+      };
+
       function getGroupTrackInfo(group) {
         var primary = group[0];
         var now = Date.now();
@@ -6027,23 +5985,6 @@
           if (err) showToast("Error: " + err, true);
           setTimeout(refreshAll, 1000);
           setTimeout(refreshAll, 3000);
-        });
-      };
-
-      window.mediaPlayPause = function (entityId) {
-        for (var i = 0; i < lastStatesCache.length; i++) {
-          if (lastStatesCache[i].entity_id === entityId) {
-            lastStatesCache[i].state = (lastStatesCache[i].state === "playing") ? "paused" : "playing";
-            break;
-          }
-        }
-        if (lastStatesCache.length > 0) renderDashboard(lastStatesCache);
-
-        haRequest("POST", "/api/services/media_player/media_play_pause", {
-          entity_id: entityId
-        }, function (err) {
-          if (err) showToast("Error: " + err, true);
-          setTimeout(refreshAll, 800);
         });
       };
 
