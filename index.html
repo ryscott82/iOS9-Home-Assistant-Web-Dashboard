@@ -2390,7 +2390,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.78.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.79.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -2777,8 +2777,10 @@
             stateControlHtml += '</div>';
             stateControlHtml += '<button class="thermostat-btn" style="width:52px; height:52px; line-height:52px; font-size:28px; font-weight:850; margin:0; border-radius:12px;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', 1)">+</button>';
 
-            // Embedded feature buttons inside pool & hot tub heater strips (middle section, no icons, 22px text)
+            // Embedded feature buttons inside pool & hot tub heater strips (middle section, no icons, 22px text, spacious fitting)
             var featureButtonsHtml = "";
+            var btnStyle = "height:54px; padding:0 26px; font-size:22px; font-weight:850; border-radius:12px; white-space:nowrap; -webkit-flex-shrink:0; flex-shrink:0; display:-webkit-inline-flex; display:inline-flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer;";
+
             if (isPool) {
               var wfEnt = findFeatureEntity("waterfall");
               var wfEid = wfEnt ? wfEnt.entity_id : "switch.pool_waterfall";
@@ -2787,7 +2789,7 @@
               var wfBg = wfOn ? "rgba(10,132,255,0.28)" : "rgba(120,120,128,0.14)";
               var wfBorder = wfOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.3)";
               var wfColor = wfOn ? "#0a84ff" : "currentColor";
-              featureButtonsHtml = '<button class="thermostat-btn" style="height:52px; padding:0 22px; font-size:22px; font-weight:850; border-radius:12px; background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
+              featureButtonsHtml = '<button class="thermostat-btn" style="' + btnStyle + ' background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + '; margin:0;" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
             } else if (isHotTub) {
               var jEnt = findFeatureEntity("jets");
               var jEid = jEnt ? jEnt.entity_id : "switch.hot_tub_jets";
@@ -2796,7 +2798,7 @@
               var jBg = jOn ? "rgba(10,132,255,0.28)" : "rgba(120,120,128,0.14)";
               var jBorder = jOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.3)";
               var jColor = jOn ? "#0a84ff" : "currentColor";
-              featureButtonsHtml += '<button class="thermostat-btn" style="height:52px; padding:0 22px; font-size:22px; font-weight:850; border-radius:12px; background:' + jBg + '; border:' + jBorder + '; color:' + jColor + '; cursor:pointer; margin-right:10px;" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">Jets</button>';
+              featureButtonsHtml += '<button class="thermostat-btn" style="' + btnStyle + ' background:' + jBg + '; border:' + jBorder + '; color:' + jColor + '; margin-right:12px;" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">Jets</button>';
 
               var aEnt = findFeatureEntity("air");
               var aEid = aEnt ? aEnt.entity_id : "switch.hot_tub_air_blower";
@@ -2805,7 +2807,7 @@
               var aBg = aOn ? "rgba(10,132,255,0.28)" : "rgba(120,120,128,0.14)";
               var aBorder = aOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.3)";
               var aColor = aOn ? "#0a84ff" : "currentColor";
-              featureButtonsHtml += '<button class="thermostat-btn" style="height:52px; padding:0 22px; font-size:22px; font-weight:850; border-radius:12px; background:' + aBg + '; border:' + aBorder + '; color:' + aColor + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); toggleEntity(\'' + aEid + '\', \'' + aDom + '\')" title="Toggle Air Blower">Air</button>';
+              featureButtonsHtml += '<button class="thermostat-btn" style="' + btnStyle + ' background:' + aBg + '; border:' + aBorder + '; color:' + aColor + '; margin:0;" onclick="event.stopPropagation(); toggleEntity(\'' + aEid + '\', \'' + aDom + '\')" title="Toggle Air Blower">Air</button>';
             }
 
             stateControlHtml += '</div>';
@@ -2826,14 +2828,21 @@
 
         var h = '<div class="tile overview-big-tile' + activeClass + heaterTileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer; ' + widthStyle + '">';
         h += '<div class="heater-card-container" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%; -webkit-justify-content:space-between; justify-content:space-between;">';
-        h += '<div class="heater-left-info" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        
+        // LEFT: Icon + Title
+        h += '<div class="heater-left-info" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-flex:1 1 0%; flex:1 1 0%; min-width:0; text-align:left;">';
         h += '<div class="tile-icon" style="width:58px; height:58px; margin-right:10px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div class="tile-name" style="font-size:' + titleFontSize + '; font-weight:850; white-space:normal; word-break:break-word; line-height:' + titleLineHeight + '; max-height:2.3em; overflow:hidden; letter-spacing:-0.8px;">' + name + '</div>';
         h += '</div>';
+
+        // MIDDLE: Feature buttons (Waterfall, Jets, Air) - PERFECTLY CENTERED
         if (featureButtonsHtml) {
-          h += '<div class="heater-middle-buttons" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin:0 16px; -webkit-flex-shrink:0; flex-shrink:0;">' + featureButtonsHtml + '</div>';
+          h += '<div class="heater-middle-buttons" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-box-pack:center; -webkit-justify-content:center; justify-content:center; margin:0 auto; padding:0 12px; -webkit-flex-shrink:0; flex-shrink:0; text-align:center;">' + featureButtonsHtml + '</div>';
         }
-        h += stateControlHtml;
+
+        // RIGHT: Presets + Stepper
+        h += '<div class="heater-right-controls" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-box-pack:end; -webkit-justify-content:flex-end; justify-content:flex-end; -webkit-flex:1 1 0%; flex:1 1 0%; gap:6px; margin-left:auto; -webkit-flex-shrink:0; flex-shrink:0;">' + stateControlHtml + '</div>';
+
         h += '</div>';
         h += '</div>';
         return h;
