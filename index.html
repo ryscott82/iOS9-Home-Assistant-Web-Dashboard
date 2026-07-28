@@ -2361,7 +2361,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.73.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.74.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -2842,31 +2842,35 @@
         var state = primary.state;
         var isPlaying = (state === "playing");
 
-        // Dynamic scaling parameters based on active card count to fit screen without scrolling
-        var artSize = 360;
-        var titleSize = "34px";
-        var artistSize = "20px";
-        var cardPadding = "26px";
-        var cardMarginBottom = "24px";
-        var ctrlBtnSize = 56;
-        var playBtnSize = 68;
+        // UI Scaling tailored for iPad Mini 1st Gen (1024x768 landscape)
+        // 1 active album: Giant 480px album art & 44px text filling 100% of screen height
+        var artSize = 480;
+        var titleSize = "44px";
+        var artistSize = "26px";
+        var cardPadding = "28px";
+        var cardMarginBottom = "80px"; // Pushes idle speakers & footer below the fold
+        var ctrlBtnSize = 64;
+        var playBtnSize = 80;
+        var speakerTitleSize = "18px";
 
         if (cardCount === 2) {
-          artSize = 210;
-          titleSize = "24px";
-          artistSize = "16px";
+          artSize = 240;
+          titleSize = "26px";
+          artistSize = "18px";
           cardPadding = "16px";
-          cardMarginBottom = "14px";
-          ctrlBtnSize = 46;
-          playBtnSize = 54;
+          cardMarginBottom = "16px";
+          ctrlBtnSize = 48;
+          playBtnSize = 58;
+          speakerTitleSize = "15px";
         } else if (cardCount >= 3) {
-          artSize = 140;
+          artSize = 160;
           titleSize = "20px";
           artistSize = "14px";
           cardPadding = "12px";
-          cardMarginBottom = "10px";
+          cardMarginBottom = "12px";
           ctrlBtnSize = 40;
-          playBtnSize = 46;
+          playBtnSize = 48;
+          speakerTitleSize = "14px";
         }
 
         // Media Info
@@ -2960,7 +2964,7 @@
           var mName = escapeHtml(friendlyName(m));
           var spkMarginBottom = (cardCount >= 2) ? '6px' : '12px';
           h += '<div class="media-page-speaker-row" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; align-items:flex-start; margin-bottom:' + spkMarginBottom + ';">';
-          h += '<div class="media-page-speaker-name" style="font-size:14px; font-weight:800; margin-bottom:2px; color:currentColor;">' + mName + '</div>';
+          h += '<div class="media-page-speaker-name" style="font-size:' + speakerTitleSize + '; font-weight:800; margin-bottom:4px; color:currentColor;">' + mName + '</div>';
           h += '<div class="media-page-speaker-vol" style="width:100%; max-width:100%;">' + renderVolumeControls([m], true) + '</div>';
           h += '</div>';
         }
