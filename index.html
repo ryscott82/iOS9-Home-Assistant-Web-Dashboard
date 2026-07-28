@@ -2361,7 +2361,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.75.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.76.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -2749,34 +2749,35 @@
             stateControlHtml += '</div>';
             stateControlHtml += '<button class="thermostat-btn" style="width:48px; height:48px; line-height:48px; font-size:26px; font-weight:850; margin:0; border-radius:10px;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', 1)">+</button>';
 
-            // Embedded feature buttons inside pool & hot tub heater strips
+            // Embedded feature buttons inside pool & hot tub heater strips (middle section, no icons, 18px text)
+            var featureButtonsHtml = "";
             if (isPool) {
               var wfEnt = findFeatureEntity("waterfall");
               var wfEid = wfEnt ? wfEnt.entity_id : "switch.pool_waterfall";
               var wfDom = wfEid.split('.')[0];
               var wfOn = wfEnt ? (wfEnt.state === "on" || wfEnt.state === "On") : false;
-              var wfBg = wfOn ? "rgba(10,132,255,0.28)" : "rgba(120,120,128,0.12)";
-              var wfBorder = wfOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.25)";
+              var wfBg = wfOn ? "rgba(10,132,255,0.28)" : "rgba(120,120,128,0.14)";
+              var wfBorder = wfOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.3)";
               var wfColor = wfOn ? "#0a84ff" : "currentColor";
-              stateControlHtml += '<button class="thermostat-btn" style="height:48px; padding:0 14px; font-size:16px; font-weight:850; border-radius:10px; background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + '; cursor:pointer; margin-left:8px;" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">🌊 Waterfall</button>';
+              featureButtonsHtml = '<button class="thermostat-btn" style="height:48px; padding:0 18px; font-size:18px; font-weight:850; border-radius:10px; background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
             } else if (isHotTub) {
               var jEnt = findFeatureEntity("jets");
               var jEid = jEnt ? jEnt.entity_id : "switch.hot_tub_jets";
               var jDom = jEid.split('.')[0];
               var jOn = jEnt ? (jEnt.state === "on" || jEnt.state === "On") : false;
-              var jBg = jOn ? "rgba(10,132,255,0.28)" : "rgba(120,120,128,0.12)";
-              var jBorder = jOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.25)";
+              var jBg = jOn ? "rgba(10,132,255,0.28)" : "rgba(120,120,128,0.14)";
+              var jBorder = jOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.3)";
               var jColor = jOn ? "#0a84ff" : "currentColor";
-              stateControlHtml += '<button class="thermostat-btn" style="height:48px; padding:0 14px; font-size:16px; font-weight:850; border-radius:10px; background:' + jBg + '; border:' + jBorder + '; color:' + jColor + '; cursor:pointer; margin-left:8px;" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">🌀 Jets</button>';
+              featureButtonsHtml += '<button class="thermostat-btn" style="height:48px; padding:0 18px; font-size:18px; font-weight:850; border-radius:10px; background:' + jBg + '; border:' + jBorder + '; color:' + jColor + '; cursor:pointer; margin-right:8px;" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">Jets</button>';
 
               var aEnt = findFeatureEntity("air");
               var aEid = aEnt ? aEnt.entity_id : "switch.hot_tub_air_blower";
               var aDom = aEid.split('.')[0];
               var aOn = aEnt ? (aEnt.state === "on" || aEnt.state === "On") : false;
-              var aBg = aOn ? "rgba(10,132,255,0.28)" : "rgba(120,120,128,0.12)";
-              var aBorder = aOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.25)";
+              var aBg = aOn ? "rgba(10,132,255,0.28)" : "rgba(120,120,128,0.14)";
+              var aBorder = aOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.3)";
               var aColor = aOn ? "#0a84ff" : "currentColor";
-              stateControlHtml += '<button class="thermostat-btn" style="height:48px; padding:0 14px; font-size:16px; font-weight:850; border-radius:10px; background:' + aBg + '; border:' + aBorder + '; color:' + aColor + '; cursor:pointer; margin-left:6px;" onclick="event.stopPropagation(); toggleEntity(\'' + aEid + '\', \'' + aDom + '\')" title="Toggle Air Blower">💨 Air</button>';
+              featureButtonsHtml += '<button class="thermostat-btn" style="height:48px; padding:0 18px; font-size:18px; font-weight:850; border-radius:10px; background:' + aBg + '; border:' + aBorder + '; color:' + aColor + '; cursor:pointer; margin:0;" onclick="event.stopPropagation(); toggleEntity(\'' + aEid + '\', \'' + aDom + '\')" title="Toggle Air Blower">Air</button>';
             }
 
             stateControlHtml += '</div>';
@@ -2800,6 +2801,9 @@
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
         h += '<div class="tile-name" style="font-size:' + titleFontSize + '; font-weight:850; white-space:normal; word-break:break-word; line-height:' + titleLineHeight + '; max-height:2.3em; overflow:hidden; letter-spacing:-0.8px;">' + name + '</div>';
         h += '</div>';
+        if (featureButtonsHtml) {
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin:0 16px; -webkit-flex-shrink:0; flex-shrink:0;">' + featureButtonsHtml + '</div>';
+        }
         h += stateControlHtml;
         h += '</div>';
         h += '</div>';
