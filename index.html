@@ -1270,11 +1270,15 @@
       .tile.overview-big-tile.is-heater-tile .chem-alert-btn {
         height: 48px !important;
         width: 48px !important;
+        background: #ff3b30 !important;
+        color: #ffffff !important;
         border-radius: 12px !important;
       }
       .tile.overview-big-tile.is-heater-tile .chem-alert-btn svg {
         width: 22px !important;
         height: 22px !important;
+        stroke: #ffffff !important;
+        color: #ffffff !important;
       }
 
       .tile.overview-big-tile.is-heater-tile .stepper-btn {
@@ -2482,7 +2486,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.90.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.91.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="allOffToggleBtn" onclick="toggleAllOffButtonOverride()" title="Test All Off Button">🌙 Test All Off</button>
@@ -2897,8 +2901,8 @@
                 }
               }
               if (hasRedChem) {
-                var beakerSvg = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block; margin:auto;"><path d="M10 2v7.5L4.5 19.5A2 2 0 0 0 6.2 22h11.6a2 2 0 0 0 1.7-2.5L14 9.5V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>';
-                chemBeakerBtnHtml = '<button class="chem-alert-btn" onclick="event.stopPropagation(); switchTab(\'chemicals\')" title="Chemicals Out of Range - View Log" style="height:68px; width:68px; background:rgba(255,59,48,0.22); border:2px solid #ff3b30; color:#ff453a; border-radius:16px; display:-webkit-inline-flex; display:inline-flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; margin-right:12px !important; border:none; -webkit-appearance:none; box-sizing:border-box;">' + beakerSvg + '</button>';
+                var beakerSvg = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; margin:auto; color:#ffffff;"><path d="M10 2v7.5L4.5 19.5A2 2 0 0 0 6.2 22h11.6a2 2 0 0 0 1.7-2.5L14 9.5V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>';
+                chemBeakerBtnHtml = '<button class="chem-alert-btn" onclick="event.stopPropagation(); switchTab(\'chemicals\')" title="Chemicals Out of Range - View Log" style="height:68px; width:68px; background:#ff3b30; color:#ffffff; border-radius:16px; display:-webkit-inline-flex; display:inline-flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; margin-right:12px !important; border:none; -webkit-appearance:none; box-sizing:border-box; box-shadow:0 4px 12px rgba(255,59,48,0.45);">' + beakerSvg + '</button>';
               }
             }
 
