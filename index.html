@@ -1267,6 +1267,16 @@
         border-radius: 12px !important;
       }
 
+      .tile.overview-big-tile.is-heater-tile .chem-alert-btn {
+        height: 48px !important;
+        width: 48px !important;
+        border-radius: 12px !important;
+      }
+      .tile.overview-big-tile.is-heater-tile .chem-alert-btn svg {
+        width: 22px !important;
+        height: 22px !important;
+      }
+
       .tile.overview-big-tile.is-heater-tile .stepper-btn {
         height: 48px !important;
         width: 48px !important;
@@ -2444,15 +2454,14 @@
   </div>
 
   <!-- APP -->
-  <main class="app-content" id="appContent" style="display:none; padding-top: 30px;">
+  <main class="app-content" id="appContent" style="display:none; padding-top: 0px;">
 
     <!-- UNIFIED HEADER (Top Left: Welcome Message | Top Right: Date/Time + 3-Line Hamburger Menu Button) -->
-    <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-bottom:14px; padding:0 4px;">
+    <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-top:4px; margin-bottom:12px; padding:0 4px;">
       <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:48px; font-weight:850; white-space:normal; word-break:break-word; line-height:1.05; padding-right:12px; letter-spacing:-0.8px;">Welcome Home</div>
       <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; -webkit-flex-shrink:0; flex-shrink:0;">
         <div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:flex-end; align-items:flex-end;">
           <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:20px; font-weight:700; white-space:nowrap;"></div>
-          <div id="headerChemBanner" onclick="switchTab('chemicals')" style="display:none; cursor:pointer; margin-top:2px; font-size:11.5px; font-weight:700; color:#ff3b30; background:rgba(255,59,48,0.12); border:1px solid rgba(255,59,48,0.35); padding:2px 8px; border-radius:6px; white-space:nowrap;">Check Chemicals</div>
         </div>
         <button id="headerNavBtn" class="menu-icon-btn" onclick="toggleMainNavigation(event)" title="Menu" style="width:48px; height:48px; border-radius:12px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0; box-sizing:border-box; text-align:center;">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
@@ -2473,7 +2482,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.89.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.90.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="allOffToggleBtn" onclick="toggleAllOffButtonOverride()" title="Test All Off Button">🌙 Test All Off</button>
@@ -2875,6 +2884,24 @@
             // Embedded feature buttons inside pool & hot tub heater strips (single row layout, spacious buttons)
             var featureButtonsHtml = "";
 
+            // Check if this pool/hottub has chemical recommendations out of range
+            var chemContext = isHotTub ? "hottub" : (isPool ? "pool" : "");
+            var chemBeakerBtnHtml = "";
+            if (chemContext) {
+              var recs = getRecommendationsData(lastStatesCache || [], chemContext);
+              var hasRedChem = false;
+              for (var rc = 0; rc < recs.length; rc++) {
+                if (recs[rc].severity === "red") {
+                  hasRedChem = true;
+                  break;
+                }
+              }
+              if (hasRedChem) {
+                var beakerSvg = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block; margin:auto;"><path d="M10 2v7.5L4.5 19.5A2 2 0 0 0 6.2 22h11.6a2 2 0 0 0 1.7-2.5L14 9.5V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>';
+                chemBeakerBtnHtml = '<button class="chem-alert-btn" onclick="event.stopPropagation(); switchTab(\'chemicals\')" title="Chemicals Out of Range - View Log" style="height:68px; width:68px; background:rgba(255,59,48,0.22); border:2px solid #ff3b30; color:#ff453a; border-radius:16px; display:-webkit-inline-flex; display:inline-flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; margin-right:12px !important; border:none; -webkit-appearance:none; box-sizing:border-box;">' + beakerSvg + '</button>';
+              }
+            }
+
             if (isPool) {
               var wfEnt = findFeatureEntity("waterfall");
               var wfEid = wfEnt ? wfEnt.entity_id : "switch.pool_waterfall";
@@ -2883,7 +2910,7 @@
               var wfBg = wfOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
               var wfBorder = wfOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
               var wfColor = wfOn ? "#0a84ff" : "currentColor";
-              featureButtonsHtml = '<button class="feature-btn" style="background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
+              featureButtonsHtml = chemBeakerBtnHtml + '<button class="feature-btn" style="background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
             } else if (isHotTub) {
               var jEnt = findFeatureEntity("jets");
               var jEid = jEnt ? jEnt.entity_id : "switch.scott_jets_high";
@@ -2892,7 +2919,7 @@
               var jBg = jOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
               var jBorder = jOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
               var jColor = jOn ? "#0a84ff" : "currentColor";
-              featureButtonsHtml += '<button class="feature-btn" style="background:' + jBg + '; border:' + jBorder + '; color:' + jColor + '; margin-right:12px !important;" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">Jets</button>';
+              featureButtonsHtml = chemBeakerBtnHtml + '<button class="feature-btn" style="background:' + jBg + '; border:' + jBorder + '; color:' + jColor + '; margin-right:12px !important;" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">Jets</button>';
 
               var aEnt = findFeatureEntity("air");
               var aEid = aEnt ? aEnt.entity_id : "switch.hot_tub_air_blower";
