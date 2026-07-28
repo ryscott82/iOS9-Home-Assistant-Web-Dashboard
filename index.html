@@ -1203,6 +1203,10 @@
       }
 
       /* Responsive text scaling & shorter cards on Mobile (< 767px) */
+      .header-welcome {
+        font-size: 32px !important;
+      }
+
       .tile.overview-big-tile {
         height: 76px !important;
         min-height: 76px !important;
@@ -2444,7 +2448,7 @@
 
     <!-- UNIFIED HEADER (Top Left: Welcome Message | Top Right: Date/Time + 3-Line Hamburger Menu Button) -->
     <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-bottom:14px; padding:0 4px;">
-      <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:28px; font-weight:800; white-space:normal; word-break:break-word; line-height:1.1; padding-right:12px;">Welcome Home</div>
+      <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:48px; font-weight:850; white-space:normal; word-break:break-word; line-height:1.05; padding-right:12px; letter-spacing:-0.8px;">Welcome Home</div>
       <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; -webkit-flex-shrink:0; flex-shrink:0;">
         <div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:flex-end; align-items:flex-end;">
           <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:20px; font-weight:700; white-space:nowrap;"></div>
@@ -2469,7 +2473,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.87.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.88.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="allOffToggleBtn" onclick="toggleAllOffButtonOverride()" title="Test All Off Button">🌙 Test All Off</button>
@@ -2553,7 +2557,9 @@
       window.switchTab = function (tabName) {
         activeTab = tabName;
         applyTabClass(tabName);
-        renderApp();
+        if (lastStatesCache && lastStatesCache.length > 0) {
+          renderDashboard(lastStatesCache);
+        }
       };
 
       window.toggleMainNavigation = function (e) {
