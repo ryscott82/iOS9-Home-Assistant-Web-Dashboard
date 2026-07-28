@@ -1392,15 +1392,23 @@
     .media-page-controls-row {
       display: -webkit-flex;
       display: flex;
+      -webkit-box-pack: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      -webkit-box-align: center;
       -webkit-align-items: center;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
+      width: 100%;
+      margin: 10px auto 20px auto;
+      text-align: center !important;
     }
 
     .media-page-ctrl-btn {
-      width: 52px;
-      height: 52px;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 56px;
+      height: 56px;
+      margin: 0 12px;
       border-radius: 50%;
       background: rgba(120, 120, 128, 0.16);
       border: none;
@@ -1408,20 +1416,25 @@
       cursor: pointer;
       display: -webkit-flex;
       display: flex;
-      -webkit-align-items: center;
-      align-items: center;
+      -webkit-box-pack: center;
       -webkit-justify-content: center;
       justify-content: center;
+      -webkit-box-align: center;
+      -webkit-align-items: center;
+      align-items: center;
       outline: none;
+      padding: 0;
       -webkit-tap-highlight-color: transparent;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
     }
 
     .media-page-play-btn {
-      width: 64px;
-      height: 64px;
+      width: 68px;
+      height: 68px;
       background: #007aff;
       color: #ffffff;
-      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
+      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.4);
     }
 
     .media-page-progress-container {
@@ -2348,7 +2361,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.71.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.72.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -2876,15 +2889,23 @@
         // Playback Controls (Previous, Play/Pause, Next)
         var primaryEid = primary.entity_id;
         h += '<div class="media-page-controls-row">';
-        h += '<button class="media-page-ctrl-btn" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>';
+        h += '<div class="media-page-ctrl-btn" role="button" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous">';
+        h += '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+        h += '</div>';
 
         if (isPlaying) {
-          h += '<button class="media-page-ctrl-btn media-page-play-btn" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>';
+          h += '<div class="media-page-ctrl-btn media-page-play-btn" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause">';
+          h += '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+          h += '</div>';
         } else {
-          h += '<button class="media-page-ctrl-btn media-page-play-btn" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>';
+          h += '<div class="media-page-ctrl-btn media-page-play-btn" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play">';
+          h += '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M8 5v14l11-7z"/></svg>';
+          h += '</div>';
         }
 
-        h += '<button class="media-page-ctrl-btn" onclick="mediaNextTrack(\'' + primaryEid + '\')" title="Next"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>';
+        h += '<div class="media-page-ctrl-btn" role="button" onclick="mediaNextTrack(\'' + primaryEid + '\')" title="Next">';
+        h += '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+        h += '</div>';
         h += '</div>';
 
         // Progress / Duration Bar
