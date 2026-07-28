@@ -2473,7 +2473,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.88.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.89.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="allOffToggleBtn" onclick="toggleAllOffButtonOverride()" title="Test All Off Button">🌙 Test All Off</button>
@@ -3941,16 +3941,6 @@
             } else {
               chemBanner.style.display = "none";
             }
-          }
-          if (headerWelcomeEl) {
-            headerWelcomeEl.style.fontSize = "";
-            headerWelcomeEl.style.fontWeight = "";
-            headerWelcomeEl.style.letterSpacing = "";
-          }
-          if (headerDateTimeEl) {
-            headerDateTimeEl.style.fontSize = "";
-            headerDateTimeEl.style.fontWeight = "";
-            headerDateTimeEl.style.letterSpacing = "";
           }
           if (navBtn) navBtn.style.display = "";
           updateClock();
@@ -6812,32 +6802,14 @@
       };
 
       window.switchTab = function (tabName) {
-        if (tabName === "home") {
-          sleepModeDismissedToNormalHome = true;
-        } else {
-          sleepModeDismissedToNormalHome = true;
-        }
         activeTab = tabName;
+        applyTabClass(tabName);
         try { localStorage.setItem("ha_active_tab", tabName); } catch (e) { }
 
-        // Immediately shrink header fonts when clicking off Sleep Mode page
-        var hWelcome = document.getElementById("headerWelcome");
-        var hDateTime = document.getElementById("headerDateTime");
-        var hNavBtn = document.getElementById("headerNavBtn");
-        if (hWelcome) {
-          hWelcome.style.fontSize = "28px";
-          hWelcome.style.fontWeight = "800";
-          hWelcome.style.letterSpacing = "";
-        }
-        if (hDateTime) {
-          hDateTime.style.fontSize = "20px";
-          hDateTime.style.fontWeight = "700";
-          hDateTime.style.letterSpacing = "";
-        }
-        if (hNavBtn) hNavBtn.style.display = "";
-
-        if (lastStatesCache.length > 0) {
+        if (lastStatesCache && lastStatesCache.length > 0) {
           renderDashboard(lastStatesCache);
+        } else {
+          refreshAll();
         }
       };
 
