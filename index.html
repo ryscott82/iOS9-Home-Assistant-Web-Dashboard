@@ -2361,7 +2361,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.72.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.73.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="sleepToggleBtn" onclick="toggleSleepOverride()" title="Test Sleep Mode">😴 Sleep Mode</button>
@@ -2836,11 +2836,38 @@
         });
       };
 
-      function renderMediaCardLayout(group) {
+      function renderMediaCardLayout(group, cardCount) {
         var primary = group[0] || group;
         var attrs = primary.attributes || {};
         var state = primary.state;
         var isPlaying = (state === "playing");
+
+        // Dynamic scaling parameters based on active card count to fit screen without scrolling
+        var artSize = 360;
+        var titleSize = "34px";
+        var artistSize = "20px";
+        var cardPadding = "26px";
+        var cardMarginBottom = "24px";
+        var ctrlBtnSize = 56;
+        var playBtnSize = 68;
+
+        if (cardCount === 2) {
+          artSize = 210;
+          titleSize = "24px";
+          artistSize = "16px";
+          cardPadding = "16px";
+          cardMarginBottom = "14px";
+          ctrlBtnSize = 46;
+          playBtnSize = 54;
+        } else if (cardCount >= 3) {
+          artSize = 140;
+          titleSize = "20px";
+          artistSize = "14px";
+          cardPadding = "12px";
+          cardMarginBottom = "10px";
+          ctrlBtnSize = 40;
+          playBtnSize = 46;
+        }
 
         // Media Info
         var title = escapeHtml(attrs.media_title || attrs.friendly_name || "No Track Selected");
@@ -2866,63 +2893,74 @@
         var posStr = fmtTime(mediaPosition);
         var durStr = mediaDuration > 0 ? fmtTime(mediaDuration) : "--:--";
 
-        var h = '<div class="media-page-card">';
+        var h = '<div class="media-page-card" style="padding:' + cardPadding + '; margin-bottom:' + cardMarginBottom + ';">';
 
-        // LEFT COLUMN: ALBUM ART (Large rounded box)
-        h += '<div class="media-page-art-container">';
+        // LEFT COLUMN: ALBUM ART (Scales dynamically)
+        var artStyle = 'width:' + artSize + 'px; height:' + artSize + 'px; min-width:' + artSize + 'px; max-width:' + artSize + 'px;';
+        h += '<div class="media-page-art-container" style="' + artStyle + '">';
         if (artSrc) {
           h += '<img class="media-page-art" src="' + escapeHtml(artSrc) + '" alt="Album Art" />';
         } else {
+          var iconSize = Math.round(artSize * 0.25);
           h += '<div class="media-page-art-placeholder">';
-          h += '<svg width="64" height="64" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>';
+          h += '<svg width="' + iconSize + '" height="' + iconSize + '" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>';
           h += '</div>';
         }
         h += '</div>';
 
-        // RIGHT COLUMN: TRACK INFO + CONTROLS + DURATION + VOLUMES
+        // RIGHT COLUMN: DETAILS
         h += '<div class="media-page-details">';
 
         // Track Title & Artist
-        h += '<div class="media-page-track-title">' + title + '</div>';
-        h += '<div class="media-page-artist-name">' + artist + '</div>';
+        h += '<div class="media-page-track-title" style="font-size:' + titleSize + ';">' + title + '</div>';
+        h += '<div class="media-page-artist-name" style="font-size:' + artistSize + ';">' + artist + '</div>';
 
-        // Playback Controls (Previous, Play/Pause, Next)
+        // Playback Controls
         var primaryEid = primary.entity_id;
-        h += '<div class="media-page-controls-row">';
-        h += '<div class="media-page-ctrl-btn" role="button" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous">';
-        h += '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+        var ctrlBtnStyle = 'width:' + ctrlBtnSize + 'px; height:' + ctrlBtnSize + 'px; margin: 0 10px;';
+        var playBtnStyle = 'width:' + playBtnSize + 'px; height:' + playBtnSize + 'px; margin: 0 10px;';
+        var prevNextSvgSize = Math.round(ctrlBtnSize * 0.46);
+        var playSvgSize = Math.round(playBtnSize * 0.48);
+
+        var ctrlRowMargin = (cardCount >= 3) ? '2px auto 6px auto' : ((cardCount === 2) ? '4px auto 10px auto' : '6px auto 14px auto');
+        h += '<div class="media-page-controls-row" style="margin:' + ctrlRowMargin + ';">';
+        h += '<div class="media-page-ctrl-btn" style="' + ctrlBtnStyle + '" role="button" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous">';
+        h += '<svg width="' + prevNextSvgSize + '" height="' + prevNextSvgSize + '" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
         h += '</div>';
 
         if (isPlaying) {
-          h += '<div class="media-page-ctrl-btn media-page-play-btn" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause">';
-          h += '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+          h += '<div class="media-page-ctrl-btn media-page-play-btn" style="' + playBtnStyle + '" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause">';
+          h += '<svg width="' + playSvgSize + '" height="' + playSvgSize + '" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
           h += '</div>';
         } else {
-          h += '<div class="media-page-ctrl-btn media-page-play-btn" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play">';
-          h += '<svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M8 5v14l11-7z"/></svg>';
+          h += '<div class="media-page-ctrl-btn media-page-play-btn" style="' + playBtnStyle + '" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play">';
+          h += '<svg width="' + playSvgSize + '" height="' + playSvgSize + '" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M8 5v14l11-7z"/></svg>';
           h += '</div>';
         }
 
-        h += '<div class="media-page-ctrl-btn" role="button" onclick="mediaNextTrack(\'' + primaryEid + '\')" title="Next">';
-        h += '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+        h += '<div class="media-page-ctrl-btn" style="' + ctrlBtnStyle + '" role="button" onclick="mediaNextTrack(\'' + primaryEid + '\')" title="Next">';
+        h += '<svg width="' + prevNextSvgSize + '" height="' + prevNextSvgSize + '" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
         h += '</div>';
         h += '</div>';
 
         // Progress / Duration Bar
         if (mediaDuration > 0) {
-          h += '<div class="media-page-progress-container">';
+          var progMarginBottom = (cardCount >= 2) ? '10px' : '20px';
+          h += '<div class="media-page-progress-container" style="margin-bottom:' + progMarginBottom + ';">';
           h += '<div class="media-page-progress-bar"><div class="media-page-progress-fill" style="width:' + posPct + '%;"></div></div>';
           h += '<div class="media-page-progress-times"><span>' + posStr + '</span><span>' + durStr + '</span></div>';
           h += '</div>';
         }
 
         // Speaker Volume Controls
-        h += '<div class="media-page-speakers-section">';
+        var spkPaddingTop = (cardCount >= 3) ? '6px' : ((cardCount === 2) ? '8px' : '14px');
+        h += '<div class="media-page-speakers-section" style="padding-top:' + spkPaddingTop + ';">';
         for (var g = 0; g < group.length; g++) {
           var m = group[g];
           var mName = escapeHtml(friendlyName(m));
-          h += '<div class="media-page-speaker-row" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; align-items:flex-start; margin-bottom:12px;">';
-          h += '<div class="media-page-speaker-name" style="font-size:15px; font-weight:800; margin-bottom:4px; color:currentColor;">' + mName + '</div>';
+          var spkMarginBottom = (cardCount >= 2) ? '6px' : '12px';
+          h += '<div class="media-page-speaker-row" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; align-items:flex-start; margin-bottom:' + spkMarginBottom + ';">';
+          h += '<div class="media-page-speaker-name" style="font-size:14px; font-weight:800; margin-bottom:2px; color:currentColor;">' + mName + '</div>';
           h += '<div class="media-page-speaker-vol" style="width:100%; max-width:100%;">' + renderVolumeControls([m], true) + '</div>';
           h += '</div>';
         }
@@ -2981,7 +3019,7 @@
         // 1. ACTIVE PLAYING / PAUSED MEDIA CARDS
         if (activeGroups.length > 0) {
           for (var k = 0; k < activeGroups.length; k++) {
-            h += renderMediaCardLayout(activeGroups[k]);
+            h += renderMediaCardLayout(activeGroups[k], activeGroups.length);
           }
         } else {
           // If no media is active
@@ -2993,7 +3031,9 @@
 
         // 2. IDLE / STOPPED MEDIA PLAYERS AT BOTTOM
         if (idlePlayers.length > 0) {
-          h += '<div class="media-idle-section">';
+          var idleSectionPadding = (activeGroups.length > 0) ? '12px 16px' : '16px 20px';
+          var idleSectionMargin = (activeGroups.length > 0) ? '10px' : '20px';
+          h += '<div class="media-idle-section" style="padding:' + idleSectionPadding + '; margin-top:' + idleSectionMargin + ';">';
           h += '<div class="media-idle-title">Idle / Off Speakers (Tap to Play)</div>';
           h += '<div class="media-idle-list">';
           for (var m = 0; m < idlePlayers.length; m++) {
