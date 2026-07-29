@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background:#000000;">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-touch-fullscreen" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <title>Home Controls</title>
@@ -22,6 +23,7 @@
 
     html {
       height: 100%;
+      background: #000000 !important;
     }
 
     body {
@@ -34,9 +36,9 @@
       -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
-    /* Also color the html tag in dark mode to prevent white flashes when overscrolling */
+    /* Color the html tag black to prevent white flashes or white status bars on iPad */
     html.dark-theme {
-      background: #0d1117;
+      background: #000000 !important;
     }
 
     /* ======== SETUP OVERLAY ======== */
@@ -2486,7 +2488,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.91.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.92.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="allOffToggleBtn" onclick="toggleAllOffButtonOverride()" title="Test All Off Button">🌙 Test All Off</button>
