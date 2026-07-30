@@ -2667,7 +2667,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.98.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.97.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊 Sound</button>
@@ -2765,70 +2765,6 @@
         } catch (e) { }
       }
 
-      var lightningAlarmInterval = null;
-
-      function playLightningAlarmSound() {
-        if (!soundFeedbackEnabled) return;
-        try {
-          var ctx = getAudioContext();
-          if (!ctx) return;
-
-          // Two-tone urgent emergency alert chime (880Hz & 1320Hz ascending pitch sweep)
-          var osc1 = ctx.createOscillator();
-          var osc2 = ctx.createOscillator();
-          var gain = ctx.createGain();
-
-          osc1.type = "sawtooth";
-          osc2.type = "sine";
-
-          osc1.frequency.setValueAtTime(880, ctx.currentTime);
-          osc2.frequency.setValueAtTime(1320, ctx.currentTime);
-
-          // Urgent pitch sweep up
-          osc1.frequency.linearRampToValueAtTime(1174.66, ctx.currentTime + 0.25);
-          osc2.frequency.linearRampToValueAtTime(1760, ctx.currentTime + 0.25);
-
-          gain.gain.setValueAtTime(0.35, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-
-          osc1.connect(gain);
-          osc2.connect(gain);
-          gain.connect(ctx.destination);
-          osc1.start(ctx.currentTime);
-          osc2.start(ctx.currentTime);
-          osc1.stop(ctx.currentTime + 0.35);
-          osc2.stop(ctx.currentTime + 0.35);
-        } catch (e) { }
-      }
-
-      var lightningAlarmInterval = null;
-      var lightningAlarmTimeout = null;
-
-      function startLightningAlarmLoop() {
-        if (lightningAlarmInterval) return;
-        playLightningAlarmSound();
-        lightningAlarmInterval = setInterval(function () {
-          playLightningAlarmSound();
-        }, 750);
-
-        // Auto-stop emergency alarm sound after 10 seconds
-        if (lightningAlarmTimeout) clearTimeout(lightningAlarmTimeout);
-        lightningAlarmTimeout = setTimeout(function () {
-          stopLightningAlarmLoop();
-        }, 10000);
-      }
-
-      function stopLightningAlarmLoop() {
-        if (lightningAlarmInterval) {
-          clearInterval(lightningAlarmInterval);
-          lightningAlarmInterval = null;
-        }
-        if (lightningAlarmTimeout) {
-          clearTimeout(lightningAlarmTimeout);
-          lightningAlarmTimeout = null;
-        }
-      }
-
       window.toggleSoundFeedback = function () {
         soundFeedbackEnabled = !soundFeedbackEnabled;
         try {
@@ -2862,6 +2798,65 @@
         }
       });
 
+      var lightningAlarmTimer = null;
+      var lightningAlarmNodes = [];
+
+      function playLightningAlarmSound() {
+        if (!soundFeedbackEnabled) return;
+        try {
+          stopLightningAlarmSound(); // Clear any playing alarm
+
+          var ctx = getAudioContext();
+          if (!ctx) return;
+
+          var now = ctx.currentTime;
+          var duration = 10; // 10 seconds total
+
+          var osc = ctx.createOscillator();
+          var gain = ctx.createGain();
+
+          osc.type = "sawtooth";
+          
+          // Schedule alternating siren pitch (880Hz <-> 1180Hz pulse every 0.25s) for 10s
+          for (var t = 0; t < duration; t += 0.25) {
+            var freq = ((Math.floor(t / 0.25) % 2) === 0) ? 880 : 1180;
+            osc.frequency.setValueAtTime(freq, now + t);
+          }
+
+          // Volume ramp envelope: fast fade-in, steady alarm pulses, fade out at 10s
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.35, now + 0.1);
+          gain.gain.setValueAtTime(0.35, now + duration - 0.2);
+          gain.gain.linearRampToValueAtTime(0.001, now + duration);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(now);
+          osc.stop(now + duration);
+
+          lightningAlarmNodes = [osc, gain];
+
+          lightningAlarmTimer = setTimeout(function () {
+            stopLightningAlarmSound();
+          }, duration * 1000);
+        } catch (e) { }
+      }
+
+      function stopLightningAlarmSound() {
+        if (lightningAlarmTimer) {
+          clearTimeout(lightningAlarmTimer);
+          lightningAlarmTimer = null;
+        }
+        if (lightningAlarmNodes.length > 0) {
+          try {
+            lightningAlarmNodes[0].stop();
+            lightningAlarmNodes[0].disconnect();
+          } catch (e) { }
+          lightningAlarmNodes = [];
+        }
+      }
+
       function checkLightningSafety(allStates) {
         var isLightningOn = false;
         for (var i = 0; i < allStates.length; i++) {
@@ -2881,11 +2876,14 @@
         var overlay = document.getElementById("lightningOverlay");
         if (overlay) {
           if (shouldShowAlert) {
+            var wasHidden = overlay.classList.contains("hidden");
             overlay.className = "lightning-overlay";
-            startLightningAlarmLoop();
+            if (wasHidden) {
+              playLightningAlarmSound();
+            }
           } else {
             overlay.className = "lightning-overlay hidden";
-            stopLightningAlarmLoop();
+            stopLightningAlarmSound();
           }
         }
       }
@@ -2893,7 +2891,7 @@
       window.dismissLightningAlert = function () {
         lightningAlertDismissed = true;
         forceLightningTest = false;
-        stopLightningAlarmLoop();
+        stopLightningAlarmSound();
         var overlay = document.getElementById("lightningOverlay");
         if (overlay) {
           overlay.className = "lightning-overlay hidden";
@@ -2917,6 +2915,11 @@
             btn.style.color = "";
             btn.style.borderColor = "";
           }
+        }
+        if (forceLightningTest) {
+          playLightningAlarmSound();
+        } else {
+          stopLightningAlarmSound();
         }
         if (lastStatesCache && lastStatesCache.length > 0) {
           renderDashboard(lastStatesCache);
