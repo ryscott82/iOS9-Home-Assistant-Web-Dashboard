@@ -1308,6 +1308,173 @@
       }
     }
 
+    /* ======== LIGHTNING SAFETY ALERT MODAL & FLASHING ANIMATIONS ======== */
+    .lightning-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10000;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px);
+      -webkit-transition: opacity 0.3s ease;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightning-overlay.hidden {
+      display: none !important;
+    }
+
+    .lightning-card {
+      position: relative;
+      width: 100%;
+      max-width: 500px;
+      background: #d70015;
+      border: 4px solid #ffffff;
+      border-radius: 28px;
+      padding: 40px 28px 28px 28px;
+      color: #ffffff;
+      text-align: center;
+      box-sizing: border-box;
+      -webkit-animation: lightningFlashPulse 1.2s infinite ease-in-out;
+      animation: lightningFlashPulse 1.2s infinite ease-in-out;
+    }
+
+    @-webkit-keyframes lightningFlashPulse {
+      0%, 100% {
+        background: #d70015;
+        border-color: #ffffff;
+        box-shadow: 0 0 30px rgba(255, 59, 48, 0.9), 0 0 60px rgba(255, 59, 48, 0.6);
+        -webkit-transform: scale(1);
+        transform: scale(1);
+      }
+      50% {
+        background: #ff3b30;
+        border-color: #ffe600;
+        box-shadow: 0 0 60px rgba(255, 230, 0, 0.9), 0 0 100px rgba(255, 59, 48, 1);
+        -webkit-transform: scale(1.02);
+        transform: scale(1.02);
+      }
+    }
+
+    @keyframes lightningFlashPulse {
+      0%, 100% {
+        background: #d70015;
+        border-color: #ffffff;
+        box-shadow: 0 0 30px rgba(255, 59, 48, 0.9), 0 0 60px rgba(255, 59, 48, 0.6);
+        transform: scale(1);
+      }
+      50% {
+        background: #ff3b30;
+        border-color: #ffe600;
+        box-shadow: 0 0 60px rgba(255, 230, 0, 0.9), 0 0 100px rgba(255, 59, 48, 1);
+        transform: scale(1.02);
+      }
+    }
+
+    /* Dismiss 'x' button in TOP LEFT corner */
+    .lightning-dismiss-btn {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 2px solid rgba(255, 255, 255, 0.7);
+      color: #ffffff;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 40px;
+      text-align: center;
+      cursor: pointer;
+      padding: 0;
+      outline: none;
+      -webkit-appearance: none;
+      -webkit-transition: background 0.2s, transform 0.1s;
+      transition: background 0.2s, transform 0.1s;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+    }
+
+    .lightning-dismiss-btn:active {
+      background: rgba(0, 0, 0, 0.65);
+      -webkit-transform: scale(0.92);
+      transform: scale(0.92);
+    }
+
+    .lightning-icon-box {
+      font-size: 68px;
+      line-height: 1;
+      margin-bottom: 10px;
+      text-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      -webkit-animation: lightningIconBounce 1s infinite alternate;
+      animation: lightningIconBounce 1s infinite alternate;
+    }
+
+    @-webkit-keyframes lightningIconBounce {
+      0% { -webkit-transform: translateY(0); transform: translateY(0); }
+      100% { -webkit-transform: translateY(-8px); transform: translateY(-8px); }
+    }
+
+    @keyframes lightningIconBounce {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px); }
+    }
+
+    .lightning-title {
+      font-size: 30px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .lightning-message {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.4;
+      margin-bottom: 22px;
+      opacity: 0.95;
+    }
+
+    .lightning-action-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 16px;
+      background: #ffffff;
+      color: #d70015;
+      font-size: 20px;
+      font-weight: 850;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      -webkit-appearance: none;
+      -webkit-transition: transform 0.15s, opacity 0.15s;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .lightning-action-btn:active {
+      opacity: 0.85;
+      -webkit-transform: scale(0.98);
+      transform: scale(0.98);
+    }
+
     body.tab-overview footer.app-footer {
       display: none !important;
     }
@@ -2390,6 +2557,17 @@
     </div>
   </div>
 
+  <!-- LIGHTNING ALERT OVERLAY MODAL -->
+  <div id="lightningOverlay" class="lightning-overlay hidden">
+    <div class="lightning-card">
+      <button class="lightning-dismiss-btn" onclick="dismissLightningAlert()" title="Dismiss Alert">&times;</button>
+      <div class="lightning-icon-box">⚡</div>
+      <div class="lightning-title">LIGHTNING NEARBY!</div>
+      <div class="lightning-message">Lightning safety detector has registered lightning in the near vicinity. Seek shelter indoors immediately.</div>
+      <button class="lightning-action-btn" onclick="dismissLightningAlert()">Acknowledge Safety Alert</button>
+    </div>
+  </div>
+
   <!-- CUSTOM KEYPAD MODAL -->
   <div id="keypadOverlay" class="setup-overlay hidden">
     <div class="setup-card"
@@ -2488,9 +2666,10 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.93.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.94.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
+        <button class="footer-btn" id="lightningTestBtn" onclick="toggleLightningTest()" title="Test Lightning Safety Alert">⚡ Test Lightning</button>
         <button class="footer-btn" id="allOffToggleBtn" onclick="toggleAllOffButtonOverride()" title="Test All Off Button">🌙 Test All Off</button>
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
         <button class="footer-btn" onclick="location.reload()" title="Refresh">&#8635; Refresh</button>
@@ -2534,8 +2713,70 @@
       var lastActivatedScene = "";
       var checkedTodayAlertDismissed = false;
       var themeOverride = null;
-      var themeTimeout = null;
       var forceAllOffButtonOverride = false;
+      var lightningAlertDismissed = false;
+      var lastLightningState = false;
+      var forceLightningTest = false;
+
+      function checkLightningSafety(allStates) {
+        var isLightningOn = false;
+        for (var i = 0; i < allStates.length; i++) {
+          if (allStates[i].entity_id === "input_boolean.lightning_safety") {
+            isLightningOn = (allStates[i].state === "on" || allStates[i].state === "On" || allStates[i].state === true);
+            break;
+          }
+        }
+
+        // Toggling from OFF to ON automatically resets user dismissal so new warnings pop up!
+        if (isLightningOn && !lastLightningState) {
+          lightningAlertDismissed = false;
+        }
+        lastLightningState = isLightningOn;
+
+        var shouldShowAlert = (isLightningOn || forceLightningTest) && !lightningAlertDismissed;
+        var overlay = document.getElementById("lightningOverlay");
+        if (overlay) {
+          if (shouldShowAlert) {
+            overlay.className = "lightning-overlay";
+          } else {
+            overlay.className = "lightning-overlay hidden";
+          }
+        }
+      }
+
+      window.dismissLightningAlert = function () {
+        lightningAlertDismissed = true;
+        forceLightningTest = false;
+        var overlay = document.getElementById("lightningOverlay");
+        if (overlay) {
+          overlay.className = "lightning-overlay hidden";
+        }
+        showToast("Lightning safety alert acknowledged");
+      };
+
+      window.toggleLightningTest = function () {
+        forceLightningTest = !forceLightningTest;
+        lightningAlertDismissed = false;
+        var btn = document.getElementById("lightningTestBtn");
+        if (btn) {
+          if (forceLightningTest) {
+            btn.textContent = "⚡ Lightning: TEST ON";
+            btn.style.background = "#d70015";
+            btn.style.color = "#ffffff";
+            btn.style.borderColor = "#ff3b30";
+          } else {
+            btn.textContent = "⚡ Test Lightning";
+            btn.style.background = "";
+            btn.style.color = "";
+            btn.style.borderColor = "";
+          }
+        }
+        if (lastStatesCache && lastStatesCache.length > 0) {
+          renderDashboard(lastStatesCache);
+        } else {
+          checkLightningSafety([]);
+        }
+      };
 
       // Chemical Inputs pending selection and 3-minute auto-expiry timers
       var selectedPresetValues = {};
@@ -3735,6 +3976,7 @@
 
       // ======== RENDER ========
       function renderDashboard(allStates) {
+        checkLightningSafety(allStates);
         var welcomeMessage = "Welcome Home";
         for (var i = 0; i < allStates.length; i++) {
           if (allStates[i].entity_id === "input_text.dashboard_welcome_message") {
