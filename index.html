@@ -253,32 +253,14 @@
       color: #1c1c1e;
     }
 
-    .header-welcome.large-welcome {
-      font-size: 64px !important;
-      line-height: 1.04 !important;
-      letter-spacing: -1.2px !important;
-      margin-bottom: 6px !important;
-    }
-
-    @media (max-width: 767px) {
-      .header-welcome.large-welcome {
-        font-size: 42px !important;
-        line-height: 1.08 !important;
-      }
-    }
-
     body.dark-theme .header-welcome {
       color: #ffffff;
     }
 
     .header-datetime {
-      display: none !important;
-    }
-
-    body.dark-theme .home-bottom-clock-card {
-      background: #161b22 !important;
-      border-color: rgba(255, 255, 255, 0.08) !important;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+      font-size: 16px;
+      font-weight: 500;
+      color: #8e8e93;
     }
 
     body.dark-theme .header-datetime {
@@ -1461,6 +1443,64 @@
       box-sizing: border-box;
     }
 
+    /* ======== SPARSE HOME LAYOUT (4 OR LESS CARD ROWS) ======== */
+    body.tab-home.sparse-home-layout #headerWelcome {
+      font-size: 68px !important;
+      font-weight: 900 !important;
+      letter-spacing: -1.4px !important;
+      line-height: 1.02 !important;
+      margin-top: 4px !important;
+      margin-bottom: 8px !important;
+    }
+
+    .sparse-bottom-clock {
+      display: none;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      width: 100%;
+      margin-top: 36px;
+      margin-bottom: 28px;
+      padding: 36px 20px;
+      border-radius: 28px;
+      background: rgba(120, 120, 128, 0.1);
+      border: 1px solid rgba(120, 120, 128, 0.18);
+      text-align: center;
+      box-sizing: border-box;
+      -webkit-transition: all 0.3s ease;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-theme .sparse-bottom-clock {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    body.tab-home.sparse-home-layout .sparse-bottom-clock {
+      display: -webkit-flex !important;
+      display: flex !important;
+    }
+
+    .sparse-clock-time {
+      font-size: 76px;
+      font-weight: 900;
+      letter-spacing: -1.8px;
+      line-height: 1;
+      color: currentColor;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF UI Display", sans-serif;
+    }
+
+    .sparse-clock-date {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 10px;
+      color: #8e8e93;
+      letter-spacing: -0.2px;
+    }
+
     .sleep-mode-grid {
       display: -webkit-flex;
       display: flex;
@@ -2618,6 +2658,9 @@
     <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-top:4px; margin-bottom:12px; padding:0 4px;">
       <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:48px; font-weight:850; white-space:normal; word-break:break-word; line-height:1.05; padding-right:12px; letter-spacing:-0.8px;">Welcome Home</div>
       <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; -webkit-flex-shrink:0; flex-shrink:0;">
+        <div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:flex-end; align-items:flex-end;">
+          <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:20px; font-weight:700; white-space:nowrap;"></div>
+        </div>
         <button id="headerNavBtn" class="menu-icon-btn" onclick="toggleMainNavigation(event)" title="Menu" style="width:48px; height:48px; border-radius:12px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0; box-sizing:border-box; text-align:center;">
           <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
         </button>
@@ -2631,13 +2674,19 @@
       </div>
     </div>
 
+    <!-- BIG BOTTOM CLOCK FOR SPARSE HOME LAYOUTS (4 OR LESS CARD ROWS) -->
+    <div id="sparseBottomClock" class="sparse-bottom-clock">
+      <div id="sparseClockTime" class="sparse-clock-time"></div>
+      <div id="sparseClockDate" class="sparse-clock-date"></div>
+    </div>
+
     <!-- FOOTER CONTROLS -->
     <footer class="app-footer">
       <div class="footer-status-group" onclick="showDebug()">
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.2.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.0.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊 Sound</button>
@@ -2919,8 +2968,45 @@
         if (cachedScene) lastActivatedScene = cachedScene;
       } catch (e) { }
 
+      function calculateHomeRows() {
+        var tiles = document.querySelectorAll("#entityContainer .tile");
+        if (!tiles || tiles.length === 0) return 0;
+        var rowTops = [];
+        for (var i = 0; i < tiles.length; i++) {
+          var top = tiles[i].offsetTop;
+          var found = false;
+          for (var r = 0; r < rowTops.length; r++) {
+            if (Math.abs(rowTops[r] - top) < 15) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            rowTops.push(top);
+          }
+        }
+        return rowTops.length;
+      }
+
+      function checkSparseHomeLayout() {
+        if (activeTab !== "home") {
+          document.body.classList.remove("sparse-home-layout");
+          return;
+        }
+
+        var rows = calculateHomeRows();
+        // If there's 4 or less rows of cards on the home screen
+        if (rows > 0 && rows <= 4) {
+          document.body.classList.add("sparse-home-layout");
+        } else {
+          document.body.classList.remove("sparse-home-layout");
+        }
+        updateHeaderDateTime();
+      }
+      window.checkSparseHomeLayout = checkSparseHomeLayout;
+
       function applyTabClass(tabName) {
-        document.body.className = document.body.className.replace(/\btab-[a-z]+\b/g, "").trim();
+        document.body.className = document.body.className.replace(/\btab-[a-z]+\b/g, "").replace(/\bsparse-home-layout\b/g, "").trim();
         document.body.classList.add("tab-" + tabName);
         try {
           localStorage.setItem("ha_active_tab", tabName);
@@ -2928,6 +3014,7 @@
 
         if (tabName === "home") {
           window.scrollTo(0, 0);
+          setTimeout(checkSparseHomeLayout, 50);
         }
       }
 
@@ -3731,10 +3818,19 @@
         var dateStr = dayName + ", " + monthName + " " + dateNum;
         var timeStr = hours + ":" + minutesStr + " " + ampm;
 
-        var bottomTimeEl = document.getElementById("homeBottomTime");
-        var bottomDateEl = document.getElementById("homeBottomDate");
-        if (bottomTimeEl) bottomTimeEl.textContent = timeStr;
-        if (bottomDateEl) bottomDateEl.textContent = dateStr;
+        var el = document.getElementById("headerDateTime");
+        if (el) {
+          if (document.body.classList.contains("is-sleep-mode")) {
+            el.textContent = timeStr;
+          } else {
+            el.textContent = dateStr + " • " + timeStr;
+          }
+        }
+
+        var sparseTimeEl = document.getElementById("sparseClockTime");
+        var sparseDateEl = document.getElementById("sparseClockDate");
+        if (sparseTimeEl) sparseTimeEl.textContent = timeStr;
+        if (sparseDateEl) sparseDateEl.textContent = dateStr;
       }
 
       var idleTimer = null;
@@ -3931,25 +4027,8 @@
         });
       };
 
-      function isChemicalEntity(entity) {
-        if (!entity || !entity.entity_id) return false;
-        var eid = entity.entity_id.toLowerCase();
-        var fname = (friendlyName(entity) || "").toLowerCase();
-
-        if (eid.indexOf("chem") !== -1 || fname.indexOf("chem") !== -1) return true;
-        if (eid.indexOf("ph_") !== -1 || fname.indexOf("ph recommendation") !== -1 || fname.indexOf("ph level") !== -1) return true;
-        if (eid.indexOf("alkalinity") !== -1 || fname.indexOf("alkalinity") !== -1) return true;
-        if (eid.indexOf("chlorine") !== -1 || fname.indexOf("chlorine") !== -1) return true;
-        if (eid.indexOf("recommendation") !== -1 || fname.indexOf("recommendation") !== -1) return true;
-        if (fname.indexOf("chemical addition") !== -1 || eid.indexOf("chemical_addition") !== -1) return true;
-
-        return false;
-      }
-
       function isHomeScreenEntity(entity) {
         if (!entity || !entity.entity_id) return false;
-        if (isChemicalEntity(entity)) return false;
-
         var eid = entity.entity_id.toLowerCase();
         var fname = (friendlyName(entity) || "").toLowerCase();
 
@@ -4392,7 +4471,6 @@
           var rawHomeList = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
           var homeEntities = [];
           for (i = 0; i < rawHomeList.length; i++) {
-            if (isChemicalEntity(rawHomeList[i])) continue;
             if (!hasHomeTagDefined || isHomeScreenEntity(rawHomeList[i])) {
               homeEntities.push(rawHomeList[i]);
             }
@@ -4401,31 +4479,6 @@
           var now = new Date();
           var currentHour = now.getHours();
           var isAfter11PM = (currentHour >= 23 || currentHour < 5); // 11:00 PM to 5:00 AM
-
-          // Calculate total rows of cards on Home screen to enlarge top welcome message if <= 4 rows
-          var homeRowCount = 0;
-          for (i = 0; i < homeEntities.length; i++) {
-            var entItem = homeEntities[i];
-            var isHeaterEnt = (entItem.entity_id && (entItem.entity_id.indexOf("water_heater.") === 0 || (entItem.entity_id.indexOf("climate.") === 0 && (entItem.entity_id.indexOf("pool") !== -1 || entItem.entity_id.indexOf("hot_tub") !== -1 || entItem.entity_id.indexOf("spa") !== -1))));
-            if (isHeaterEnt) {
-              homeRowCount += 1;
-            } else {
-              homeRowCount += 0.5;
-            }
-          }
-          homeRowCount += (mediaGroups.length * 0.5);
-          if (isAfter11PM || forceAllOffButtonOverride) {
-            homeRowCount += 1;
-          }
-          homeRowCount = Math.ceil(homeRowCount);
-
-          if (headerWelcomeEl) {
-            if (homeRowCount <= 4) {
-              headerWelcomeEl.classList.add("large-welcome");
-            } else {
-              headerWelcomeEl.classList.remove("large-welcome");
-            }
-          }
 
           if (mediaGroups.length > 0 || homeEntities.length > 0 || isAfter11PM || forceAllOffButtonOverride) {
             html += '<div class="tile-grid">';
@@ -4445,23 +4498,9 @@
               html += '</div>';
             }
 
-            // Prominent Large Date & Time card at the bottom of the home grid if <= 4 rows of cards
-            if (homeRowCount <= 4) {
-              html += '<div class="home-bottom-clock-card" style="-webkit-flex: 0 0 calc(100% - 12px); flex: 0 0 calc(100% - 12px); width: calc(100% - 12px); margin: 16px 6px 6px 6px; padding: 24px 20px; text-align: center; border-radius: 28px; background: #ffffff; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 2px solid rgba(0,0,0,0.04); box-sizing: border-box;">';
-              html += '<div id="homeBottomTime" style="font-size: 56px; font-weight: 850; line-height: 1; letter-spacing: -1px; margin-bottom: 6px; color: currentColor;"></div>';
-              html += '<div id="homeBottomDate" style="font-size: 22px; font-weight: 650; color: #8e8e93; text-transform: uppercase; letter-spacing: 0.5px;"></div>';
-              html += '</div>';
-            }
-
             html += '</div>';
           }
-        } else {
-          if (headerWelcomeEl) {
-            headerWelcomeEl.classList.remove("large-welcome");
-          }
-        }
-
-        if (activeTab === "media") {
+        } else if (activeTab === "media") {
           html += renderMediaPage(allStates);
         } else if (activeTab === "controls") {
           document.body.className = (themeOverride === "dark" || isNight ? "dark-theme" : "");
@@ -4722,6 +4761,7 @@
         }
 
         document.getElementById("entityContainer").innerHTML = html;
+        setTimeout(checkSparseHomeLayout, 60);
       }
 
       // ======== ENTITY RENDERERS ========
