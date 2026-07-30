@@ -1309,46 +1309,14 @@
       }
     }
 
-    /* ======== LIGHTNING SAFETY ALERT MODAL & FLASHING ANIMATIONS ======== */
+    /* ======== LIGHTNING SAFETY ALERT OVERLAY & HARSH FLASHING STROBE ======== */
     .lightning-overlay {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(180, 0, 0, 0.95);
       z-index: 10000;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-align-items: center;
-      align-items: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      padding: 24px;
-      box-sizing: border-box;
-      -webkit-backdrop-filter: blur(16px);
-      backdrop-filter: blur(16px);
-      -webkit-animation: emergencyOverlayStrobe 0.8s infinite ease-in-out;
-      animation: emergencyOverlayStrobe 0.8s infinite ease-in-out;
-    }
-
-    .lightning-overlay.hidden {
-      display: none !important;
-    }
-
-    .lightning-card {
-      position: relative;
-      width: 96vw;
-      height: 92vh;
-      max-width: 96vw;
-      max-height: 94vh;
-      background: #cc0000;
-      border: 6px solid #ffe600;
-      border-radius: 36px;
-      padding: 40px 32px 32px 32px;
-      color: #ffffff;
-      text-align: center;
-      box-sizing: border-box;
       display: -webkit-flex;
       display: flex;
       -webkit-flex-direction: column;
@@ -1357,100 +1325,100 @@
       justify-content: space-between;
       -webkit-align-items: center;
       align-items: center;
-      -webkit-animation: lightningFlashPulse 0.8s infinite ease-in-out;
-      animation: lightningFlashPulse 0.8s infinite ease-in-out;
+      padding: 36px 24px;
+      box-sizing: border-box;
+      color: #ffffff;
+      text-align: center;
+      -webkit-animation: harshRedBlackStrobe 0.35s infinite steps(1, end);
+      animation: harshRedBlackStrobe 0.35s infinite steps(1, end);
     }
 
-    /* Dramatic full-screen flashing red and black strobe keyframes */
-    @-webkit-keyframes emergencyOverlayStrobe {
-      0%, 100% { background: rgba(204, 0, 0, 0.98); }
-      50% { background: rgba(0, 0, 0, 0.98); }
-    }
-    @keyframes emergencyOverlayStrobe {
-      0%, 100% { background: rgba(204, 0, 0, 0.98); }
-      50% { background: rgba(0, 0, 0, 0.98); }
+    .lightning-overlay.hidden {
+      display: none !important;
     }
 
-    @-webkit-keyframes lightningFlashPulse {
-      0%, 100% {
-        background: #cc0000;
-        border-color: #ffffff;
-        box-shadow: 0 0 50px rgba(255, 0, 0, 1), 0 0 100px rgba(255, 230, 0, 0.9);
-        -webkit-transform: scale(1);
-        transform: scale(1);
-      }
-      50% {
-        background: #000000;
-        border-color: #ffe600;
-        box-shadow: 0 0 80px rgba(255, 230, 0, 1), 0 0 140px rgba(255, 255, 255, 0.9);
-        -webkit-transform: scale(1.015);
-        transform: scale(1.015);
-      }
+    /* Harsh zero-fade red & black flashing keyframes */
+    @-webkit-keyframes harshRedBlackStrobe {
+      0%, 49.9% { background: #d70015; }
+      50%, 100% { background: #000000; }
     }
-    @keyframes lightningFlashPulse {
-      0%, 100% {
-        background: #cc0000;
-        border-color: #ffffff;
-        box-shadow: 0 0 50px rgba(255, 0, 0, 1), 0 0 100px rgba(255, 230, 0, 0.9);
-        transform: scale(1);
-      }
-      50% {
-        background: #000000;
-        border-color: #ffe600;
-        box-shadow: 0 0 80px rgba(255, 230, 0, 1), 0 0 140px rgba(255, 255, 255, 0.9);
-        transform: scale(1.015);
-      }
+    @keyframes harshRedBlackStrobe {
+      0%, 49.9% { background: #d70015; }
+      50%, 100% { background: #000000; }
+    }
+
+    .lightning-content-top {
+      margin-top: 10px;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-align-items: center;
+      align-items: center;
     }
 
     .lightning-icon-box {
-      font-size: 130px;
+      font-size: 100px;
       line-height: 1;
-      margin: 10px 0;
-      text-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
-      -webkit-animation: lightningIconBounce 0.7s infinite alternate ease-in-out;
-      animation: lightningIconBounce 0.7s infinite alternate ease-in-out;
+      margin-bottom: 8px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
+      -webkit-animation: lightningIconBounce 0.6s infinite alternate ease-in-out;
+      animation: lightningIconBounce 0.6s infinite alternate ease-in-out;
     }
 
     @-webkit-keyframes lightningIconBounce {
       0% { -webkit-transform: translateY(0) scale(1); transform: translateY(0) scale(1); }
-      100% { -webkit-transform: translateY(-16px) scale(1.1); transform: translateY(-16px) scale(1.1); }
+      100% { -webkit-transform: translateY(-14px) scale(1.08); transform: translateY(-14px) scale(1.08); }
     }
     @keyframes lightningIconBounce {
       0% { transform: translateY(0) scale(1); }
-      100% { transform: translateY(-16px) scale(1.1); }
+      100% { transform: translateY(-14px) scale(1.08); }
     }
 
     .lightning-title {
-      font-size: 54px;
+      font-size: 46px;
       font-weight: 950;
-      letter-spacing: -1px;
-      margin-bottom: 16px;
+      letter-spacing: -0.5px;
       text-transform: uppercase;
-      text-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+      text-shadow: 0 4px 16px rgba(0, 0, 0, 0.9);
       line-height: 1.05;
+      color: #ffffff;
     }
 
     .lightning-message {
-      font-size: 30px;
+      font-size: 24px;
       font-weight: 750;
-      line-height: 1.35;
-      margin-bottom: 24px;
-      max-width: 90%;
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      line-height: 1.4;
+      max-width: 620px;
+      color: #ffffff;
+      text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9);
+      padding: 0 12px;
+    }
+
+    .lightning-content-bottom {
+      width: 100%;
+      max-width: 520px;
+      max-height: 24vh;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      margin-bottom: 12px;
     }
 
     .lightning-action-btn {
       width: 100%;
-      max-width: 600px;
-      padding: 24px;
-      border-radius: 24px;
+      padding: 18px 24px;
+      border-radius: 20px;
       background: #ffffff;
-      color: #cc0000;
-      font-size: 30px;
+      color: #d70015;
+      font-size: 22px;
       font-weight: 900;
-      border: 4px solid #ffe600;
+      border: 3px solid #ffe600;
       cursor: pointer;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
       -webkit-appearance: none;
       -webkit-transition: transform 0.15s, opacity 0.15s;
       transition: transform 0.15s, opacity 0.15s;
@@ -2544,12 +2512,14 @@
     </div>
   </div>
 
-  <!-- LIGHTNING ALERT OVERLAY MODAL -->
+  <!-- LIGHTNING ALERT OVERLAY (FULL SCREEN HARSH STROBE WARNING) -->
   <div id="lightningOverlay" class="lightning-overlay hidden">
-    <div class="lightning-card">
+    <div class="lightning-content-top">
       <div class="lightning-icon-box">⚡</div>
       <div class="lightning-title">LIGHTNING NEARBY!</div>
-      <div class="lightning-message">Lightning safety detector has registered lightning in the near vicinity. Seek shelter indoors immediately.</div>
+    </div>
+    <div class="lightning-message">Lightning safety detector has registered lightning in the near vicinity. Seek shelter indoors immediately.</div>
+    <div class="lightning-content-bottom">
       <button class="lightning-action-btn" onclick="dismissLightningAlert()">Acknowledge Safety Alert</button>
     </div>
   </div>
@@ -2652,7 +2622,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.98.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.99.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊 Sound</button>
