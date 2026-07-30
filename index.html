@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" style="background:#000000;">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#000000">
+  <meta name="theme-color" content="#f2f2f7">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-touch-fullscreen" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <title>Home Controls</title>
@@ -23,7 +23,7 @@
 
     html {
       height: 100%;
-      background: #000000 !important;
+      background: #f2f2f7;
     }
 
     body {
@@ -36,9 +36,9 @@
       -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
-    /* Color the html tag black to prevent white flashes or white status bars on iPad */
+    /* Color html tag in dark theme to match dark site background (#0d1117) */
     html.dark-theme {
-      background: #000000 !important;
+      background: #0d1117 !important;
     }
 
     /* ======== SETUP OVERLAY ======== */
@@ -2488,7 +2488,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.92.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v2.93.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="allOffToggleBtn" onclick="toggleAllOffButtonOverride()" title="Test All Off Button">🌙 Test All Off</button>
@@ -3950,8 +3950,21 @@
           }
         }
 
-        // RENDER BASED ON ACTIVE TAB
-        document.body.className = (themeOverride === "dark" || isNight ? "dark-theme " : "") + "tab-" + activeTab;
+        // RENDER BASED ON ACTIVE TAB & DYNAMIC THEME COLOR
+        var isDarkTheme = (themeOverride === "dark" || isNight);
+        document.body.className = (isDarkTheme ? "dark-theme " : "") + "tab-" + activeTab;
+
+        // Dynamic status bar and html background matching site background
+        var themeBgColor = isDarkTheme ? "#0d1117" : "#f2f2f7";
+        if (isDarkTheme) {
+          document.documentElement.classList.add("dark-theme");
+        } else {
+          document.documentElement.classList.remove("dark-theme");
+        }
+        var themeMetaEl = document.querySelector('meta[name="theme-color"]');
+        if (themeMetaEl) {
+          themeMetaEl.setAttribute("content", themeBgColor);
+        }
 
         var appFooterEl = document.querySelector("footer.app-footer");
         var headerWelcomeEl = document.getElementById("headerWelcome");
