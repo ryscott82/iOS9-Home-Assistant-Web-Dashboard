@@ -2637,7 +2637,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.1.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.2.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊 Sound</button>
@@ -3931,8 +3931,25 @@
         });
       };
 
+      function isChemicalEntity(entity) {
+        if (!entity || !entity.entity_id) return false;
+        var eid = entity.entity_id.toLowerCase();
+        var fname = (friendlyName(entity) || "").toLowerCase();
+
+        if (eid.indexOf("chem") !== -1 || fname.indexOf("chem") !== -1) return true;
+        if (eid.indexOf("ph_") !== -1 || fname.indexOf("ph recommendation") !== -1 || fname.indexOf("ph level") !== -1) return true;
+        if (eid.indexOf("alkalinity") !== -1 || fname.indexOf("alkalinity") !== -1) return true;
+        if (eid.indexOf("chlorine") !== -1 || fname.indexOf("chlorine") !== -1) return true;
+        if (eid.indexOf("recommendation") !== -1 || fname.indexOf("recommendation") !== -1) return true;
+        if (fname.indexOf("chemical addition") !== -1 || eid.indexOf("chemical_addition") !== -1) return true;
+
+        return false;
+      }
+
       function isHomeScreenEntity(entity) {
         if (!entity || !entity.entity_id) return false;
+        if (isChemicalEntity(entity)) return false;
+
         var eid = entity.entity_id.toLowerCase();
         var fname = (friendlyName(entity) || "").toLowerCase();
 
@@ -4375,6 +4392,7 @@
           var rawHomeList = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
           var homeEntities = [];
           for (i = 0; i < rawHomeList.length; i++) {
+            if (isChemicalEntity(rawHomeList[i])) continue;
             if (!hasHomeTagDefined || isHomeScreenEntity(rawHomeList[i])) {
               homeEntities.push(rawHomeList[i]);
             }
