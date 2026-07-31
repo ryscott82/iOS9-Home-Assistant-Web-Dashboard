@@ -3091,7 +3091,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.9.7</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.10.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -4422,6 +4422,7 @@
         }
         var speakerName = escapeHtml(names.join(" & "));
         var eid = escapeHtml(primary.entity_id);
+        var primaryCleanEid = primary.entity_id.replace(/\./g, "_");
         var state = primary.state;
         var unavailable = state === "unavailable";
 
@@ -4442,7 +4443,6 @@
           }
         }
 
-        var activeClass = isPlaying ? " active-blue" : "";
         var bigTrackTitle = escapeHtml(title) || "Playing";
         var smallSpeakerSubtext = speakerName + (artist ? ' • ' + escapeHtml(artist) : '');
 
@@ -4450,7 +4450,47 @@
           ? '<svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>'
           : '<svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff"><path d="M8 5v14l11-7z"/></svg>';
 
-        var h = '<div class="tile overview-big-tile' + activeClass + '" onclick="showTab(\'media\')" style="cursor:pointer;" title="Open Media Page">';
+        // Dynamic album color background tinting when playing
+        var homeCardStyle = 'cursor:pointer;';
+        if (isPlaying) {
+          var tintRgb = (artUrl && albumColorCache[artUrl]) ? albumColorCache[artUrl] : { r: 65, g: 122, b: 160 };
+          var lightRgb = ensureLightVibrantTint(tintRgb);
+          var tr = lightRgb.r, tg = lightRgb.g, tb = lightRgb.b;
+          var isDarkTheme = document.body.classList.contains("dark-theme");
+          if (isDarkTheme) {
+            homeCardStyle += ' background: rgba(' + tr + ',' + tg + ',' + tb + ', 0.22); border: 1.5px solid rgba(' + tr + ',' + tg + ',' + tb + ', 0.55); box-shadow: 0 4px 18px rgba(' + tr + ',' + tg + ',' + tb + ', 0.35);';
+          } else {
+            var lR = Math.round(tr + (255 - tr) * 0.35);
+            var lG = Math.round(tg + (255 - tg) * 0.35);
+            var lB = Math.round(tb + (255 - tb) * 0.35);
+            homeCardStyle += ' background: rgba(' + lR + ',' + lG + ',' + lB + ', 0.28); border: 1.5px solid rgba(' + tr + ',' + tg + ',' + tb + ', 0.45); box-shadow: 0 4px 18px rgba(' + tr + ',' + tg + ',' + tb + ', 0.22);';
+          }
+
+          if (artUrl && !albumColorCache[artUrl]) {
+            extractAlbumDominantColor(artUrl, function(extractedRgb) {
+              var homeCardEl = document.getElementById("home_media_card_" + primaryCleanEid);
+              if (homeCardEl) {
+                var lRgb = ensureLightVibrantTint(extractedRgb);
+                var eR = lRgb.r, eG = lRgb.g, eB = lRgb.b;
+                var isDark = document.body.classList.contains("dark-theme");
+                if (isDark) {
+                  homeCardEl.style.background = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.22)';
+                  homeCardEl.style.borderColor = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.55)';
+                  homeCardEl.style.boxShadow = '0 4px 18px rgba(' + eR + ',' + eG + ',' + eB + ', 0.35)';
+                } else {
+                  var hlR = Math.round(eR + (255 - eR) * 0.35);
+                  var hlG = Math.round(eG + (255 - eG) * 0.35);
+                  var hlB = Math.round(eB + (255 - eB) * 0.35);
+                  homeCardEl.style.background = 'rgba(' + hlR + ',' + hlG + ',' + hlB + ', 0.28)';
+                  homeCardEl.style.borderColor = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.45)';
+                  homeCardEl.style.boxShadow = '0 4px 18px rgba(' + eR + ',' + eG + ',' + eB + ', 0.22)';
+                }
+              }
+            });
+          }
+        }
+
+        var h = '<div id="home_media_card_' + primaryCleanEid + '" class="tile overview-big-tile" onclick="showTab(\'media\')" style="' + homeCardStyle + '" title="Open Media Page">';
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
 
         // Enlarged 64px x 64px Album Art with transparent Play/Pause overlay icon (tapping art toggles play/pause)

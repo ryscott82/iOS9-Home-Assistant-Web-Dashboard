@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.10.0] - 2026-07-31
+- **Dynamic Album-Tinted Home Media Cards**: Replaced static generic blue background tint (`.active-blue`) on the Home page with dynamic background, border, and glow tinting derived directly from the currently playing album's extracted dominant color.
+
 ## [v3.9.7] - 2026-07-31
 - **Vibrant Saturated Light Mode Card Glow (`getLightModeGlowRgb`)**: Replaced heavy black drop shadows in light mode with a luminous 38px saturated color halo (`rgba(gR, gG, gB, 0.58)`), creating a neon-like ambient glow surrounding media cards in light mode while leaving dark mode untouched.
 
