@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.11.7] - 2026-07-31
+- **Compact Media Tiles on All Controls Page**: Removed album cover images from media tiles on the All Controls page (`renderMediaPlayer`). Scaled control buttons to compact 30px/34px circles (`gap: 6px`) to ensure buttons fit comfortably inside each tile without overflowing or wrapping.
+
 ## [v3.11.6] - 2026-07-31
 - **Inline Home Icon Button on Non-Home Tabs**: On non-Home tabs (`All Controls`, `Chemicals`, `Media`), the Home icon button (🏠) is placed in the exact same inline flex row directly to the right of `.tab-bar` (`.menu-bar-wrapper`), hiding the separate top header button to eliminate line breaks. On the Home tab, the full-width segmented tab bar and top header hamburger menu (☰) are active.
 
