@@ -848,52 +848,6 @@
     }
 
     /* ======== SEGMENTED TAB CONTROL ======== */
-    .menu-bar-wrapper {
-      display: -webkit-flex;
-      display: flex;
-      -webkit-align-items: center;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-      margin: 0 0 18px 0;
-    }
-
-    .menu-bar-wrapper .tab-bar {
-      margin: 0;
-      -webkit-flex: 1;
-      flex: 1;
-      min-width: 0;
-    }
-
-    .menu-home-btn {
-      height: 40px;
-      width: 48px;
-      border-radius: 12px;
-      background: rgba(120, 120, 128, 0.16);
-      color: currentColor;
-      border: none;
-      cursor: pointer;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-align-items: center;
-      align-items: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      padding: 0;
-      -webkit-flex-shrink: 0;
-      flex-shrink: 0;
-      transition: background 0.2s ease, transform 0.1s ease;
-    }
-
-    .menu-home-btn:active {
-      transform: scale(0.95);
-      background: rgba(120, 120, 128, 0.28);
-    }
-
-    body.dark-theme .menu-home-btn {
-      background: rgba(255, 255, 255, 0.12);
-    }
-
     .tab-bar {
       display: -webkit-flex;
       display: flex;
@@ -901,6 +855,10 @@
       padding: 3px;
       border-radius: 12px;
       margin: 0 4px 18px 4px;
+    }
+
+    body.dark-theme .tab-bar {
+      background: rgba(255, 255, 255, 0.07);
     }
 
     body.dark-theme .tab-bar {
@@ -3227,7 +3185,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.11.4</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.11.5</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -5280,13 +5238,14 @@
 
         var html = "";
 
-        // Render Menu Bar Wrapper (Full-Length Tab Bar + Single Home Icon Button on the Right)
-        html += '<div class="menu-bar-wrapper">';
+        // Render Tab Segmented control
         html += '<div class="tab-bar">';
+        var hActive = activeTab === "home" ? " active" : "";
         var cActive = activeTab === "controls" ? " active" : "";
         var chActive = activeTab === "chemicals" ? " active" : "";
         var mActive = activeTab === "media" ? " active" : "";
 
+        html += '<button class="tab-btn' + hActive + '" onclick="switchTab(\'home\')">Home</button>';
         html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">All Controls</button>';
         if (hasRedWarning) {
           if (activeTab === "chemicals") {
@@ -5304,14 +5263,7 @@
           html += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals</button>';
         }
         html += '<button class="tab-btn' + mActive + '" onclick="switchTab(\'media\')">Media</button>';
-        html += '</div>'; // end tab-bar
-
-        // Home Icon Button directly to the right of the menu bar
-        var homeBtnActiveStyle = activeTab === "home" ? ' style="background:rgba(0,122,255,0.22); color:#007aff; border:1px solid rgba(0,122,255,0.4);"' : '';
-        html += '<button class="menu-home-btn" onclick="switchTab(\'home\')" title="Home Tab"' + homeBtnActiveStyle + '>';
-        html += '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>';
-        html += '</button>';
-        html += '</div>'; // end menu-bar-wrapper
+        html += '</div>';
 
         // Header navigation icon always stays as Hamburger Menu button
         var navBtn = document.getElementById("headerNavBtn");
