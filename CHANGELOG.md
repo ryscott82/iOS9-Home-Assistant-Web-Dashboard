@@ -2,6 +2,11 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.9.0] - 2026-07-31
+- **Dynamic 1/2 Height Grid for > 3 Media Players**: Automatically applies `.media-page-grid.compact-grid` (245px 1/2 height cards) when > 3 media players are active on the Media page, fitting up to 6 media players on a single screen without vertical scrolling.
+- **Mini Album Art Cards on All Controls Page**: Replaced basic media text tiles on the All Controls page with mini album cover cards featuring background artwork, speaker badges, play/pause controls, and volume sliders.
+- **Home Page Media Card Tap Navigation**: Tapping anywhere on the middle/text area of a media player card on the Home page instantly navigates to the dedicated Media page (`showTab('media')`).
+
 ## [v3.8.0] - 2026-07-31
 - **Half-Height Volume Control Bar**: Compacted `.media-large-vol-bar` height by 50% down to `25px`, with scaled `36px x 25px` stepper buttons (`16px` SVG icons) and `12px` bold volume percentage readout.
 - **Curved Bottom Border Progress Bar**: Positioned a 6px progress track at the absolute bottom edge of media cards (`.media-card-bottom-progress-track`). Because `.media-page-card` uses `border-radius: 20px; overflow: hidden`, the progress fill seamlessly curves along the bottom 20px rounded border frame.
