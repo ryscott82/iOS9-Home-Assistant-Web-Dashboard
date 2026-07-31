@@ -855,18 +855,19 @@
       align-items: center;
       gap: 10px;
       width: 100%;
-      margin: 0 4px 18px 4px;
+      margin: 0 0 18px 0;
     }
 
     .menu-bar-wrapper .tab-bar {
       margin: 0;
-      -webkit-flex: 0 1 auto;
-      flex: 0 1 auto;
+      -webkit-flex: 1;
+      flex: 1;
+      min-width: 0;
     }
 
     .menu-home-btn {
       height: 40px;
-      width: 44px;
+      width: 48px;
       border-radius: 12px;
       background: rgba(120, 120, 128, 0.16);
       color: currentColor;
@@ -3226,7 +3227,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.11.2</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.11.3</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -5279,15 +5280,13 @@
 
         var html = "";
 
-        // Render Menu Bar Wrapper (Tab Bar on Left + Home Button to the Right)
+        // Render Menu Bar Wrapper (Full-Length Tab Bar + Single Home Icon Button on the Right)
         html += '<div class="menu-bar-wrapper">';
         html += '<div class="tab-bar">';
-        var hActive = activeTab === "home" ? " active" : "";
         var cActive = activeTab === "controls" ? " active" : "";
         var chActive = activeTab === "chemicals" ? " active" : "";
         var mActive = activeTab === "media" ? " active" : "";
 
-        html += '<button class="tab-btn' + hActive + '" onclick="switchTab(\'home\')">Home</button>';
         html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">All Controls</button>';
         if (hasRedWarning) {
           if (activeTab === "chemicals") {

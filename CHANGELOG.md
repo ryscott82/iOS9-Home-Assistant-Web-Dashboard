@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.11.3] - 2026-07-31
+- **Full-Width Menu Bar with Single Dedicated Home Icon Button**: Expanded `.tab-bar` to stretch across the full width of the screen minus the Home button (`flex: 1; min-width: 0`), and removed the duplicate text `Home` button from inside `.tab-bar` so that `.menu-home-btn` on the right acts as the single Home button.
+
 ## [v3.11.2] - 2026-07-31
 - **Left-Aligned Compact Menu Bar with Adjacent Home Button**: Wrapped `.tab-bar` in a `.menu-bar-wrapper` flex container aligned on the left (`flex: 0 1 auto`), placing a dedicated Home icon button (`.menu-home-btn`) directly to its right for instant navigation to the Home screen.
 
