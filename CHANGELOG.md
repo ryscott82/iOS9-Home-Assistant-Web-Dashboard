@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.6.2] - 2026-07-31
+- **Perimeter-First Album Color Sampling**: Updated `extractAlbumDominantColor` to sample outer perimeter border pixels (outer 2–3 rows of canvas) first. This matches the true backdrop/frame of album covers (like the textured silver/gray metal background on Coldplay's *Mylo Xyloto / Paradise*) rather than sampling inner cutouts or focal subjects.
+
 ## [v3.6.1] - 2026-07-31
 - **Hybrid Vibrant Color Preference Algorithm**: Updated `extractAlbumDominantColor` to prioritize non-neutral vibrant color pixels (`sat > 18`) over dull background grays when vibrant pixels are present, while retaining clean monochromatic gray/black/white fallback for black & white album art.
 
