@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.11.0] - 2026-07-31
+- **Single Active Player Full-Space Layout**: When only 1 media player is active on the Media page, the card expands to fill the entire available height (`height: calc(100vh - 180px)`). Features a 32px blurred album art backdrop (`blur(32px)`), an unblurred crisp `320px x 320px` album cover art image inside the card frame, and enlarged UI controls (`38px` track title, `60px` play/pause pill, `60px` skip buttons, and `36px` volume bar).
+
 ## [v3.10.1] - 2026-07-31
 - **Enlarged Home Media Card Album Art & Play Button**: Increased album art thumbnail size to `88px x 88px` (`border-radius: 18px`), enlarged play/pause overlay button to `52px` circle with `40px` SVG icon, and scaled skip button to `54px x 54px` for prominent visibility and easy tapping from across the room.
 - **Home Media Card Navigation**: Tapping anywhere on the middle/text area of the Home media player card navigates directly to the Media page (`showTab('media')`).
