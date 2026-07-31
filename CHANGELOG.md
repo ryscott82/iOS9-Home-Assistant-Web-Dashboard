@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.9.2] - 2026-07-31
+- **Restored Dominant Album Color Bottom Gradient**: Restored bottom card gradient overlay to transition smoothly into a rich, deep darkened shade of the extracted dominant album color (`0.30 * RGB`), matching the seamless ambient album color fade (e.g., deep royal blue for Djo *End of Beginning*).
+
 ## [v3.9.1] - 2026-07-31
 - **Dark Mode Light Vibrant Accent Boost (`ensureLightVibrantTint`)**: Dynamically boosts color brightness for dark extracted album colors in dark mode so UI buttons (play pill, volume slider, equalizer wave, outer glow) render in light, luminous, high-contrast accent colors against `#0d1117` dark card backgrounds.
 - **Theme-Adaptive Bottom Gradient Overlay**: Configured card background overlay to fade down into dark `#0d1117` in dark mode and pure white `#ffffff` in light mode.

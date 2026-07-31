@@ -3089,7 +3089,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.9.1</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.9.2</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -4144,6 +4144,15 @@
               for (var eb = 0; eb < eqBars.length; eb++) {
                 eqBars[eb].style.background = 'rgb(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ')';
               }
+              // Dynamically update bottom background fade to extracted dominant album color
+              var bgOverlayEl = document.getElementById("card_bg_overlay_" + primaryCleanEid);
+              if (bgOverlayEl) {
+                var dR = Math.round(lightRgb.r * 0.3);
+                var dG = Math.round(lightRgb.g * 0.3);
+                var dB = Math.round(lightRgb.b * 0.3);
+                var newGrad = 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + dR + ',' + dG + ',' + dB + ', 0.65) 50%, rgba(' + dR + ',' + dG + ',' + dB + ', 0.95) 100%)';
+                bgOverlayEl.style.background = newGrad;
+              }
             }
           });
         }
@@ -4157,20 +4166,14 @@
         var cardGlowStyle = 'box-shadow: 0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + tr + ',' + tg + ',' + tb + ', 0.32);';
         var h = '<div id="media_card_' + primaryCleanEid + '" class="media-page-card" style="' + cardGlowStyle + '">';
 
-        // 1. ALBUM ART FULL CARD BACKGROUND + DYNAMIC HIGHLIGHT COLOR FADE OVERLAY
+        // 1. ALBUM ART FULL CARD BACKGROUND + DYNAMIC DOMINANT COLOR GRADIENT OVERLAY
         if (artSrc) {
           h += '<div class="media-card-bg-image" style="background-image: url(\'' + escapeHtml(artSrc) + '\');"></div>';
         } else {
           h += '<div class="media-card-bg-fallback"></div>';
         }
 
-        var isDarkTheme = document.body.classList.contains("dark-theme");
-        var bgOverlayStyle = "";
-        if (isDarkTheme) {
-          bgOverlayStyle = 'background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.5) 45%, rgba(13,17,23,0.94) 85%); background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.5) 45%, rgba(13,17,23,0.94) 85%);';
-        } else {
-          bgOverlayStyle = 'background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(' + tr + ',' + tg + ',' + tb + ', 0.25) 45%, rgba(255,255,255,0.94) 85%); background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + tr + ',' + tg + ',' + tb + ', 0.25) 45%, rgba(255,255,255,0.94) 85%);';
-        }
+        var bgOverlayStyle = 'background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.65) 50%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.95) 100%); background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.65) 50%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.95) 100%);';
         h += '<div id="card_bg_overlay_' + primaryCleanEid + '" class="media-card-bg-overlay" style="' + bgOverlayStyle + '"></div>';
 
         // Glass sweep only on playing media cards with random interval scheduling
