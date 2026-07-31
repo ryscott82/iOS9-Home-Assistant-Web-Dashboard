@@ -3185,7 +3185,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.11.8</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.12.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -8799,13 +8799,90 @@
             h += '</button>';
 
             h += '</div>';
+          }
+          h += '</div>';
+          return h;
+        }
 
-            // Volume Control Slider (Compact mode)
-            h += renderVolumeControls(group, true);
+        // Active / Playing Media Player with Dynamic Blurred Background & Album Dominant Color Controls
+        var domRgb = { r: 0, g: 122, b: 255 }; // Default iOS blue accent
+        if (artUrl) {
+          if (albumColorCache[artUrl]) {
+            domRgb = albumColorCache[artUrl];
+          } else {
+            extractAlbumDominantColor(artUrl, function () {
+              if (activeTab === "controls") renderTab("controls");
+            });
           }
         }
 
+        var domRgbStr = 'rgb(' + domRgb.r + ',' + domRgb.g + ',' + domRgb.b + ')';
+        var domRgbGlow = 'rgba(' + domRgb.r + ',' + domRgb.g + ',' + domRgb.b + ', 0.45)';
+
+        var cardBg = isDarkTheme ? '#161b22' : '#ffffff';
+        var overlayBg = isDarkTheme ? 'rgba(13, 17, 23, 0.78)' : 'rgba(255, 255, 255, 0.82)';
+        var textColor = isDarkTheme ? '#ffffff' : '#1c1c1e';
+        var subTextColor = isDarkTheme ? 'rgba(255,255,255,0.75)' : '#8e8e93';
+
+        var h = '<div class="tile media-tile" style="position:relative; overflow:hidden; background:' + cardBg + '; border-radius:18px; padding:12px 14px; display:block; box-sizing:border-box; text-align:left;">';
+
+        // 1. Blurred Album Art Background Layer
+        if (artUrl) {
+          h += '<div style="position:absolute; top:-20px; left:-20px; right:-20px; bottom:-20px; background-image:url(\'' + artUrl + '\'); background-size:cover; background-position:center; -webkit-filter:blur(24px) brightness(' + (isDarkTheme ? '0.75' : '1.05') + '); filter:blur(24px) brightness(' + (isDarkTheme ? '0.75' : '1.05') + '); opacity:' + (isDarkTheme ? '0.5' : '0.4') + '; pointer-events:none; z-index:0;"></div>';
+        }
+
+        // 2. Light/Dark Mode Glass Tint Overlay
+        h += '<div style="position:absolute; top:0; left:0; right:0; bottom:0; background:' + overlayBg + '; -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); pointer-events:none; z-index:1;"></div>';
+
+        // 3. Foreground Content (z-index: 2)
+        h += '<div style="position:relative; z-index:2;">';
+
+        // Top Row: Speaker Name & Track Info
+        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin-bottom:8px;">';
+
+        // Metadata: Speaker Name & Track Title
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; margin-right:8px;">';
+        h += '<div style="font-weight:850; font-size:14px; color:' + textColor + '; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + name + '</div>';
+        h += '<div style="font-size:12px; color:' + subTextColor + '; font-weight:600; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(title) + (artist ? ' &bull; ' + escapeHtml(artist) : '') + '</div>';
         h += '</div>';
+
+        if (!unavailable) {
+          // Highlighted Control Buttons tinted with extracted dominant album color
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:8px; -webkit-flex-shrink:0; flex-shrink:0;">';
+
+          // Back (Previous)
+          h += '<button class="footer-btn" style="background:' + (isDarkTheme ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.06)') + '; color:' + textColor + '; width:32px; height:32px; border-radius:50%; margin:0; border:none; padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;" onclick="mediaPrevious(\'' + eid + '\')" title="Previous Track">';
+          h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+          h += '</button>';
+
+          // Play/Pause Button - Highlighted with extracted dominant album color!
+          var activeBg = isPlaying ? domRgbStr : (isDarkTheme ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)');
+          var activeIconColor = isPlaying ? '#ffffff' : textColor;
+          var activeGlow = isPlaying ? 'box-shadow: 0 4px 12px ' + domRgbGlow + ';' : '';
+
+          h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeIconColor + '; width:36px; height:36px; border-radius:50%; margin:0; border:none; ' + activeGlow + ' padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; transition: background 0.2s ease;" onclick="mediaPlayPause(\'' + eid + '\')" title="Play / Pause">';
+          if (isPlaying) {
+            h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+          } else {
+            h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+          }
+          h += '</button>';
+
+          // Next (Skip)
+          h += '<button class="footer-btn" style="background:' + (isDarkTheme ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.06)') + '; color:' + textColor + '; width:32px; height:32px; border-radius:50%; margin:0; border:none; padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;" onclick="mediaNext(\'' + eid + '\')" title="Next Track">';
+          h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+          h += '</button>';
+
+          h += '</div>';
+        }
+        h += '</div>'; // end top row
+
+        if (!unavailable) {
+          h += renderVolumeControls(group, true);
+        }
+
+        h += '</div>'; // end foreground content container
+        h += '</div>'; // end tile container
         return h;
       }
 

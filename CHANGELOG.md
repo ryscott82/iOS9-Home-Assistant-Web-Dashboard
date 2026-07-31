@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.12.0] - 2026-07-31
+- **Dynamic Blurred Background & Dominant Color Control Highlights on All Controls Page**: Active media player tiles on the All Controls page (`renderMediaPlayer`) feature a 24px blurred backdrop image of the playing album cover with a light (`rgba(255,255,255,0.82)`) or dark (`rgba(13,17,23,0.78)`) glass tint overlay depending on current theme mode. Highlighted playback controls (Play/Pause button) dynamically use the album's extracted dominant color (`extractAlbumDominantColor`) for background fill and glow shadow.
+
 ## [v3.11.8] - 2026-07-31
 - **Fixed All Controls Media Player Rendering**: Replaced `renderMediaCardLayout` (which was rendering the large Media page background cards) with `renderMediaPlayer` inside `tile-grid` on the All Controls page (`activeTab === "controls"`). Media player cards on the All Controls page now render as clean compact tiles without album cover artwork and with buttons fitting perfectly inside.
 
