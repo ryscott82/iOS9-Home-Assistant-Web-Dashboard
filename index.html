@@ -1638,120 +1638,222 @@
       box-shadow: 0 0 20px rgba(255, 204, 0, 0.5) !important;
     }
 
-    /* ======== REDESIGNED MEDIA PAGE STYLES (HIGH USABILITY) ======== */
-    .media-page-container {
+    /* ======== ALBUM ART CARD BACKGROUND & FROSTED GLASS CONTROLS ======== */
+    .media-page-grid {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+      gap: 20px;
       width: 100%;
-      max-width: 960px;
-      margin: 8px auto 0 auto;
-      padding: 0 8px;
       box-sizing: border-box;
     }
 
     .media-page-card {
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 28px;
+      position: relative;
+      overflow: hidden;
+      border-radius: 36px;
+      min-height: 520px;
       padding: 24px;
-      margin-bottom: 24px;
       display: -webkit-flex;
       display: flex;
       -webkit-flex-direction: column;
       flex-direction: column;
       -webkit-justify-content: space-between;
       justify-content: space-between;
-      min-height: 520px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
       box-sizing: border-box;
-      width: 100%;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      -webkit-flex: 1 1 calc(50% - 10px);
+      flex: 1 1 calc(50% - 10px);
+      min-width: 340px;
     }
 
-    body:not(.dark-theme) .media-page-card {
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    @media (max-width: 720px) {
+      .media-page-card {
+        -webkit-flex: 1 1 100%;
+        flex: 1 1 100%;
+        min-width: 0;
+      }
     }
 
-    /* 1. TOP 1/4 HEIGHT: TRACK TITLE & ARTIST (TOTAL WIDTH) */
-    .media-card-top-section {
-      width: 100%;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-align-items: center;
-      align-items: center;
-      margin-bottom: 16px;
-      box-sizing: border-box;
+    .media-card-bg-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-size: cover;
+      background-position: center;
+      z-index: 1;
+      -webkit-transform: scale(1.05);
+      transform: scale(1.05);
     }
 
-    .media-card-header-art {
-      width: 110px;
-      height: 110px;
-      min-width: 110px;
-      max-width: 110px;
-      border-radius: 20px;
-      overflow: hidden;
-      margin-right: 20px;
-      background: rgba(120, 120, 128, 0.16);
-      display: -webkit-flex;
-      display: flex;
-      -webkit-align-items: center;
-      align-items: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      -webkit-flex-shrink: 0;
-      flex-shrink: 0;
+    .media-card-bg-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: -webkit-linear-gradient(top, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.88) 100%);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.88) 100%);
+      z-index: 2;
     }
 
-    .media-card-header-art img {
+    .media-card-bg-fallback {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 50%, #0d1117 100%);
+      z-index: 1;
+    }
+
+    .media-card-content {
+      position: relative;
+      z-index: 3;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .media-card-header-art.placeholder {
-      color: #8e8e93;
-    }
-
-    .media-card-header-text {
-      -webkit-flex: 1;
-      flex: 1;
-      min-width: 0;
       display: -webkit-flex;
       display: flex;
       -webkit-flex-direction: column;
       flex-direction: column;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
     }
 
-    .media-card-track-title {
-      font-size: 38px;
-      font-weight: 900;
-      letter-spacing: -0.8px;
-      line-height: 1.12;
-      color: currentColor;
-      margin-bottom: 6px;
-      white-space: normal;
-      word-break: break-word;
+    .media-card-top-bar {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    .media-card-speaker-badge {
+      font-size: 15px;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.9);
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      letter-spacing: -0.2px;
+    }
+
+    /* Equalizer Audio Wave Animation */
+    .media-card-equalizer {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: flex-end;
+      align-items: flex-end;
+      gap: 3px;
+      height: 20px;
+      padding: 0 4px;
+    }
+
+    .eq-bar {
+      width: 3px;
+      background: #ffffff;
+      border-radius: 2px;
+      -webkit-animation: eqWave 0.8s infinite alternate ease-in-out;
+      animation: eqWave 0.8s infinite alternate ease-in-out;
+    }
+
+    .eq-bar:nth-child(1) { height: 12px; animation-delay: 0.1s; }
+    .eq-bar:nth-child(2) { height: 18px; animation-delay: 0.3s; }
+    .eq-bar:nth-child(3) { height: 10px; animation-delay: 0.2s; }
+    .eq-bar:nth-child(4) { height: 16px; animation-delay: 0.4s; }
+
+    @-webkit-keyframes eqWave {
+      0% { height: 4px; }
+      100% { height: 20px; }
+    }
+    @keyframes eqWave {
+      0% { height: 4px; }
+      100% { height: 20px; }
+    }
+
+    .media-card-info-box {
+      width: 100%;
+      margin-top: auto;
+      margin-bottom: 12px;
     }
 
     .media-card-artist-name {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-      color: #8e8e93;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 4px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    }
+
+    .media-card-track-title {
+      font-size: 34px;
+      font-weight: 950;
+      letter-spacing: -0.8px;
+      line-height: 1.15;
+      color: #ffffff;
+      margin-bottom: 16px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
       white-space: normal;
       word-break: break-word;
     }
 
-    /* 2. MIDDLE 1/2 HEIGHT: MEDIA CONTROLS & PROGRESS BAR */
-    .media-card-middle-section {
+    .media-card-progress-box {
       width: 100%;
+      margin-top: 8px;
+    }
+
+    .media-card-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .media-card-progress-fill {
+      height: 100%;
+      background: #ffffff;
+      border-radius: 4px;
+      -webkit-transition: width 0.2s linear;
+      transition: width 0.2s linear;
+    }
+
+    .media-card-progress-times {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      font-size: 16px;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 6px;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+    }
+
+    /* FROSTED GLASS BLUR CONTROLS BAR AT BOTTOM */
+    .media-card-controls-glass {
+      background: rgba(20, 20, 25, 0.68);
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 28px;
+      padding: 16px 18px;
       display: -webkit-flex;
       display: flex;
       -webkit-flex-direction: column;
       flex-direction: column;
-      -webkit-align-items: center;
-      align-items: center;
-      margin: 10px 0 20px 0;
-      box-sizing: border-box;
+      gap: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
     }
 
     .media-card-controls-row {
@@ -1759,44 +1861,16 @@
       display: flex;
       -webkit-align-items: center;
       align-items: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      gap: 24px;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
       width: 100%;
-      margin-bottom: 24px;
     }
 
-    .media-btn-large {
-      width: 76px;
-      height: 76px;
-      border-radius: 22px;
-      background: rgba(120, 120, 128, 0.16);
-      color: currentColor;
-      border: none;
-      cursor: pointer;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-align-items: center;
-      align-items: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      outline: none;
-      -webkit-appearance: none;
-      -webkit-transition: transform 0.1s, background 0.15s;
-      transition: transform 0.10s, background 0.15s;
-    }
-
-    .media-btn-large:active {
-      -webkit-transform: scale(0.93);
-      transform: scale(0.93);
-      background: rgba(120, 120, 128, 0.3);
-    }
-
-    .media-btn-giant {
-      width: 104px;
-      height: 104px;
-      border-radius: 30px;
-      background: #007aff;
+    .media-glass-btn {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: transparent;
       color: #ffffff;
       border: none;
       cursor: pointer;
@@ -1808,79 +1882,57 @@
       justify-content: center;
       outline: none;
       -webkit-appearance: none;
-      box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
-      -webkit-transition: transform 0.1s, opacity 0.15s;
-      transition: transform 0.10s, opacity 0.15s;
+      -webkit-transition: transform 0.1s, background 0.15s;
+      transition: transform 0.1s, background 0.15s;
     }
 
-    .media-btn-giant:active {
-      -webkit-transform: scale(0.93);
-      transform: scale(0.93);
-      opacity: 0.85;
+    .media-glass-btn:active {
+      background: rgba(255, 255, 255, 0.2);
+      -webkit-transform: scale(0.92);
+      transform: scale(0.92);
     }
 
-    .media-card-progress-box {
-      width: 100%;
-      margin-top: 4px;
-    }
-
-    .media-card-progress-bar {
-      width: 100%;
-      height: 14px;
-      background: rgba(120, 120, 128, 0.2);
-      border-radius: 7px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .media-card-progress-fill {
-      height: 100%;
-      background: #007aff;
-      border-radius: 7px;
-      -webkit-transition: width 0.2s linear;
-      transition: width 0.2s linear;
-    }
-
-    .media-card-progress-times {
+    .media-glass-play-pill {
+      height: 56px;
+      padding: 0 28px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.28);
+      color: #ffffff;
+      font-size: 20px;
+      font-weight: 850;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      cursor: pointer;
       display: -webkit-flex;
       display: flex;
-      -webkit-justify-content: space-between;
-      justify-content: space-between;
-      font-size: 20px;
-      font-weight: 700;
-      color: #8e8e93;
-      margin-top: 8px;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      outline: none;
+      -webkit-appearance: none;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      -webkit-transition: transform 0.1s, background 0.15s;
+      transition: transform 0.1s, background 0.15s;
     }
 
-    /* 3. BOTTOM 1/4 HEIGHT: VOLUME & SPEAKERS */
-    .media-card-bottom-section {
+    .media-glass-play-pill:active {
+      background: rgba(255, 255, 255, 0.45);
+      -webkit-transform: scale(0.95);
+      transform: scale(0.95);
+    }
+
+    .media-card-volume-section {
       width: 100%;
-      margin-top: 10px;
-    }
-
-    .media-card-speaker-block {
-      margin-bottom: 12px;
-    }
-
-    .media-card-speaker-title {
-      font-size: 20px;
-      font-weight: 800;
-      margin-bottom: 8px;
-      color: currentColor;
     }
 
     .media-large-vol-bar {
       position: relative;
       width: 100%;
-      height: 58px;
-      border-radius: 18px;
-      background: rgba(120, 120, 128, 0.16);
+      height: 50px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.15);
       overflow: hidden;
       box-sizing: border-box;
-    }
-
-    body.dark-theme .media-large-vol-bar {
-      background: rgba(255, 255, 255, 0.1);
     }
 
     .media-large-vol-fill {
@@ -1888,8 +1940,8 @@
       top: 0;
       left: 0;
       bottom: 0;
-      background: rgba(0, 122, 255, 0.35);
-      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 16px;
       -webkit-transition: width 0.15s ease;
       transition: width 0.15s ease;
       z-index: 1;
@@ -1911,12 +1963,12 @@
     }
 
     .media-vol-btn {
-      width: 64px;
-      height: 50px;
-      border-radius: 14px;
+      width: 54px;
+      height: 44px;
+      border-radius: 12px;
       background: transparent;
       border: none;
-      color: #007aff;
+      color: #ffffff;
       cursor: pointer;
       display: -webkit-flex;
       display: flex;
@@ -1929,13 +1981,13 @@
     }
 
     .media-vol-btn:active {
-      background: rgba(0, 122, 255, 0.2);
+      background: rgba(255, 255, 255, 0.25);
     }
 
     .media-vol-display {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 850;
-      color: currentColor;
+      color: #ffffff;
       letter-spacing: -0.3px;
     }
 
@@ -2834,7 +2886,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.1.1</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.2.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -3712,64 +3764,80 @@
 
         var h = '<div class="media-page-card">';
 
-        // 1. TOP 1/4 HEIGHT & TOTAL WIDTH: TRACK TITLE & ARTIST (+ ALBUM ART)
-        h += '<div class="media-card-top-section">';
+        // 1. ALBUM ART FULL CARD BACKGROUND + DARKENED GRADIENT OVERLAY
         if (artSrc) {
-          h += '<div class="media-card-header-art"><img src="' + escapeHtml(artSrc) + '" alt="Album Art" /></div>';
+          h += '<div class="media-card-bg-image" style="background-image: url(\'' + escapeHtml(artSrc) + '\');"></div>';
         } else {
-          h += '<div class="media-card-header-art placeholder"><svg width="44" height="44" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div>';
+          h += '<div class="media-card-bg-fallback"></div>';
         }
-        h += '<div class="media-card-header-text">';
-        h += '<div class="media-card-track-title">' + title + '</div>';
-        h += '<div class="media-card-artist-name">' + artist + '</div>';
-        h += '</div>';
-        h += '</div>';
+        h += '<div class="media-card-bg-overlay"></div>';
 
-        // 2. MIDDLE HALF (1/2 HEIGHT): MEDIA CONTROLS & PROGRESS BAR
-        h += '<div class="media-card-middle-section">';
-        
-        // Playback Buttons Row (Huge buttons)
-        h += '<div class="media-card-controls-row">';
-        h += '<button class="media-btn-large prev-btn" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous Track">';
-        h += '<svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
-        h += '</button>';
+        // 2. CARD CONTENT CONTAINER (FRONT LAYER)
+        h += '<div class="media-card-content">';
 
+        // TOP ROW: SPEAKER BADGE & EQUALIZER AUDIO WAVE VISUALIZER
+        h += '<div class="media-card-top-bar">';
+        var speakerNames = [];
+        for (var sn = 0; sn < group.length; sn++) {
+          speakerNames.push(friendlyName(group[sn]));
+        }
+        h += '<div class="media-card-speaker-badge">' + escapeHtml(speakerNames.join(" & ")) + '</div>';
         if (isPlaying) {
-          h += '<button class="media-btn-giant play-pause-btn" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause">';
-          h += '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-          h += '</button>';
-        } else {
-          h += '<button class="media-btn-giant play-pause-btn" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play">';
-          h += '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
-          h += '</button>';
+          h += '<div class="media-card-equalizer" title="Playing"><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span><span class="eq-bar"></span></div>';
         }
+        h += '</div>'; // end media-card-top-bar
 
-        h += '<button class="media-btn-large next-btn" onclick="mediaNextTrack(\'' + primaryEid + '\')" title="Next Track">';
-        h += '<svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
-        h += '</button>';
-        h += '</div>'; // end media-card-controls-row
+        // MIDDLE / LOWER TRACK INFO: ARTIST & SONG TITLE + PROGRESS BAR
+        h += '<div class="media-card-info-box">';
+        h += '<div class="media-card-artist-name">' + artist + '</div>';
+        h += '<div class="media-card-track-title">' + title + '</div>';
 
-        // Thick Progress Bar & Timestamps
+        // PROGRESS BAR & TIMESTAMPS
         if (mediaDuration > 0) {
           h += '<div class="media-card-progress-box">';
           h += '<div class="media-card-progress-bar"><div class="media-card-progress-fill" style="width:' + posPct + '%;"></div></div>';
           h += '<div class="media-card-progress-times"><span>' + posStr + '</span><span>' + durStr + '</span></div>';
           h += '</div>';
         }
-        h += '</div>'; // end media-card-middle-section
+        h += '</div>'; // end media-card-info-box
 
-        // 3. BOTTOM QUARTER (1/4 HEIGHT): VOLUME & SPEAKERS
-        h += '<div class="media-card-bottom-section">';
+        // BOTTOM FROSTED GLASS BLUR CONTROLS BAR
+        h += '<div class="media-card-controls-glass">';
+        
+        // Playback Controls Row (Prev, Play/Pause Pill, Next)
+        h += '<div class="media-card-controls-row">';
+        h += '<button class="media-glass-btn prev-btn" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous Track">';
+        h += '<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+        h += '</button>';
+
+        if (isPlaying) {
+          h += '<button class="media-glass-play-pill" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause">';
+          h += '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+          h += '<span>Pause</span>';
+          h += '</button>';
+        } else {
+          h += '<button class="media-glass-play-pill" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play">';
+          h += '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="margin-right:6px;"><path d="M8 5v14l11-7z"/></svg>';
+          h += '<span>Play</span>';
+          h += '</button>';
+        }
+
+        h += '<button class="media-glass-btn next-btn" onclick="mediaNextTrack(\'' + primaryEid + '\')" title="Next Track">';
+        h += '<svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+        h += '</button>';
+        h += '</div>'; // end media-card-controls-row
+
+        // Speaker Volume Controls Section inside glass
+        h += '<div class="media-card-volume-section">';
         for (var g = 0; g < group.length; g++) {
           var m = group[g];
-          var mName = escapeHtml(friendlyName(m));
-          h += '<div class="media-card-speaker-block">';
-          h += '<div class="media-card-speaker-title">' + mName + '</div>';
-          h += '<div class="media-card-speaker-vol">' + renderLargeVolumeControls(m) + '</div>';
-          h += '</div>';
+          h += renderLargeVolumeControls(m);
         }
-        h += '</div>'; // end media-card-bottom-section
+        h += '</div>'; // end volume section
 
+        h += '</div>'; // end media-card-controls-glass
+
+        h += '</div>'; // end media-card-content
         h += '</div>'; // end media-page-card
         return h;
       }
@@ -3819,11 +3887,13 @@
 
         var h = '<div class="media-page-container">';
 
-        // 1. ACTIVE PLAYING / PAUSED MEDIA CARDS
+        // 1. ACTIVE PLAYING / PAUSED MEDIA CARDS (Side-by-Side Grid when multiple)
         if (activeGroups.length > 0) {
+          h += '<div class="media-page-grid">';
           for (var k = 0; k < activeGroups.length; k++) {
             h += renderMediaCardLayout(activeGroups[k], activeGroups.length);
           }
+          h += '</div>';
         } else {
           // If no media is active
           h += '<div class="media-idle-section" style="text-align:center; padding:36px 20px; margin-bottom:20px;">';
