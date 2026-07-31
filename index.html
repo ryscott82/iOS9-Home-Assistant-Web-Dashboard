@@ -1653,8 +1653,8 @@
       position: relative;
       overflow: hidden;
       border-radius: 36px;
-      min-height: 520px;
-      padding: 24px;
+      min-height: 580px;
+      padding: 28px 24px 24px 24px;
       display: -webkit-flex;
       display: flex;
       -webkit-flex-direction: column;
@@ -1668,6 +1668,12 @@
       -webkit-flex: 1 1 calc(50% - 10px);
       flex: 1 1 calc(50% - 10px);
       min-width: 340px;
+    }
+
+    body:not(.dark-theme) .media-page-card {
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      color: #1c1c1e;
     }
 
     @media (max-width: 720px) {
@@ -1685,21 +1691,28 @@
       right: 0;
       bottom: 0;
       background-size: cover;
-      background-position: center;
+      background-position: center top;
       z-index: 1;
       -webkit-transform: scale(1.05);
       transform: scale(1.05);
     }
 
+    /* Dark Mode Overlay: Fades album cover to solid black at bottom */
     .media-card-bg-overlay {
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: -webkit-linear-gradient(top, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.88) 100%);
-      background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.88) 100%);
+      background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(13,17,23,0.45) 40%, rgba(13,17,23,0.96) 72%, #0d1117 100%);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(13,17,23,0.45) 40%, rgba(13,17,23,0.96) 72%, #0d1117 100%);
       z-index: 2;
+    }
+
+    /* Light Mode Overlay: Fades album cover to solid white at bottom */
+    body:not(.dark-theme) .media-card-bg-overlay {
+      background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(255,255,255,0.55) 40%, rgba(255,255,255,0.98) 72%, #ffffff 100%);
+      background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(255,255,255,0.55) 40%, rgba(255,255,255,0.98) 72%, #ffffff 100%);
     }
 
     .media-card-bg-fallback {
@@ -1710,6 +1723,10 @@
       bottom: 0;
       background: linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 50%, #0d1117 100%);
       z-index: 1;
+    }
+
+    body:not(.dark-theme) .media-card-bg-fallback {
+      background: linear-gradient(135deg, #e5e5ea 0%, #f2f2f7 50%, #ffffff 100%);
     }
 
     .media-card-content {
@@ -1733,18 +1750,26 @@
       -webkit-justify-content: space-between;
       justify-content: space-between;
       width: 100%;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .media-card-speaker-badge {
       font-size: 15px;
       font-weight: 800;
-      color: rgba(255, 255, 255, 0.9);
-      background: rgba(0, 0, 0, 0.4);
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.45);
       padding: 6px 14px;
       border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       letter-spacing: -0.2px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+
+    body:not(.dark-theme) .media-card-speaker-badge {
+      color: #1c1c1e;
+      background: rgba(255, 255, 255, 0.75);
+      border-color: rgba(0, 0, 0, 0.12);
+      text-shadow: none;
     }
 
     /* Equalizer Audio Wave Animation */
@@ -1766,6 +1791,10 @@
       animation: eqWave 0.8s infinite alternate ease-in-out;
     }
 
+    body:not(.dark-theme) .eq-bar {
+      background: #007aff;
+    }
+
     .eq-bar:nth-child(1) { height: 12px; animation-delay: 0.1s; }
     .eq-bar:nth-child(2) { height: 18px; animation-delay: 0.3s; }
     .eq-bar:nth-child(3) { height: 10px; animation-delay: 0.2s; }
@@ -1783,7 +1812,7 @@
     .media-card-info-box {
       width: 100%;
       margin-top: auto;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .media-card-artist-name {
@@ -1792,6 +1821,11 @@
       color: rgba(255, 255, 255, 0.85);
       margin-bottom: 4px;
       text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+    }
+
+    body:not(.dark-theme) .media-card-artist-name {
+      color: #636366;
+      text-shadow: none;
     }
 
     .media-card-track-title {
@@ -1804,6 +1838,11 @@
       text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
       white-space: normal;
       word-break: break-word;
+    }
+
+    body:not(.dark-theme) .media-card-track-title {
+      color: #1c1c1e;
+      text-shadow: none;
     }
 
     .media-card-progress-box {
@@ -1820,12 +1859,20 @@
       position: relative;
     }
 
+    body:not(.dark-theme) .media-card-progress-bar {
+      background: rgba(0, 0, 0, 0.12);
+    }
+
     .media-card-progress-fill {
       height: 100%;
       background: #ffffff;
       border-radius: 4px;
       -webkit-transition: width 0.2s linear;
       transition: width 0.2s linear;
+    }
+
+    body:not(.dark-theme) .media-card-progress-fill {
+      background: #007aff;
     }
 
     .media-card-progress-times {
@@ -1840,7 +1887,12 @@
       text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
     }
 
-    /* FROSTED GLASS BLUR CONTROLS BAR AT BOTTOM */
+    body:not(.dark-theme) .media-card-progress-times {
+      color: #636366;
+      text-shadow: none;
+    }
+
+    /* LOWERED FROSTED GLASS BLUR CONTROLS BAR AT BOTTOM */
     .media-card-controls-glass {
       background: rgba(20, 20, 25, 0.68);
       -webkit-backdrop-filter: blur(20px);
@@ -1854,6 +1906,13 @@
       flex-direction: column;
       gap: 12px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      margin-top: 16px;
+    }
+
+    body:not(.dark-theme) .media-card-controls-glass {
+      background: rgba(242, 242, 247, 0.82);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     }
 
     .media-card-controls-row {
@@ -1886,10 +1945,18 @@
       transition: transform 0.1s, background 0.15s;
     }
 
+    body:not(.dark-theme) .media-glass-btn {
+      color: #1c1c1e;
+    }
+
     .media-glass-btn:active {
       background: rgba(255, 255, 255, 0.2);
       -webkit-transform: scale(0.92);
       transform: scale(0.92);
+    }
+
+    body:not(.dark-theme) .media-glass-btn:active {
+      background: rgba(0, 0, 0, 0.08);
     }
 
     .media-glass-play-pill {
@@ -1915,10 +1982,21 @@
       transition: transform 0.1s, background 0.15s;
     }
 
+    body:not(.dark-theme) .media-glass-play-pill {
+      background: #007aff;
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+    }
+
     .media-glass-play-pill:active {
       background: rgba(255, 255, 255, 0.45);
       -webkit-transform: scale(0.95);
       transform: scale(0.95);
+    }
+
+    body:not(.dark-theme) .media-glass-play-pill:active {
+      background: #0056b3;
     }
 
     .media-card-volume-section {
@@ -1935,6 +2013,10 @@
       box-sizing: border-box;
     }
 
+    body:not(.dark-theme) .media-large-vol-bar {
+      background: rgba(0, 0, 0, 0.08);
+    }
+
     .media-large-vol-fill {
       position: absolute;
       top: 0;
@@ -1945,6 +2027,10 @@
       -webkit-transition: width 0.15s ease;
       transition: width 0.15s ease;
       z-index: 1;
+    }
+
+    body:not(.dark-theme) .media-large-vol-fill {
+      background: rgba(0, 122, 255, 0.25);
     }
 
     .media-large-vol-content {
@@ -2886,7 +2972,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.2.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.2.1</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
