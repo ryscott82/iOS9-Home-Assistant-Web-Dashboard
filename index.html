@@ -1818,7 +1818,7 @@
     }
 
     body:not(.dark-theme) .eq-bar {
-      background: #007aff;
+      background: rgb(65, 122, 160);
     }
 
     .eq-bar:nth-child(1) { height: 12px; animation-delay: 0.1s; }
@@ -1898,14 +1898,14 @@
 
     .media-card-progress-fill {
       height: 100%;
-      background: #ffffff;
+      background: rgb(65, 122, 160);
       border-radius: 4px;
       -webkit-transition: width 0.2s linear;
       transition: width 0.2s linear;
     }
 
     body:not(.dark-theme) .media-card-progress-fill {
-      background: #007aff;
+      background: rgb(65, 122, 160);
     }
 
     .media-card-progress-times {
@@ -1995,11 +1995,11 @@
       height: 56px;
       padding: 0 28px;
       border-radius: 28px;
-      background: rgba(255, 255, 255, 0.28);
+      background: rgba(65, 122, 160, 0.85);
       color: #ffffff;
       font-size: 20px;
       font-weight: 850;
-      border: 1px solid rgba(255, 255, 255, 0.3);
+      border: 1px solid rgba(65, 122, 160, 0.6);
       cursor: pointer;
       display: -webkit-flex;
       display: flex;
@@ -2009,26 +2009,26 @@
       justify-content: center;
       outline: none;
       -webkit-appearance: none;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 4px 14px rgba(65, 122, 160, 0.4);
       -webkit-transition: transform 0.1s, background 0.15s;
       transition: transform 0.1s, background 0.15s;
     }
 
     body:not(.dark-theme) .media-glass-play-pill {
-      background: #007aff;
+      background: rgb(65, 122, 160);
       color: #ffffff;
       border: none;
-      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.35);
+      box-shadow: 0 4px 14px rgba(65, 122, 160, 0.35);
     }
 
     .media-glass-play-pill:active {
-      background: rgba(255, 255, 255, 0.45);
+      background: rgba(65, 122, 160, 0.95);
       -webkit-transform: scale(0.95);
       transform: scale(0.95);
     }
 
     body:not(.dark-theme) .media-glass-play-pill:active {
-      background: #0056b3;
+      background: rgba(65, 122, 160, 0.95);
     }
 
     .media-card-volume-section {
@@ -2054,7 +2054,7 @@
       top: 0;
       left: 0;
       bottom: 0;
-      background: rgba(255, 255, 255, 0.35);
+      background: rgba(65, 122, 160, 0.35);
       border-radius: 16px;
       -webkit-transition: width 0.15s ease;
       transition: width 0.15s ease;
@@ -2062,7 +2062,7 @@
     }
 
     body:not(.dark-theme) .media-large-vol-fill {
-      background: rgba(0, 122, 255, 0.25);
+      background: rgba(65, 122, 160, 0.35);
     }
 
     .media-large-vol-content {
@@ -3004,7 +3004,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.4.1</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.5.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -3827,27 +3827,78 @@
         });
       };
 
-      function hslToRgb(h, s, l) {
-        var r, g, b;
-        h = h / 360;
-        var hue2rgb = function (p, q, t) {
-          if (t < 0) t += 1;
-          if (t > 1) t -= 1;
-          if (t < 1/6) return p + (q - p) * 6 * t;
-          if (t < 1/2) return q;
-          if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-          return p;
-        };
-        if (s === 0) {
-          r = g = b = l;
-        } else {
-          var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-          var p = 2 * l - q;
-          r = hue2rgb(p, q, h + 1/3);
-          g = hue2rgb(p, q, h);
-          b = hue2rgb(p, q, h - 1/3);
+      var albumColorCache = {};
+
+      function extractAlbumDominantColor(artSrc, callback) {
+        var defaultRgb = { r: 65, g: 122, b: 160 };
+        if (!artSrc) {
+          callback(defaultRgb);
+          return;
         }
-        return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+        if (albumColorCache[artSrc]) {
+          callback(albumColorCache[artSrc]);
+          return;
+        }
+
+        var img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = function () {
+          try {
+            var canvas = document.createElement("canvas");
+            canvas.width = 24;
+            canvas.height = 24;
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, 24, 24);
+            var imgData = ctx.getImageData(0, 0, 24, 24).data;
+
+            var rSum = 0, gSum = 0, bSum = 0, count = 0;
+            var maxSat = -1, maxSatRgb = null;
+
+            for (var p = 0; p < imgData.length; p += 16) {
+              var r = imgData[p];
+              var g = imgData[p + 1];
+              var b = imgData[p + 2];
+
+              var maxC = Math.max(r, g, b);
+              var minC = Math.min(r, g, b);
+              var brightness = (r + g + b) / 3;
+              var sat = maxC - minC;
+
+              if (brightness > 25 && brightness < 235 && sat > 15) {
+                rSum += r;
+                gSum += g;
+                bSum += b;
+                count++;
+                if (sat > maxSat) {
+                  maxSat = sat;
+                  maxSatRgb = { r: r, g: g, b: b };
+                }
+              }
+            }
+
+            var finalColor = defaultRgb;
+            if (maxSatRgb) {
+              finalColor = maxSatRgb;
+            } else if (count > 0) {
+              finalColor = {
+                r: Math.round(rSum / count),
+                g: Math.round(gSum / count),
+                b: Math.round(bSum / count)
+              };
+            }
+
+            albumColorCache[artSrc] = finalColor;
+            callback(finalColor);
+          } catch (err) {
+            albumColorCache[artSrc] = defaultRgb;
+            callback(defaultRgb);
+          }
+        };
+        img.onerror = function () {
+          albumColorCache[artSrc] = defaultRgb;
+          callback(defaultRgb);
+        };
+        img.src = artSrc;
       }
 
       function renderLargeVolumeControls(m, tr, tg, tb) {
@@ -3857,7 +3908,7 @@
         var mVolume = typeof mAttrs.volume_level !== "undefined" ? mAttrs.volume_level : 0.5;
         var volPct = Math.round(mVolume * 100);
 
-        var fillStyle = (typeof tr !== "undefined") ? 'style="width:' + volPct + '%; background: rgba(' + tr + ',' + tg + ',' + tb + ', 0.35);"' : 'style="width:' + volPct + '%;"';
+        var fillStyle = (typeof tr !== "undefined") ? 'style="width:' + volPct + '%; background: rgba(' + tr + ',' + tg + ',' + tb + ', 0.35);"' : 'style="width:' + volPct + '%; background: rgba(65, 122, 160, 0.35);"';
 
         var h = '<div class="media-large-vol-bar">';
         h += '<div id="vol_bar_fill_' + mCleanEid + '" class="media-large-vol-fill" ' + fillStyle + '></div>';
@@ -3891,15 +3942,30 @@
           artSrc = entityPicture.indexOf("http") === 0 ? entityPicture : haUrl + entityPicture;
         }
 
-        // Calculate a subtle dynamic album tint (vibrant HSL hue with 65% sat & 45% light for high contrast)
-        var str = (artist || "") + "___" + (title || "");
-        var hash = 0;
-        for (var i = 0; i < str.length; i++) {
-          hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        var hue = Math.abs(hash) % 360;
-        var tintRgb = hslToRgb(hue, 0.65, 0.45);
+        // Get actual album image color from cache or default to slate blue rgb(65, 122, 160)
+        var tintRgb = (artSrc && albumColorCache[artSrc]) ? albumColorCache[artSrc] : { r: 65, g: 122, b: 160 };
         var tr = tintRgb.r, tg = tintRgb.g, tb = tintRgb.b;
+        var primaryEid = primary.entity_id;
+        var primaryCleanEid = primaryEid.replace(/\./g, "_");
+
+        if (artSrc && !albumColorCache[artSrc]) {
+          extractAlbumDominantColor(artSrc, function(extractedRgb) {
+            var cardEl = document.getElementById("media_card_" + primaryCleanEid);
+            if (cardEl) {
+              cardEl.style.boxShadow = '0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + extractedRgb.r + ',' + extractedRgb.g + ',' + extractedRgb.b + ', 0.32)';
+              var pillEl = cardEl.querySelector(".media-glass-play-pill");
+              if (pillEl) {
+                pillEl.style.background = 'rgba(' + extractedRgb.r + ',' + extractedRgb.g + ',' + extractedRgb.b + ', 0.85)';
+                pillEl.style.borderColor = 'rgba(' + extractedRgb.r + ',' + extractedRgb.g + ',' + extractedRgb.b + ', 0.6)';
+                pillEl.style.boxShadow = '0 4px 14px rgba(' + extractedRgb.r + ',' + extractedRgb.g + ',' + extractedRgb.b + ', 0.4)';
+              }
+              var fillEl = document.getElementById("prog_fill_page_" + primaryCleanEid);
+              if (fillEl) {
+                fillEl.style.background = 'rgb(' + extractedRgb.r + ',' + extractedRgb.g + ',' + extractedRgb.b + ')';
+              }
+            }
+          });
+        }
 
         // Duration / Progress Calculation
         var mediaDuration = attrs.media_duration || 0;
@@ -3913,11 +3979,10 @@
         }
         var posStr = fmtTime(mediaPosition);
         var durStr = mediaDuration > 0 ? fmtTime(mediaDuration) : "--:--";
-        var primaryEid = primary.entity_id;
 
-        // Outer Card Glow with subtle dynamic album tint
+        // Outer Card Glow with dynamic album tint (or default slate blue rgb(65,122,160))
         var cardGlowStyle = 'box-shadow: 0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + tr + ',' + tg + ',' + tb + ', 0.32);';
-        var h = '<div class="media-page-card" style="' + cardGlowStyle + '">';
+        var h = '<div id="media_card_' + primaryCleanEid + '" class="media-page-card" style="' + cardGlowStyle + '">';
 
         // 1. ALBUM ART FULL CARD BACKGROUND + DARKENED GRADIENT OVERLAY + GLASS SWEEP ANIMATION
         if (artSrc) {
@@ -3952,7 +4017,6 @@
 
         // PROGRESS BAR & TIMESTAMPS (Optimistic Position Estimation Enabled)
         if (mediaDuration > 0) {
-          var primaryCleanEid = primaryEid.replace(/\./g, "_");
           var progFillStyle = 'style="width:' + posPct + '%; background: rgb(' + tr + ',' + tg + ',' + tb + ');"';
           h += '<div class="media-card-progress-box">';
           h += '<div class="media-card-progress-bar"><div id="prog_fill_page_' + primaryCleanEid + '" class="media-card-progress-fill" ' + progFillStyle + '></div></div>';
