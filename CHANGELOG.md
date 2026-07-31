@@ -2,10 +2,8 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
-## [v3.12.0] - 2026-07-31
-- **Unified Top-Left Navigation Header Bar**: Placed all navigation tab buttons (Home with house icon, All Controls, Chemicals, Media) squished together on the left side of the top header in a single unified row.
-- **Home-Only Welcome Message Banner**: Configured `#headerWelcome` ("Welcome Home") to display strictly on the Home screen and automatically hide when navigating to any other tab.
-- **Removed Top Time & Date**: Removed top header time/date displays (`#headerDateTime`) to streamline layout.
+## [v3.11.1] - 2026-07-31
+- **Simplified Top Header**: Completely removed date and time text from the top header container. The welcome message (`#headerWelcome`) is now displayed exclusively on the Home tab (`activeTab === "home"`), and automatically hidden on all other tabs for a clean, distraction-free view.
 
 ## [v3.11.0] - 2026-07-31
 - **Single Active Player Full-Space Layout**: When only 1 media player is active on the Media page, the card expands to fill the entire available height (`height: calc(100vh - 180px)`). Features a 32px blurred album art backdrop (`blur(32px)`), an unblurred crisp `320px x 320px` album cover art image inside the card frame, and enlarged UI controls (`38px` track title, `60px` play/pause pill, `60px` skip buttons, and `36px` volume bar).
