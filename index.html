@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#f2f2f7">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -27,7 +28,11 @@
       background: #f2f2f7;
     }
 
-    body, button, input, select, textarea {
+    body,
+    button,
+    input,
+    select,
+    textarea {
       min-height: 100%;
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF UI Display", "SF UI Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
       background: #f2f2f7;
@@ -701,6 +706,7 @@
       box-sizing: border-box !important;
       margin: 0 !important;
     }
+
     .stepper-btn:active {
       opacity: 0.7 !important;
     }
@@ -1163,6 +1169,7 @@
 
 
     @media (max-width: 600px) {
+
       /* Force 1 Card Per Row on Mobile Home Page */
       .tile-grid .tile,
       .tile.overview-tile,
@@ -1242,7 +1249,7 @@
         padding: 14px 16px !important;
       }
 
-      .tile.overview-big-tile.is-heater-tile > div {
+      .tile.overview-big-tile.is-heater-tile>div {
         -webkit-flex-wrap: wrap !important;
         flex-wrap: wrap !important;
         -webkit-justify-content: space-between !important;
@@ -1251,7 +1258,7 @@
       }
 
       /* Wrap middle feature buttons (child 2) onto full width row 2 on mobile */
-      .tile.overview-big-tile.is-heater-tile > div > div:nth-child(2) {
+      .tile.overview-big-tile.is-heater-tile>div>div:nth-child(2) {
         -webkit-flex: 0 0 100% !important;
         flex: 0 0 100% !important;
         width: 100% !important;
@@ -1277,6 +1284,7 @@
         color: #ffffff !important;
         border-radius: 12px !important;
       }
+
       .tile.overview-big-tile.is-heater-tile .chem-alert-btn svg {
         width: 22px !important;
         height: 22px !important;
@@ -1339,12 +1347,29 @@
 
     /* Harsh zero-fade red & black flashing keyframes */
     @-webkit-keyframes harshRedBlackStrobe {
-      0%, 49.9% { background: #d70015; }
-      50%, 100% { background: #000000; }
+
+      0%,
+      49.9% {
+        background: #d70015;
+      }
+
+      50%,
+      100% {
+        background: #000000;
+      }
     }
+
     @keyframes harshRedBlackStrobe {
-      0%, 49.9% { background: #d70015; }
-      50%, 100% { background: #000000; }
+
+      0%,
+      49.9% {
+        background: #d70015;
+      }
+
+      50%,
+      100% {
+        background: #000000;
+      }
     }
 
     .lightning-content-top {
@@ -1367,12 +1392,25 @@
     }
 
     @-webkit-keyframes lightningIconBounce {
-      0% { -webkit-transform: translateY(0) scale(1); transform: translateY(0) scale(1); }
-      100% { -webkit-transform: translateY(-14px) scale(1.08); transform: translateY(-14px) scale(1.08); }
+      0% {
+        -webkit-transform: translateY(0) scale(1);
+        transform: translateY(0) scale(1);
+      }
+
+      100% {
+        -webkit-transform: translateY(-14px) scale(1.08);
+        transform: translateY(-14px) scale(1.08);
+      }
     }
+
     @keyframes lightningIconBounce {
-      0% { transform: translateY(0) scale(1); }
-      100% { transform: translateY(-14px) scale(1.08); }
+      0% {
+        transform: translateY(0) scale(1);
+      }
+
+      100% {
+        transform: translateY(-14px) scale(1.08);
+      }
     }
 
     .lightning-title {
@@ -1450,7 +1488,7 @@
       letter-spacing: -1.4px !important;
       line-height: 1.02 !important;
       margin-top: 4px !important;
-      margin-bottom: 8px !important;
+      margin-bottom: 2px !important;
     }
 
     .sparse-bottom-clock {
@@ -1462,7 +1500,7 @@
       -webkit-justify-content: center;
       justify-content: center;
       width: 100%;
-      margin-top: 36px;
+      margin-top: 5px;
       margin-bottom: 28px;
       padding: 36px 20px;
       border-radius: 28px;
@@ -1600,76 +1638,81 @@
       box-shadow: 0 0 20px rgba(255, 204, 0, 0.5) !important;
     }
 
-    /* ======== MEDIA PAGE STYLES ======== */
+    /* ======== REDESIGNED MEDIA PAGE STYLES (HIGH USABILITY) ======== */
     .media-page-container {
       width: 100%;
       max-width: 960px;
-      margin: 16px auto 0 auto;
-      padding: 0 12px;
+      margin: 8px auto 0 auto;
+      padding: 0 8px;
       box-sizing: border-box;
     }
 
     .media-page-card {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 28px;
       padding: 24px;
       margin-bottom: 24px;
       display: -webkit-flex;
       display: flex;
-      -webkit-flex-direction: row;
-      flex-direction: row;
-      -webkit-align-items: flex-start;
-      align-items: flex-start;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      min-height: 520px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
       box-sizing: border-box;
+      width: 100%;
     }
 
     body:not(.dark-theme) .media-page-card {
       background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
     }
 
-    .media-page-art-container {
-      width: 320px;
-      height: 320px;
-      min-width: 320px;
-      max-width: 320px;
-      border-radius: 24px;
+    /* 1. TOP 1/4 HEIGHT: TRACK TITLE & ARTIST (TOTAL WIDTH) */
+    .media-card-top-section {
+      width: 100%;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+
+    .media-card-header-art {
+      width: 110px;
+      height: 110px;
+      min-width: 110px;
+      max-width: 110px;
+      border-radius: 20px;
       overflow: hidden;
-      margin-right: 28px;
-      background: rgba(120, 120, 128, 0.12);
+      margin-right: 20px;
+      background: rgba(120, 120, 128, 0.16);
       display: -webkit-flex;
       display: flex;
       -webkit-align-items: center;
       align-items: center;
       -webkit-justify-content: center;
       justify-content: center;
-      box-sizing: border-box;
       -webkit-flex-shrink: 0;
       flex-shrink: 0;
     }
 
-    .media-page-art {
+    .media-card-header-art img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
-      border-radius: 24px;
     }
 
-    .media-page-art-placeholder {
+    .media-card-header-art.placeholder {
       color: #8e8e93;
-      display: -webkit-flex;
-      display: flex;
-      -webkit-align-items: center;
-      align-items: center;
-      -webkit-justify-content: center;
-      justify-content: center;
     }
 
-    .media-page-details {
+    .media-card-header-text {
       -webkit-flex: 1;
       flex: 1;
       min-width: 0;
@@ -1679,131 +1722,221 @@
       flex-direction: column;
     }
 
-    .media-page-track-title {
-      font-size: 32px;
+    .media-card-track-title {
+      font-size: 38px;
       font-weight: 900;
-      letter-spacing: -0.6px;
-      line-height: 1.15;
+      letter-spacing: -0.8px;
+      line-height: 1.12;
       color: currentColor;
       margin-bottom: 6px;
       white-space: normal;
       word-break: break-word;
     }
 
-    .media-page-artist-name {
-      font-size: 20px;
-      font-weight: 600;
+    .media-card-artist-name {
+      font-size: 24px;
+      font-weight: 700;
       color: #8e8e93;
-      margin-bottom: 18px;
+      white-space: normal;
+      word-break: break-word;
     }
 
-    .media-page-controls-row {
+    /* 2. MIDDLE 1/2 HEIGHT: MEDIA CONTROLS & PROGRESS BAR */
+    .media-card-middle-section {
+      width: 100%;
       display: -webkit-flex;
       display: flex;
-      -webkit-box-pack: center;
-      -webkit-justify-content: center;
-      justify-content: center;
-      -webkit-box-align: center;
+      -webkit-flex-direction: column;
+      flex-direction: column;
       -webkit-align-items: center;
       align-items: center;
-      width: 100%;
-      margin: 10px auto 20px auto;
-      text-align: center !important;
+      margin: 10px 0 20px 0;
+      box-sizing: border-box;
     }
 
-    .media-page-ctrl-btn {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 56px;
-      height: 56px;
-      margin: 0 12px;
-      border-radius: 50%;
+    .media-card-controls-row {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      gap: 24px;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+
+    .media-btn-large {
+      width: 76px;
+      height: 76px;
+      border-radius: 22px;
       background: rgba(120, 120, 128, 0.16);
-      border: none;
       color: currentColor;
+      border: none;
       cursor: pointer;
       display: -webkit-flex;
       display: flex;
-      -webkit-box-pack: center;
+      -webkit-align-items: center;
+      align-items: center;
       -webkit-justify-content: center;
       justify-content: center;
-      -webkit-box-align: center;
-      -webkit-align-items: center;
-      align-items: center;
       outline: none;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-flex-shrink: 0;
-      flex-shrink: 0;
+      -webkit-appearance: none;
+      -webkit-transition: transform 0.1s, background 0.15s;
+      transition: transform 0.10s, background 0.15s;
     }
 
-    .media-page-play-btn {
-      width: 68px;
-      height: 68px;
+    .media-btn-large:active {
+      -webkit-transform: scale(0.93);
+      transform: scale(0.93);
+      background: rgba(120, 120, 128, 0.3);
+    }
+
+    .media-btn-giant {
+      width: 104px;
+      height: 104px;
+      border-radius: 30px;
       background: #007aff;
       color: #ffffff;
-      box-shadow: 0 4px 14px rgba(0, 122, 255, 0.4);
-    }
-
-    .media-page-progress-container {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
-    .media-page-progress-bar {
-      width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: rgba(120, 120, 128, 0.2);
-      overflow: hidden;
-      margin-bottom: 6px;
-    }
-
-    .media-page-progress-fill {
-      height: 100%;
-      background: #007aff;
-      border-radius: 3px;
-    }
-
-    .media-page-progress-times {
-      display: -webkit-flex;
-      display: flex;
-      -webkit-justify-content: space-between;
-      justify-content: space-between;
-      font-size: 13px;
-      font-weight: 600;
-      color: #8e8e93;
-    }
-
-    .media-page-speakers-section {
-      width: 100%;
-      margin-top: 10px;
-      border-top: 1px solid rgba(120, 120, 128, 0.15);
-      padding-top: 14px;
-    }
-
-    .media-page-speaker-row {
+      border: none;
+      cursor: pointer;
       display: -webkit-flex;
       display: flex;
       -webkit-align-items: center;
       align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      outline: none;
+      -webkit-appearance: none;
+      box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
+      -webkit-transition: transform 0.1s, opacity 0.15s;
+      transition: transform 0.10s, opacity 0.15s;
+    }
+
+    .media-btn-giant:active {
+      -webkit-transform: scale(0.93);
+      transform: scale(0.93);
+      opacity: 0.85;
+    }
+
+    .media-card-progress-box {
+      width: 100%;
+      margin-top: 4px;
+    }
+
+    .media-card-progress-bar {
+      width: 100%;
+      height: 14px;
+      background: rgba(120, 120, 128, 0.2);
+      border-radius: 7px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .media-card-progress-fill {
+      height: 100%;
+      background: #007aff;
+      border-radius: 7px;
+      -webkit-transition: width 0.2s linear;
+      transition: width 0.2s linear;
+    }
+
+    .media-card-progress-times {
+      display: -webkit-flex;
+      display: flex;
       -webkit-justify-content: space-between;
       justify-content: space-between;
+      font-size: 20px;
+      font-weight: 700;
+      color: #8e8e93;
+      margin-top: 8px;
+    }
+
+    /* 3. BOTTOM 1/4 HEIGHT: VOLUME & SPEAKERS */
+    .media-card-bottom-section {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .media-card-speaker-block {
       margin-bottom: 12px;
     }
 
-    .media-page-speaker-name {
-      font-size: 16px;
-      font-weight: 700;
+    .media-card-speaker-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 8px;
       color: currentColor;
-      min-width: 120px;
-      padding-right: 12px;
     }
 
-    .media-page-speaker-vol {
-      -webkit-flex: 1;
-      flex: 1;
-      max-width: 340px;
+    .media-large-vol-bar {
+      position: relative;
+      width: 100%;
+      height: 58px;
+      border-radius: 18px;
+      background: rgba(120, 120, 128, 0.16);
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    body.dark-theme .media-large-vol-bar {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .media-large-vol-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background: rgba(0, 122, 255, 0.35);
+      border-radius: 18px;
+      -webkit-transition: width 0.15s ease;
+      transition: width 0.15s ease;
+      z-index: 1;
+    }
+
+    .media-large-vol-content {
+      position: relative;
+      z-index: 2;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      padding: 0 4px;
+      box-sizing: border-box;
+    }
+
+    .media-vol-btn {
+      width: 64px;
+      height: 50px;
+      border-radius: 14px;
+      background: transparent;
+      border: none;
+      color: #007aff;
+      cursor: pointer;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .media-vol-btn:active {
+      background: rgba(0, 122, 255, 0.2);
+    }
+
+    .media-vol-display {
+      font-size: 22px;
+      font-weight: 850;
+      color: currentColor;
+      letter-spacing: -0.3px;
     }
 
     .media-idle-section {
@@ -1840,10 +1973,10 @@
 
     .media-idle-pill {
       background: rgba(120, 120, 128, 0.12);
-      padding: 8px 16px;
+      padding: 12px 20px;
       border-radius: 20px;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 700;
       color: currentColor;
     }
 
@@ -2128,10 +2261,12 @@
       top: 0;
       z-index: 100;
     }
+
     body.dark-theme .floor-nav-bar {
       background: rgba(30, 30, 30, 0.85);
       border-color: rgba(255, 255, 255, 0.05);
     }
+
     .floor-nav-btn {
       background: transparent;
       border: none;
@@ -2146,12 +2281,15 @@
       -webkit-transition: background 0.15s;
       transition: background 0.15s;
     }
+
     .floor-nav-btn:active {
       background: rgba(0, 122, 255, 0.1);
     }
+
     body.dark-theme .floor-nav-btn {
       color: #0a84ff;
     }
+
     body.dark-theme .floor-nav-btn:active {
       background: rgba(10, 132, 255, 0.15);
     }
@@ -2576,7 +2714,8 @@
       <div class="lightning-icon-box">⚡</div>
       <div class="lightning-title">LIGHTNING NEARBY!</div>
     </div>
-    <div class="lightning-message">Lightning safety detector has registered lightning in the near vicinity. Seek shelter indoors immediately.</div>
+    <div class="lightning-message">Lightning safety detector has registered lightning in the near vicinity. Seek shelter
+      indoors immediately.</div>
     <div class="lightning-content-bottom">
       <button class="lightning-action-btn" onclick="dismissLightningAlert()">Acknowledge Safety Alert</button>
     </div>
@@ -2655,14 +2794,23 @@
   <main class="app-content" id="appContent" style="display:none; padding-top: 0px;">
 
     <!-- UNIFIED HEADER (Top Left: Welcome Message | Top Right: Date/Time + 3-Line Hamburger Menu Button) -->
-    <header class="app-header" id="appHeader" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-top:4px; margin-bottom:12px; padding:0 4px;">
-      <div id="headerWelcome" class="header-welcome" style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:48px; font-weight:850; white-space:normal; word-break:break-word; line-height:1.05; padding-right:12px; letter-spacing:-0.8px;">Welcome Home</div>
-      <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; -webkit-flex-shrink:0; flex-shrink:0;">
-        <div style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:flex-end; align-items:flex-end;">
-          <div id="headerDateTime" class="header-datetime" style="margin:0; font-size:20px; font-weight:700; white-space:nowrap;"></div>
+    <header class="app-header" id="appHeader"
+      style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-top:4px; margin-bottom:12px; padding:0 4px;">
+      <div id="headerWelcome" class="header-welcome"
+        style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:48px; font-weight:850; white-space:normal; word-break:break-word; line-height:1.05; padding-right:12px; letter-spacing:-0.8px;">
+        Welcome Home</div>
+      <div
+        style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; -webkit-flex-shrink:0; flex-shrink:0;">
+        <div
+          style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:flex-end; align-items:flex-end;">
+          <div id="headerDateTime" class="header-datetime"
+            style="margin:0; font-size:20px; font-weight:700; white-space:nowrap;"></div>
         </div>
-        <button id="headerNavBtn" class="menu-icon-btn" onclick="toggleMainNavigation(event)" title="Menu" style="width:48px; height:48px; border-radius:12px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0; box-sizing:border-box; text-align:center;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+        <button id="headerNavBtn" class="menu-icon-btn" onclick="toggleMainNavigation(event)" title="Menu"
+          style="width:48px; height:48px; border-radius:12px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0; box-sizing:border-box; text-align:center;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;">
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+          </svg>
         </button>
       </div>
     </header>
@@ -2686,12 +2834,15 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.0.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.1.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
-        <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊 Sound</button>
-        <button class="footer-btn" id="lightningTestBtn" onclick="toggleLightningTest()" title="Test Lightning Safety Alert">⚡ Test Lightning</button>
-        <button class="footer-btn" id="allOffToggleBtn" onclick="toggleAllOffButtonOverride()" title="Test All Off Button">🌙 Test All Off</button>
+        <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
+          Sound</button>
+        <button class="footer-btn" id="lightningTestBtn" onclick="toggleLightningTest()"
+          title="Test Lightning Safety Alert">⚡ Test Lightning</button>
+        <button class="footer-btn" id="allOffToggleBtn" onclick="toggleAllOffButtonOverride()"
+          title="Test All Off Button">🌙 Test All Off</button>
         <button class="footer-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Theme">🌙 Dark</button>
         <button class="footer-btn" onclick="location.reload()" title="Refresh">&#8635; Refresh</button>
       </div>
@@ -3029,7 +3180,7 @@
       window.toggleMainNavigation = function (e) {
         if (e && e.stopPropagation) e.stopPropagation();
         if (e && e.preventDefault) e.preventDefault();
-        
+
         if (activeTab === "home") {
           window.switchTab("controls");
         } else {
@@ -3088,7 +3239,7 @@
         if (!entity) return domain;
         var eid = entity.entity_id.toLowerCase();
         var name = (friendlyName(entity) || "").toLowerCase();
-        
+
         if (eid === "switch.pool_waterfall" || name.indexOf("waterfall") !== -1) {
           return "waterfall";
         }
@@ -3112,7 +3263,7 @@
         }
         var name = friendlyName(entity);
         var lower = name.toLowerCase();
-        
+
         var rooms = [
           "master bedroom", "ryan's bedroom", "mason's bedroom", "keira's bedroom",
           "living room", "kitchen", "family room", "dining room", "office",
@@ -3121,7 +3272,7 @@
         ];
         for (var r = 0; r < rooms.length; r++) {
           if (lower.indexOf(rooms[r]) !== -1) {
-            return rooms[r].replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+            return rooms[r].replace(/\b\w/g, function (l) { return l.toUpperCase(); });
           }
         }
         return "";
@@ -3145,21 +3296,21 @@
         if (name.indexOf("basement") !== -1 || lowerEid.indexOf("basement") !== -1) {
           return "Basement";
         }
-        if (name.indexOf("upstairs") !== -1 || lowerEid.indexOf("upstairs") !== -1 || 
-            name.indexOf("second") !== -1 || lowerEid.indexOf("second") !== -1 || 
-            name.indexOf("2nd") !== -1 || lowerEid.indexOf("2nd") !== -1 || 
-            name.indexOf("loft") !== -1 || lowerEid.indexOf("loft") !== -1) {
+        if (name.indexOf("upstairs") !== -1 || lowerEid.indexOf("upstairs") !== -1 ||
+          name.indexOf("second") !== -1 || lowerEid.indexOf("second") !== -1 ||
+          name.indexOf("2nd") !== -1 || lowerEid.indexOf("2nd") !== -1 ||
+          name.indexOf("loft") !== -1 || lowerEid.indexOf("loft") !== -1) {
           return "Upstairs";
         }
-        if (name.indexOf("outdoor") !== -1 || lowerEid.indexOf("outdoor") !== -1 || 
-            name.indexOf("patio") !== -1 || lowerEid.indexOf("patio") !== -1 || 
-            name.indexOf("pool") !== -1 || lowerEid.indexOf("pool") !== -1 || 
-            name.indexOf("deck") !== -1 || lowerEid.indexOf("deck") !== -1 || 
-            name.indexOf("yard") !== -1 || lowerEid.indexOf("yard") !== -1 || 
-            name.indexOf("hottub") !== -1 || lowerEid.indexOf("hottub") !== -1 || 
-            name.indexOf("hot tub") !== -1 || lowerEid.indexOf("hot_tub") !== -1 || 
-            name.indexOf("exterior") !== -1 || lowerEid.indexOf("exterior") !== -1 || 
-            name.indexOf("garage") !== -1 || lowerEid.indexOf("garage") !== -1) {
+        if (name.indexOf("outdoor") !== -1 || lowerEid.indexOf("outdoor") !== -1 ||
+          name.indexOf("patio") !== -1 || lowerEid.indexOf("patio") !== -1 ||
+          name.indexOf("pool") !== -1 || lowerEid.indexOf("pool") !== -1 ||
+          name.indexOf("deck") !== -1 || lowerEid.indexOf("deck") !== -1 ||
+          name.indexOf("yard") !== -1 || lowerEid.indexOf("yard") !== -1 ||
+          name.indexOf("hottub") !== -1 || lowerEid.indexOf("hottub") !== -1 ||
+          name.indexOf("hot tub") !== -1 || lowerEid.indexOf("hot_tub") !== -1 ||
+          name.indexOf("exterior") !== -1 || lowerEid.indexOf("exterior") !== -1 ||
+          name.indexOf("garage") !== -1 || lowerEid.indexOf("garage") !== -1) {
           return "Outdoor";
         }
         return "Main Floor";
@@ -3169,15 +3320,15 @@
         var target = event.target || event.srcElement;
         while (target && target !== event.currentTarget) {
           var tag = target.tagName.toLowerCase();
-          if (tag === "input" || tag === "button" || tag === "select" || tag === "label" || 
-              target.classList.contains("toggle-slider") || 
-              target.classList.contains("thermostat-btn") || 
-              target.classList.contains("cover-btn") || 
-              target.classList.contains("mode-btn") || 
-              target.classList.contains("preset-btn") || 
-              target.classList.contains("footer-btn") || 
-              target.classList.contains("confirm-btn") || 
-              target.classList.contains("select-wrapper")) {
+          if (tag === "input" || tag === "button" || tag === "select" || tag === "label" ||
+            target.classList.contains("toggle-slider") ||
+            target.classList.contains("thermostat-btn") ||
+            target.classList.contains("cover-btn") ||
+            target.classList.contains("mode-btn") ||
+            target.classList.contains("preset-btn") ||
+            target.classList.contains("footer-btn") ||
+            target.classList.contains("confirm-btn") ||
+            target.classList.contains("select-wrapper")) {
             return;
           }
           target = target.parentNode;
@@ -3404,7 +3555,7 @@
 
         var h = '<div class="tile overview-big-tile' + activeClass + heaterClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer; ' + widthStyle + '">';
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; height:100%;">';
-        
+
         // LEFT: Icon + Title (Omit icon for Pool & Hot Tub to save horizontal space)
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-flex-shrink:0; flex-shrink:0; margin-right:14px;">';
         if (!isFullWidth) {
@@ -3505,42 +3656,33 @@
         });
       };
 
+      function renderLargeVolumeControls(m) {
+        var mEid = escapeHtml(m.entity_id);
+        var mCleanEid = mEid.replace(/\./g, "_");
+        var mAttrs = m.attributes || {};
+        var mVolume = typeof mAttrs.volume_level !== "undefined" ? mAttrs.volume_level : 0.5;
+        var volPct = Math.round(mVolume * 100);
+
+        var h = '<div class="media-large-vol-bar">';
+        h += '<div id="vol_bar_fill_' + mCleanEid + '" class="media-large-vol-fill" style="width:' + volPct + '%;"></div>';
+        h += '<div class="media-large-vol-content">';
+        h += '<button class="media-vol-btn" onclick="adjustVolume(\'' + m.entity_id + '\', -0.0625)" title="Volume Down">';
+        h += '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>';
+        h += '</button>';
+        h += '<div class="media-vol-display">' + volPct + '%</div>';
+        h += '<button class="media-vol-btn" onclick="adjustVolume(\'' + m.entity_id + '\', 0.0625)" title="Volume Up">';
+        h += '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>';
+        h += '</button>';
+        h += '</div>';
+        h += '</div>';
+        return h;
+      }
+
       function renderMediaCardLayout(group, cardCount) {
         var primary = group[0] || group;
         var attrs = primary.attributes || {};
         var state = primary.state;
         var isPlaying = (state === "playing");
-
-        // UI Scaling tailored for iPad Mini 1st Gen (1024x768 landscape)
-        // 1 active album: Giant 480px album art & 44px text filling 100% of screen height
-        var artSize = 480;
-        var titleSize = "44px";
-        var artistSize = "26px";
-        var cardPadding = "28px";
-        var cardMarginBottom = "80px"; // Pushes idle speakers & footer below the fold
-        var ctrlBtnSize = 64;
-        var playBtnSize = 80;
-        var speakerTitleSize = "18px";
-
-        if (cardCount === 2) {
-          artSize = 240;
-          titleSize = "26px";
-          artistSize = "18px";
-          cardPadding = "16px";
-          cardMarginBottom = "16px";
-          ctrlBtnSize = 48;
-          playBtnSize = 58;
-          speakerTitleSize = "15px";
-        } else if (cardCount >= 3) {
-          artSize = 160;
-          titleSize = "20px";
-          artistSize = "14px";
-          cardPadding = "12px";
-          cardMarginBottom = "12px";
-          ctrlBtnSize = 40;
-          playBtnSize = 48;
-          speakerTitleSize = "14px";
-        }
 
         // Media Info
         var title = escapeHtml(attrs.media_title || attrs.friendly_name || "No Track Selected");
@@ -3565,81 +3707,68 @@
         }
         var posStr = fmtTime(mediaPosition);
         var durStr = mediaDuration > 0 ? fmtTime(mediaDuration) : "--:--";
-
-        var h = '<div class="media-page-card" style="padding:' + cardPadding + '; margin-bottom:' + cardMarginBottom + ';">';
-
-        // LEFT COLUMN: ALBUM ART (Scales dynamically)
-        var artStyle = 'width:' + artSize + 'px; height:' + artSize + 'px; min-width:' + artSize + 'px; max-width:' + artSize + 'px;';
-        h += '<div class="media-page-art-container" style="' + artStyle + '">';
-        if (artSrc) {
-          h += '<img class="media-page-art" src="' + escapeHtml(artSrc) + '" alt="Album Art" />';
-        } else {
-          var iconSize = Math.round(artSize * 0.25);
-          h += '<div class="media-page-art-placeholder">';
-          h += '<svg width="' + iconSize + '" height="' + iconSize + '" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>';
-          h += '</div>';
-        }
-        h += '</div>';
-
-        // RIGHT COLUMN: DETAILS
-        h += '<div class="media-page-details">';
-
-        // Track Title & Artist
-        h += '<div class="media-page-track-title" style="font-size:' + titleSize + ';">' + title + '</div>';
-        h += '<div class="media-page-artist-name" style="font-size:' + artistSize + ';">' + artist + '</div>';
-
-        // Playback Controls
         var primaryEid = primary.entity_id;
-        var ctrlBtnStyle = 'width:' + ctrlBtnSize + 'px; height:' + ctrlBtnSize + 'px; margin: 0 10px;';
-        var playBtnStyle = 'width:' + playBtnSize + 'px; height:' + playBtnSize + 'px; margin: 0 10px;';
-        var prevNextSvgSize = Math.round(ctrlBtnSize * 0.46);
-        var playSvgSize = Math.round(playBtnSize * 0.48);
 
-        var ctrlRowMargin = (cardCount >= 3) ? '2px auto 6px auto' : ((cardCount === 2) ? '4px auto 10px auto' : '6px auto 14px auto');
-        h += '<div class="media-page-controls-row" style="margin:' + ctrlRowMargin + ';">';
-        h += '<div class="media-page-ctrl-btn" style="' + ctrlBtnStyle + '" role="button" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous">';
-        h += '<svg width="' + prevNextSvgSize + '" height="' + prevNextSvgSize + '" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+        var h = '<div class="media-page-card">';
+
+        // 1. TOP 1/4 HEIGHT & TOTAL WIDTH: TRACK TITLE & ARTIST (+ ALBUM ART)
+        h += '<div class="media-card-top-section">';
+        if (artSrc) {
+          h += '<div class="media-card-header-art"><img src="' + escapeHtml(artSrc) + '" alt="Album Art" /></div>';
+        } else {
+          h += '<div class="media-card-header-art placeholder"><svg width="44" height="44" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg></div>';
+        }
+        h += '<div class="media-card-header-text">';
+        h += '<div class="media-card-track-title">' + title + '</div>';
+        h += '<div class="media-card-artist-name">' + artist + '</div>';
         h += '</div>';
+        h += '</div>';
+
+        // 2. MIDDLE HALF (1/2 HEIGHT): MEDIA CONTROLS & PROGRESS BAR
+        h += '<div class="media-card-middle-section">';
+        
+        // Playback Buttons Row (Huge buttons)
+        h += '<div class="media-card-controls-row">';
+        h += '<button class="media-btn-large prev-btn" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous Track">';
+        h += '<svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+        h += '</button>';
 
         if (isPlaying) {
-          h += '<div class="media-page-ctrl-btn media-page-play-btn" style="' + playBtnStyle + '" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause">';
-          h += '<svg width="' + playSvgSize + '" height="' + playSvgSize + '" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-          h += '</div>';
+          h += '<button class="media-btn-giant play-pause-btn" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Pause">';
+          h += '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+          h += '</button>';
         } else {
-          h += '<div class="media-page-ctrl-btn media-page-play-btn" style="' + playBtnStyle + '" role="button" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play">';
-          h += '<svg width="' + playSvgSize + '" height="' + playSvgSize + '" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M8 5v14l11-7z"/></svg>';
-          h += '</div>';
+          h += '<button class="media-btn-giant play-pause-btn" onclick="mediaPlayPause(\'' + primaryEid + '\')" title="Play">';
+          h += '<svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+          h += '</button>';
         }
 
-        h += '<div class="media-page-ctrl-btn" style="' + ctrlBtnStyle + '" role="button" onclick="mediaNextTrack(\'' + primaryEid + '\')" title="Next">';
-        h += '<svg width="' + prevNextSvgSize + '" height="' + prevNextSvgSize + '" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
-        h += '</div>';
-        h += '</div>';
+        h += '<button class="media-btn-large next-btn" onclick="mediaNextTrack(\'' + primaryEid + '\')" title="Next Track">';
+        h += '<svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+        h += '</button>';
+        h += '</div>'; // end media-card-controls-row
 
-        // Progress / Duration Bar
+        // Thick Progress Bar & Timestamps
         if (mediaDuration > 0) {
-          var progMarginBottom = (cardCount >= 2) ? '10px' : '20px';
-          h += '<div class="media-page-progress-container" style="margin-bottom:' + progMarginBottom + ';">';
-          h += '<div class="media-page-progress-bar"><div class="media-page-progress-fill" style="width:' + posPct + '%;"></div></div>';
-          h += '<div class="media-page-progress-times"><span>' + posStr + '</span><span>' + durStr + '</span></div>';
+          h += '<div class="media-card-progress-box">';
+          h += '<div class="media-card-progress-bar"><div class="media-card-progress-fill" style="width:' + posPct + '%;"></div></div>';
+          h += '<div class="media-card-progress-times"><span>' + posStr + '</span><span>' + durStr + '</span></div>';
           h += '</div>';
         }
+        h += '</div>'; // end media-card-middle-section
 
-        // Speaker Volume Controls
-        var spkPaddingTop = (cardCount >= 3) ? '6px' : ((cardCount === 2) ? '8px' : '14px');
-        h += '<div class="media-page-speakers-section" style="padding-top:' + spkPaddingTop + ';">';
+        // 3. BOTTOM QUARTER (1/4 HEIGHT): VOLUME & SPEAKERS
+        h += '<div class="media-card-bottom-section">';
         for (var g = 0; g < group.length; g++) {
           var m = group[g];
           var mName = escapeHtml(friendlyName(m));
-          var spkMarginBottom = (cardCount >= 2) ? '6px' : '12px';
-          h += '<div class="media-page-speaker-row" style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; align-items:flex-start; margin-bottom:' + spkMarginBottom + ';">';
-          h += '<div class="media-page-speaker-name" style="font-size:' + speakerTitleSize + '; font-weight:800; margin-bottom:4px; color:currentColor;">' + mName + '</div>';
-          h += '<div class="media-page-speaker-vol" style="width:100%; max-width:100%;">' + renderVolumeControls([m], true) + '</div>';
+          h += '<div class="media-card-speaker-block">';
+          h += '<div class="media-card-speaker-title">' + mName + '</div>';
+          h += '<div class="media-card-speaker-vol">' + renderLargeVolumeControls(m) + '</div>';
           h += '</div>';
         }
-        h += '</div>';
+        h += '</div>'; // end media-card-bottom-section
 
-        h += '</div>'; // end media-page-details
         h += '</div>'; // end media-page-card
         return h;
       }
@@ -3764,7 +3893,7 @@
 
         var h = '<div class="tile overview-big-tile' + activeClass + '" onclick="mediaPlayPause(\'' + eid + '\')" style="cursor:pointer;">';
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        
+
         // Enlarged 64px x 64px Album Art with transparent Play/Pause overlay icon
         h += '<div style="position:relative; width:64px; height:64px; border-radius:14px; overflow:hidden; margin-right:14px; -webkit-flex-shrink:0; flex-shrink:0; background:#f2f2f7;">';
         if (artUrl) {
@@ -3785,7 +3914,7 @@
 
         if (!unavailable) {
           h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; margin-left:14px; -webkit-flex-shrink:0; flex-shrink:0;">';
-          
+
           // Enlarged Skip/Next button (48px x 48px with 24px icon) for far-away visibility
           h += '<button class="media-ctrl-btn" style="width:48px; height:48px; border-radius:12px; background:rgba(142,142,147,0.18); border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0;" onclick="event.stopPropagation(); mediaNextTrack(\'' + eid + '\')" title="Next Track">';
           h += '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
@@ -3883,7 +4012,7 @@
         var fallbackTimeout = setTimeout(function () {
           if (!registryLoaded) {
             registryLoaded = true;
-            try { ws.close(); } catch (e) {}
+            try { ws.close(); } catch (e) { }
             refreshAll();
           }
         }, 1500);
@@ -4049,7 +4178,7 @@
         }
 
         if (fname.indexOf("ipadhomescreen") !== -1 || eid.indexOf("ipadhomescreen") !== -1 ||
-            fname.indexOf("ipaddashboard") !== -1 || eid.indexOf("ipaddashboard") !== -1) return true;
+          fname.indexOf("ipaddashboard") !== -1 || eid.indexOf("ipaddashboard") !== -1) return true;
 
         return false;
       }
@@ -4069,7 +4198,7 @@
 
         var name = (friendlyName(entity) || "").toLowerCase();
         if (name.indexOf("ipaddashboard") !== -1 || eid.indexOf("ipaddashboard") !== -1 ||
-            name.indexOf("ipadhomescreen") !== -1 || eid.indexOf("ipadhomescreen") !== -1) {
+          name.indexOf("ipadhomescreen") !== -1 || eid.indexOf("ipadhomescreen") !== -1) {
           return true;
         }
 
@@ -4810,9 +4939,9 @@
         var tileClass = "tile" + spanClass + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
         var iconName = getEntityIcon(entity, "light");
         var icon = getSvg(iconName, isOn ? getActiveSvgColor("light", entity.state) : "");
-        
+
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')" style="padding:14px 16px;">';
-        
+
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
@@ -4879,7 +5008,7 @@
 
         var tileClass = "tile card-1x1" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="padding:14px 16px;">';
-        
+
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
@@ -4890,7 +5019,7 @@
         h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
         h += '</div>';
-        
+
         h += '</div>';
         return h;
       }
@@ -4922,7 +5051,7 @@
         var icon = getSvg(iconName, isActive ? getActiveSvgColor("climate", hvacMode) : "");
 
         var h = '<div class="tile card-2x1' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
-        
+
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
@@ -4986,7 +5115,7 @@
         var icon = getSvg(iconName, isOpen ? getActiveSvgColor("cover", entity.state) : "");
 
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'cover\')" style="padding:14px 16px;">';
-        
+
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left; margin-right:8px;">';
@@ -4996,7 +5125,7 @@
         h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
-        
+
         if (!unavailable) {
           h += '<div class="cover-controls" style="display:-webkit-flex; display:flex; gap:3px; -webkit-flex-shrink:0; flex-shrink:0;">';
           h += '<button class="cover-btn" style="width:24px; height:24px; font-size:10px; line-height:24px;" onclick="coverAction(\'' + eid + '\', \'open\')" title="Open">&#9650;</button>';
@@ -5005,7 +5134,7 @@
           h += '</div>';
         }
         h += '</div>';
-        
+
         h += '</div>';
         return h;
       }
@@ -5023,7 +5152,7 @@
         var icon = getSvg(actualIcon, isLocked ? getActiveSvgColor("lock", "locked") : "");
 
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'lock\')" style="padding:14px 16px;">';
-        
+
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
         h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
         h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
@@ -5034,7 +5163,7 @@
         h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
         h += '</div>';
         h += '</div>';
-        
+
         h += '</div>';
         return h;
       }
@@ -5806,7 +5935,7 @@
             var item = recs[r];
             var itemKey = selectedRecVolume + "_" + (item.id || r);
             var isChecked = !!checkedRecItems[itemKey];
-            
+
             h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:flex-start; align-items:flex-start; margin-bottom:10px; cursor:pointer;" onclick="toggleRecCheckbox(\'' + itemKey + '\')">';
             h += '<div class="rec-checkbox' + (isChecked ? ' checked' : '') + '">';
             if (isChecked) {
@@ -6173,7 +6302,7 @@
         if (!entityId) return;
         var entity = entities[entityId];
         var dom = domain || entityId.split('.')[0];
-        
+
         var curState = entity ? entity.state : "off";
         var isCurrentlyOn = (curState === "on" || curState === "On" || curState === "playing" || curState === "open");
         var service = isCurrentlyOn ? "turn_off" : "turn_on";
@@ -7052,7 +7181,7 @@
         if (!entity.attributes) entity.attributes = {};
         var current = parseFloat(entity.attributes.temperature) || 80;
         var newTemp = current + delta;
-        
+
         entity.attributes.temperature = newTemp;
 
         var elId = "set_temp_" + entityId.replace(/[^a-zA-Z0-9_-]/g, "_");
@@ -7317,8 +7446,8 @@
 
       window.dismissCheckedToday = function (goToTab) {
         checkedTodayAlertDismissed = true;
-        try { 
-          localStorage.setItem("ha_chem_prompt_dismissed_time", Date.now()); 
+        try {
+          localStorage.setItem("ha_chem_prompt_dismissed_time", Date.now());
           localStorage.setItem("ha_chem_alert_snoozed_time", Date.now());
         } catch (e) { }
 
