@@ -1852,8 +1852,9 @@
     }
 
     body:not(.dark-theme) .media-card-artist-name {
-      color: #636366;
-      text-shadow: none;
+      color: #1c1c1e !important;
+      font-weight: 850 !important;
+      text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
     }
 
     .media-card-track-title {
@@ -3090,7 +3091,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.9.4</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.9.5</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -4133,8 +4134,17 @@
               }
               var badgeEl = cardEl.querySelector(".media-card-speaker-badge");
               if (badgeEl) {
-                badgeEl.style.borderColor = 'rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.5)';
-                badgeEl.style.background = 'rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.22)';
+                var isDark = document.body.classList.contains("dark-theme");
+                if (isDark) {
+                  badgeEl.style.borderColor = 'rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.5)';
+                  badgeEl.style.background = 'rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.22)';
+                  badgeEl.style.color = '#ffffff';
+                } else {
+                  badgeEl.style.background = '#ffffff';
+                  badgeEl.style.borderColor = 'rgba(0, 0, 0, 0.18)';
+                  badgeEl.style.color = '#1c1c1e';
+                  badgeEl.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.15)';
+                }
               }
               // Immediately update volume slider fills & equalizer bars
               var volFills = cardEl.querySelectorAll(".media-large-vol-fill");
@@ -4148,7 +4158,6 @@
               // Dynamically update bottom background fade to extracted dominant album color
               var bgOverlayEl = document.getElementById("card_bg_overlay_" + primaryCleanEid);
               if (bgOverlayEl) {
-                var isDark = document.body.classList.contains("dark-theme");
                 var newGrad = "";
                 if (isDark) {
                   var dR = Math.round(lightRgb.r * 0.3);
@@ -4212,7 +4221,12 @@
         for (var sn = 0; sn < group.length; sn++) {
           speakerNames.push(friendlyName(group[sn]));
         }
-        var badgeStyle = 'style="border-color: rgba(' + tr + ',' + tg + ',' + tb + ', 0.5); background: rgba(' + tr + ',' + tg + ',' + tb + ', 0.22);"';
+        var badgeStyle = "";
+        if (isDarkTheme) {
+          badgeStyle = 'style="border-color: rgba(' + tr + ',' + tg + ',' + tb + ', 0.5); background: rgba(' + tr + ',' + tg + ',' + tb + ', 0.22); color: #ffffff;"';
+        } else {
+          badgeStyle = 'style="background: #ffffff; border-color: rgba(0, 0, 0, 0.18); color: #1c1c1e; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);"';
+        }
         h += '<div class="media-card-speaker-badge" ' + badgeStyle + '>' + escapeHtml(speakerNames.join(" & ")) + '</div>';
         if (isPlaying) {
           var eqBarStyle = 'style="background: rgb(' + tr + ',' + tg + ',' + tb + ');"';
