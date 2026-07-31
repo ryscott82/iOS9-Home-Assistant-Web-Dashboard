@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.9.1] - 2026-07-31
+- **Dark Mode Light Vibrant Accent Boost (`ensureLightVibrantTint`)**: Dynamically boosts color brightness for dark extracted album colors in dark mode so UI buttons (play pill, volume slider, equalizer wave, outer glow) render in light, luminous, high-contrast accent colors against `#0d1117` dark card backgrounds.
+- **Theme-Adaptive Bottom Gradient Overlay**: Configured card background overlay to fade down into dark `#0d1117` in dark mode and pure white `#ffffff` in light mode.
+
 ## [v3.9.0] - 2026-07-31
 - **Dynamic 1/2 Height Grid for > 3 Media Players**: Automatically applies `.media-page-grid.compact-grid` (245px 1/2 height cards) when > 3 media players are active on the Media page, fitting up to 6 media players on a single screen without vertical scrolling.
 - **Mini Album Art Cards on All Controls Page**: Replaced basic media text tiles on the All Controls page with mini album cover cards featuring background artwork, speaker badges, play/pause controls, and volume sliders.
