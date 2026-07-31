@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.10.1] - 2026-07-31
+- **Enlarged Home Media Card Album Art & Play Button**: Increased album art thumbnail size to `88px x 88px` (`border-radius: 18px`), enlarged play/pause overlay button to `52px` circle with `40px` SVG icon, and scaled skip button to `54px x 54px` for prominent visibility and easy tapping from across the room.
+- **Home Media Card Navigation**: Tapping anywhere on the middle/text area of the Home media player card navigates directly to the Media page (`showTab('media')`).
+
 ## [v3.10.0] - 2026-07-31
 - **Dynamic Album-Tinted Home Media Cards**: Replaced static generic blue background tint (`.active-blue`) on the Home page with dynamic background, border, and glow tinting derived directly from the currently playing album's extracted dominant color.
 
