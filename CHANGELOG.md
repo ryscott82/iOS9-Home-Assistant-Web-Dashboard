@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.11.2] - 2026-07-31
+- **Left-Aligned Compact Menu Bar with Adjacent Home Button**: Wrapped `.tab-bar` in a `.menu-bar-wrapper` flex container aligned on the left (`flex: 0 1 auto`), placing a dedicated Home icon button (`.menu-home-btn`) directly to its right for instant navigation to the Home screen.
+
 ## [v3.11.1] - 2026-07-31
 - **Simplified Top Header**: Completely removed date and time text from the top header container. The welcome message (`#headerWelcome`) is now displayed exclusively on the Home tab (`activeTab === "home"`), and automatically hidden on all other tabs for a clean, distraction-free view.
 
