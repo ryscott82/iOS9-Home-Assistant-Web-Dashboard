@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.6.1] - 2026-07-31
+- **Hybrid Vibrant Color Preference Algorithm**: Updated `extractAlbumDominantColor` to prioritize non-neutral vibrant color pixels (`sat > 18`) over dull background grays when vibrant pixels are present, while retaining clean monochromatic gray/black/white fallback for black & white album art.
+
 ## [v3.6.0] - 2026-07-31
 - **Skin Tone Color Avoidance (`isSkinTone`)**: Built human skin tone range detection (`R > G > B` with warm hue bounds `0° – 48°`). Filters out artist face/skin pixels in central album cover pixels so portrait artwork does not bleed skin colors onto UI buttons or card glows.
 - **Subtle Playing-Only Glass Sheen Wipes**: Reduced glass wipe sheen opacity to `0.08` and restricted animations exclusively to media cards actively playing music.
