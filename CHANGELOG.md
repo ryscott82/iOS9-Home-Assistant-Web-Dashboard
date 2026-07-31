@@ -2,6 +2,10 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.9.4] - 2026-07-31
+- **Richer Light Mode Album Color Gradient**: Reduced white blending from 70% to 35% (`0.35 * white blend`) on the bottom background gradient in light mode, restoring rich, vibrant album color tone while keeping dark mode unchanged.
+- **High-Contrast White Speaker Badge in Light Mode**: Updated `.media-card-speaker-badge` background in light mode to `rgba(255, 255, 255, 0.94)` with subtle shadow, leaving dark mode speaker badge untouched (`rgba(tr, tg, tb, 0.22)`).
+
 ## [v3.9.3] - 2026-07-31
 - **Light Mode Soft Pastel Color Gradient**: Configured bottom background gradient in light mode to fade into a light pastel shade of the dominant album color (`tr + (255 - tr) * 0.7`), while maintaining the deep darkened shade in dark mode (`0.30 * RGB`).
 
