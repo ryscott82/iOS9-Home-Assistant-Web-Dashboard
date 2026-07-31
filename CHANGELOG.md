@@ -2,6 +2,11 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.8.0] - 2026-07-31
+- **Half-Height Volume Control Bar**: Compacted `.media-large-vol-bar` height by 50% down to `25px`, with scaled `36px x 25px` stepper buttons (`16px` SVG icons) and `12px` bold volume percentage readout.
+- **Curved Bottom Border Progress Bar**: Positioned a 6px progress track at the absolute bottom edge of media cards (`.media-card-bottom-progress-track`). Because `.media-page-card` uses `border-radius: 20px; overflow: hidden`, the progress fill seamlessly curves along the bottom 20px rounded border frame.
+- **Ultra-Compact Media Card Layout**: Removed time duration and position text numbers to maximize vertical card compactness and eliminate visual clutter.
+
 ## [v3.7.0] - 2026-07-31
 - **Dynamic Highlight-Color Bottom Fade Overlay**: Replaced static black/white bottom background fades with a dynamic gradient fading into a rich, deep darkened tint of the album's extracted highlight color (`0.30 * RGB`). Provides an ambient color glow across the bottom of media player cards while maintaining 100% WCAG AAA contrast ratio and legibility for white text and controls.
 

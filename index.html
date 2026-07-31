@@ -1909,6 +1909,28 @@
       background: rgb(65, 122, 160);
     }
 
+    .media-card-bottom-progress-track {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      z-index: 5;
+      overflow: hidden;
+    }
+
+    body:not(.dark-theme) .media-card-bottom-progress-track {
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .media-card-bottom-progress-fill {
+      height: 100%;
+      background: rgb(65, 122, 160);
+      -webkit-transition: width 0.2s linear;
+      transition: width 0.2s linear;
+    }
+
     .media-card-progress-times {
       display: -webkit-flex;
       display: flex;
@@ -1938,7 +1960,7 @@
       display: flex;
       -webkit-flex-direction: column;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       margin-top: 4px;
     }
 
@@ -1978,14 +2000,14 @@
       transition: transform 0.1s, background 0.15s;
     }
 
-    body:not(.dark-theme) .media-glass-btn {
-      color: #1c1c1e;
-    }
-
     .media-glass-btn:active {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.18);
       -webkit-transform: scale(0.92);
       transform: scale(0.92);
+    }
+
+    body:not(.dark-theme) .media-glass-btn {
+      color: #1c1c1e;
     }
 
     body:not(.dark-theme) .media-glass-btn:active {
@@ -1993,14 +2015,15 @@
     }
 
     .media-glass-play-pill {
-      height: 56px;
+      height: 52px;
       padding: 0 28px;
-      border-radius: 28px;
+      border-radius: 26px;
       background: rgba(65, 122, 160, 0.85);
       color: #ffffff;
-      font-size: 20px;
-      font-weight: 850;
       border: 1px solid rgba(65, 122, 160, 0.6);
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: -0.3px;
       cursor: pointer;
       display: -webkit-flex;
       display: flex;
@@ -2039,8 +2062,8 @@
     .media-large-vol-bar {
       position: relative;
       width: 100%;
-      height: 50px;
-      border-radius: 16px;
+      height: 25px;
+      border-radius: 12px;
       background: rgba(255, 255, 255, 0.15);
       overflow: hidden;
       box-sizing: border-box;
@@ -2056,7 +2079,7 @@
       left: 0;
       bottom: 0;
       background: rgba(65, 122, 160, 0.35);
-      border-radius: 16px;
+      border-radius: 12px;
       -webkit-transition: width 0.15s ease;
       transition: width 0.15s ease;
       z-index: 1;
@@ -2082,9 +2105,9 @@
     }
 
     .media-vol-btn {
-      width: 54px;
-      height: 44px;
-      border-radius: 12px;
+      width: 36px;
+      height: 25px;
+      border-radius: 8px;
       background: transparent;
       border: none;
       color: #ffffff;
@@ -2104,10 +2127,10 @@
     }
 
     .media-vol-display {
-      font-size: 20px;
-      font-weight: 850;
+      font-size: 12px;
+      font-weight: 800;
       color: #ffffff;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.2px;
     }
 
     .media-idle-section {
@@ -3005,7 +3028,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.7.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.8.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -3976,11 +3999,11 @@
         h += '<div id="vol_bar_fill_' + mCleanEid + '" class="media-large-vol-fill" ' + fillStyle + '></div>';
         h += '<div class="media-large-vol-content">';
         h += '<button class="media-vol-btn" onclick="adjustVolume(\'' + m.entity_id + '\', -0.0625)" title="Volume Down">';
-        h += '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>';
+        h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13H5v-2h14v2z"/></svg>';
         h += '</button>';
         h += '<div class="media-vol-display">' + volPct + '%</div>';
         h += '<button class="media-vol-btn" onclick="adjustVolume(\'' + m.entity_id + '\', 0.0625)" title="Volume Up">';
-        h += '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>';
+        h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>';
         h += '</button>';
         h += '</div>';
         h += '</div>';
@@ -4061,14 +4084,6 @@
         var mediaPosition = attrs.media_position || 0;
         var posPct = (mediaDuration > 0) ? Math.min(100, (mediaPosition / mediaDuration) * 100) : 0;
 
-        function fmtTime(sec) {
-          var m = Math.floor(sec / 60);
-          var s = Math.floor(sec % 60);
-          return m + ":" + (s < 10 ? "0" : "") + s;
-        }
-        var posStr = fmtTime(mediaPosition);
-        var durStr = mediaDuration > 0 ? fmtTime(mediaDuration) : "--:--";
-
         // Outer Card Glow with dynamic album tint (or default slate blue rgb(65,122,160))
         var cardGlowStyle = 'box-shadow: 0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + tr + ',' + tg + ',' + tb + ', 0.32);';
         var h = '<div id="media_card_' + primaryCleanEid + '" class="media-page-card" style="' + cardGlowStyle + '">';
@@ -4108,19 +4123,10 @@
         }
         h += '</div>'; // end media-card-top-bar
 
-        // MIDDLE / LOWER TRACK INFO: ARTIST & SONG TITLE + PROGRESS BAR
+        // MIDDLE / LOWER TRACK INFO: ARTIST & SONG TITLE
         h += '<div class="media-card-info-box">';
         h += '<div class="media-card-artist-name">' + artist + '</div>';
         h += '<div class="media-card-track-title">' + title + '</div>';
-
-        // PROGRESS BAR & TIMESTAMPS (Optimistic Position Estimation Enabled)
-        if (mediaDuration > 0) {
-          var progFillStyle = 'style="width:' + posPct + '%; background: rgb(' + tr + ',' + tg + ',' + tb + ');"';
-          h += '<div class="media-card-progress-box">';
-          h += '<div class="media-card-progress-bar"><div id="prog_fill_page_' + primaryCleanEid + '" class="media-card-progress-fill" ' + progFillStyle + '></div></div>';
-          h += '<div class="media-card-progress-times"><span id="prog_cur_page_' + primaryCleanEid + '">' + posStr + '</span><span>' + durStr + '</span></div>';
-          h += '</div>';
-        }
         h += '</div>'; // end media-card-info-box
 
         // BOTTOM COMPACT CONTROLS CONTAINER
@@ -4160,8 +4166,14 @@
         h += '</div>'; // end volume section
 
         h += '</div>'; // end media-card-controls-glass
-
         h += '</div>'; // end media-card-content
+
+        // CURVED PROGRESS BAR STRETCHED ACROSS VERY BOTTOM BORDER OF CARD
+        if (mediaDuration > 0) {
+          var progFillStyle = 'style="width:' + posPct + '%; background: rgb(' + tr + ',' + tg + ',' + tb + ');"';
+          h += '<div class="media-card-bottom-progress-track"><div id="prog_fill_page_' + primaryCleanEid + '" class="media-card-bottom-progress-fill" ' + progFillStyle + '></div></div>';
+        }
+
         h += '</div>'; // end media-page-card
         return h;
       }
