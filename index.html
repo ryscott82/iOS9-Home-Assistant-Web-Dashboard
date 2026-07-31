@@ -3145,26 +3145,19 @@
   <!-- APP -->
   <main class="app-content" id="appContent" style="display:none; padding-top: 0px;">
 
-    <!-- UNIFIED HEADER (Top Left: Welcome Message | Top Right: Date/Time + 3-Line Hamburger Menu Button) -->
+    <!-- UNIFIED HEADER (Top Row: Tab Menu Bar Squished Left with Home Icon | Home Screen Only: Welcome Message) -->
     <header class="app-header" id="appHeader"
-      style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-top:4px; margin-bottom:12px; padding:0 4px;">
-      <div id="headerWelcome" class="header-welcome"
-        style="-webkit-flex:1; flex:1; min-width:0; margin:0; font-size:48px; font-weight:850; white-space:normal; word-break:break-word; line-height:1.05; padding-right:12px; letter-spacing:-0.8px;">
-        Welcome Home</div>
-      <div
-        style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:12px; -webkit-flex-shrink:0; flex-shrink:0;">
-        <div
-          style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-align-items:flex-end; align-items:flex-end;">
-          <div id="headerDateTime" class="header-datetime"
-            style="margin:0; font-size:20px; font-weight:700; white-space:nowrap;"></div>
-        </div>
-        <button id="headerNavBtn" class="menu-icon-btn" onclick="toggleMainNavigation(event)" title="Menu"
-          style="width:48px; height:48px; border-radius:12px; background:rgba(120,120,128,0.16); color:currentColor; border:none; cursor:pointer; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; padding:0; -webkit-flex-shrink:0; flex-shrink:0; box-sizing:border-box; text-align:center;">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;">
-            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
-          </svg>
-        </button>
+      style="display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; width:100%; margin-top:4px; margin-bottom:12px; padding:0 4px;">
+      
+      <!-- Top Row Navigation Bar (Squished to Left Side) -->
+      <div id="topHeaderNav" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:flex-start; justify-content:flex-start; width:100%;">
+        <div id="headerTabBar" class="tab-bar" style="margin:0; width:auto; -webkit-flex-shrink:0; flex-shrink:0;"></div>
       </div>
+
+      <!-- Welcome Message Banner (Only Displayed on Home Screen) -->
+      <div id="headerWelcome" class="header-welcome"
+        style="margin:10px 0 0 0; font-size:46px; font-weight:850; white-space:normal; word-break:break-word; line-height:1.05; letter-spacing:-0.8px;">
+        Welcome Home</div>
     </header>
 
     <div id="entityContainer">
@@ -3186,7 +3179,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.11.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.12.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -5248,43 +5241,41 @@
 
         var html = "";
 
-        // Render Tab Segmented control
-        html += '<div class="tab-bar">';
-        var hActive = activeTab === "home" ? " active" : "";
-        var cActive = activeTab === "controls" ? " active" : "";
-        var chActive = activeTab === "chemicals" ? " active" : "";
-        var mActive = activeTab === "media" ? " active" : "";
+        // Render Tab Buttons into top-left Header Navigation Bar
+        var tabBarEl = document.getElementById("headerTabBar");
+        if (tabBarEl) {
+          var hActive = activeTab === "home" ? " active" : "";
+          var cActive = activeTab === "controls" ? " active" : "";
+          var chActive = activeTab === "chemicals" ? " active" : "";
+          var mActive = activeTab === "media" ? " active" : "";
 
-        html += '<button class="tab-btn' + hActive + '" onclick="switchTab(\'home\')">Home</button>';
-        html += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">All Controls</button>';
-        if (hasRedWarning) {
-          if (activeTab === "chemicals") {
-            html += '<button class="tab-btn active" style="background:#ff3b30; color:#ffffff; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">Chemical Alert</button>';
-          } else {
-            html += '<button class="tab-btn alert-red-muted" onclick="switchTab(\'chemicals\')">Chemical Alert</button>';
-          }
-        } else if (!chemicalsCheckedToday) {
-          if (activeTab === "chemicals") {
-            html += '<button class="tab-btn active" style="background:#ffcc00; color:#1c1c1e; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">Check Chemicals</button>';
-          } else {
-            html += '<button class="tab-btn alert-yellow-muted" onclick="switchTab(\'chemicals\')">Check Chemicals</button>';
-          }
-        } else {
-          html += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals</button>';
-        }
-        html += '<button class="tab-btn' + mActive + '" onclick="switchTab(\'media\')">Media</button>';
-        html += '</div>';
+          var tabHtml = '';
+          // Home Tab button with House SVG Icon
+          tabHtml += '<button class="tab-btn' + hActive + '" onclick="switchTab(\'home\')" style="display:-webkit-inline-flex; display:inline-flex; -webkit-align-items:center; align-items:center; gap:6px;">';
+          tabHtml += '<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block; vertical-align:middle;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>';
+          tabHtml += '<span>Home</span>';
+          tabHtml += '</button>';
 
-        // Update header navigation icon based on active tab
-        var navBtn = document.getElementById("headerNavBtn");
-        if (navBtn) {
-          if (activeTab === "home") {
-            navBtn.setAttribute("title", "Menu");
-            navBtn.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>';
+          tabHtml += '<button class="tab-btn' + cActive + '" onclick="switchTab(\'controls\')">All Controls</button>';
+
+          if (hasRedWarning) {
+            if (activeTab === "chemicals") {
+              tabHtml += '<button class="tab-btn active" style="background:#ff3b30; color:#ffffff; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">Chemical Alert</button>';
+            } else {
+              tabHtml += '<button class="tab-btn alert-red-muted" onclick="switchTab(\'chemicals\')">Chemical Alert</button>';
+            }
+          } else if (!chemicalsCheckedToday) {
+            if (activeTab === "chemicals") {
+              tabHtml += '<button class="tab-btn active" style="background:#ffcc00; color:#1c1c1e; font-weight:700; border:none;" onclick="switchTab(\'chemicals\')">Check Chemicals</button>';
+            } else {
+              tabHtml += '<button class="tab-btn alert-yellow-muted" onclick="switchTab(\'chemicals\')">Check Chemicals</button>';
+            }
           } else {
-            navBtn.setAttribute("title", "Home");
-            navBtn.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:block; margin:auto;"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>';
+            tabHtml += '<button class="tab-btn' + chActive + '" onclick="switchTab(\'chemicals\')">Chemicals</button>';
           }
+
+          tabHtml += '<button class="tab-btn' + mActive + '" onclick="switchTab(\'media\')">Media</button>';
+          tabBarEl.innerHTML = tabHtml;
         }
 
         // RENDER BASED ON ACTIVE TAB & DYNAMIC THEME COLOR
@@ -5305,7 +5296,11 @@
 
         var appFooterEl = document.querySelector("footer.app-footer");
         var headerWelcomeEl = document.getElementById("headerWelcome");
-        var headerDateTimeEl = document.getElementById("headerDateTime");
+
+        // Welcome Message is ONLY shown on Home tab
+        if (headerWelcomeEl) {
+          headerWelcomeEl.style.display = (activeTab === "home") ? "block" : "none";
+        }
 
         // Footer is on all pages EXCEPT home and sleep mode
         if (appFooterEl) {
