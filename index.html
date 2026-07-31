@@ -3005,7 +3005,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.6.2</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.6.3</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -3871,51 +3871,62 @@
             ctx.drawImage(img, 0, 0, 20, 20);
             var imgData = ctx.getImageData(0, 0, 20, 20).data;
 
-            var perimRSum = 0, perimGSum = 0, perimBSum = 0, perimCount = 0;
-            var innerRSum = 0, innerGSum = 0, innerBSum = 0, innerCount = 0;
+            // 12 Hue Buckets (30° intervals) + 1 Neutral Bucket
+            var buckets = [];
+            for (var b = 0; b < 13; b++) {
+              buckets[b] = { rSum: 0, gSum: 0, bSum: 0, weightSum: 0, count: 0 };
+            }
 
-            for (var y = 0; y < 20; y++) {
-              for (var x = 0; x < 20; x++) {
-                var p = (y * 20 + x) * 4;
-                var r = imgData[p];
-                var g = imgData[p + 1];
-                var b = imgData[p + 2];
+            for (var p = 0; p < imgData.length; p += 4) {
+              var r = imgData[p];
+              var g = imgData[p + 1];
+              var b = imgData[p + 2];
 
-                // Skip skin tones (face/portrait skin pixels)
-                if (isSkinTone(r, g, b)) continue;
+              // Skip facial skin tones
+              if (isSkinTone(r, g, b)) continue;
 
-                // Perimeter pixels (outer border within 2 pixels of edge)
-                var isPerimeter = (x <= 2 || x >= 17 || y <= 2 || y >= 17);
+              var maxC = Math.max(r, g, b);
+              var minC = Math.min(r, g, b);
+              var sat = maxC - minC;
+              var brightness = (r + g + b) / 3;
 
-                if (isPerimeter) {
-                  perimRSum += r;
-                  perimGSum += g;
-                  perimBSum += b;
-                  perimCount++;
-                } else {
-                  innerRSum += r;
-                  innerGSum += g;
-                  innerBSum += b;
-                  innerCount++;
-                }
+              // Filter out extreme black/white noise
+              if (brightness < 12 || brightness > 248) continue;
+
+              var bucketIdx = 12; // default neutral
+              if (sat > 14) {
+                var d = maxC - minC;
+                var hue = (maxC === r ? (g - b) / d + (g < b ? 6 : 0) : maxC === g ? (b - r) / d + 2 : (r - g) / d + 4) * 60;
+                bucketIdx = Math.floor(hue / 30) % 12;
+              }
+
+              // Weight formula: Saturation squared gives vibrant colors higher priority!
+              var weight = (sat + 1) * (sat + 1);
+              buckets[bucketIdx].rSum += r * weight;
+              buckets[bucketIdx].gSum += g * weight;
+              buckets[bucketIdx].bSum += b * weight;
+              buckets[bucketIdx].weightSum += weight;
+              buckets[bucketIdx].count++;
+            }
+
+            // Find winning bucket with maximum total weight score
+            var bestBucketIdx = -1;
+            var maxWeight = -1;
+
+            for (var i = 0; i < 13; i++) {
+              if (buckets[i].weightSum > maxWeight && buckets[i].count > 0) {
+                maxWeight = buckets[i].weightSum;
+                bestBucketIdx = i;
               }
             }
 
             var finalColor = defaultRgb;
-            // 1. Prioritize perimeter background colors (outer border pixels)
-            if (perimCount > 0) {
+            if (bestBucketIdx !== -1 && buckets[bestBucketIdx].weightSum > 0) {
+              var best = buckets[bestBucketIdx];
               finalColor = {
-                r: Math.round(perimRSum / perimCount),
-                g: Math.round(perimGSum / perimCount),
-                b: Math.round(perimBSum / perimCount)
-              };
-            }
-            // 2. If perimeter is unavailable, fallback to inner pixels
-            else if (innerCount > 0) {
-              finalColor = {
-                r: Math.round(innerRSum / innerCount),
-                g: Math.round(innerGSum / innerCount),
-                b: Math.round(innerBSum / innerCount)
+                r: Math.round(best.rSum / best.weightSum),
+                g: Math.round(best.gSum / best.weightSum),
+                b: Math.round(best.bSum / best.weightSum)
               };
             }
 

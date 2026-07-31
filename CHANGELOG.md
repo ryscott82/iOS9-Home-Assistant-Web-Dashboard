@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.6.3] - 2026-07-31
+- **Color Histogram Bucket Scoring Algorithm**: Implemented a 12-hue histogram quantization bucket algorithm weighted by saturation squared (`sat * sat`). Eliminates dull gray tinting on album covers with dark hair or shadows (such as America's *Ventura Highway* album), cleanly isolating the true vibrant golden yellow/orange sunset sky for UI controls and card glows.
+
 ## [v3.6.2] - 2026-07-31
 - **Perimeter-First Album Color Sampling**: Updated `extractAlbumDominantColor` to sample outer perimeter border pixels (outer 2–3 rows of canvas) first. This matches the true backdrop/frame of album covers (like the textured silver/gray metal background on Coldplay's *Mylo Xyloto / Paradise*) rather than sampling inner cutouts or focal subjects.
 
