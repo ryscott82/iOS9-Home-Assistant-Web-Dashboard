@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.9.6] - 2026-07-31
+- **Light Mode Album-Tinted Speaker Badge**: Tinted the light mode speaker badge background with a soft pastel blend of the extracted album color (`tr + (255 - tr) * 0.82`) and a matching color border (`rgba(tr, tg, tb, 0.35)`), leaving dark mode untouched (`rgba(tr, tg, tb, 0.22)`).
+
 ## [v3.9.5] - 2026-07-31
 - **Solid Pure White Speaker Badge in Light Mode**: Updated `.media-card-speaker-badge` in light mode to solid pure white (`#ffffff`) background, `#1c1c1e` dark text, and subtle drop shadow (`0 2px 8px rgba(0,0,0,0.15)`), leaving dark mode untouched (`rgba(tr, tg, tb, 0.22)`).
 - **High-Visibility Dark Artist Name in Light Mode**: Updated `.media-card-artist-name` in light mode to bold `#1c1c1e` text (`font-weight: 850`), making artist names crisp and readable across the room.
