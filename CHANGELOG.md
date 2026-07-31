@@ -2,8 +2,8 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
-## [v3.12.2] - 2026-07-31
-- **Vibrant Blurred Album Backdrop & Unified Control Rendering**: Cleanly rewrote `renderMediaPlayer` to eliminate an early return statement that was blocking the execution of active media player cards. Active media tiles on the All Controls page now feature a vibrant 18px blurred album art backdrop (`opacity: 0.85`), light/dark glass tint overlays (`rgba(255,255,255,0.65)` in light mode, `rgba(13,17,23,0.70)` in dark mode), dominant album color Play/Pause button fill and glow (`box-shadow: 0 4px 14px domRgbGlow`), and full volume control bars at the bottom.
+## [v3.13.0] - 2026-07-31
+- **Vibrant Blurred Album Backdrop & 100% Full-Width Media Cards on All Controls Page**: Rewrote `renderMediaPlayer` on the All Controls page so active media players render as 100% full-width cards (`flex: 1 1 100%`). Features an 85% opacity blurred album art backdrop (`filter: blur(22px) saturate(1.4)`), a translucent glass tint overlay (`linear-gradient`), a 42px Play/Pause button glowing with the album's extracted dominant color, and a full volume control bar at the bottom.
 
 ## [v3.12.1] - 2026-07-31
 - **Fixed Volume Controls & Album Art Cache Key in All Controls Media Tiles**: Fixed `artUrl` cache key generation in `getGroupTrackInfo` by removing dynamic timestamps so album dominant colors cache reliably across renders. Restored `renderVolumeControls(group, false)` on `renderMediaPlayer` tiles to ensure volume control sliders and buttons are prominently displayed on active media tiles.
