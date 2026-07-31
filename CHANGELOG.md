@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.13.1] - 2026-07-31
+- **Enhanced Paused State Card Layout & Artwork Fallback**: Updated `renderMediaPlayer` on the All Controls page so players in the `PAUSED` state (with a loaded track) trigger full active card styling. Includes robust `artUrl` extraction across all media entity attributes, dynamic title-hash backdrop gradients when image URLs are absent, all 3 control buttons (`Previous`, `Play/Pause`, `Next`), and full volume control bars.
+
 ## [v3.13.0] - 2026-07-31
 - **Vibrant Blurred Album Backdrop & 100% Full-Width Media Cards on All Controls Page**: Rewrote `renderMediaPlayer` on the All Controls page so active media players render as 100% full-width cards (`flex: 1 1 100%`). Features an 85% opacity blurred album art backdrop (`filter: blur(22px) saturate(1.4)`), a translucent glass tint overlay (`linear-gradient`), a 42px Play/Pause button glowing with the album's extracted dominant color, and a full volume control bar at the bottom.
 
