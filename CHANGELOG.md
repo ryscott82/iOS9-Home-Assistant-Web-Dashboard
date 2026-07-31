@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.9.3] - 2026-07-31
+- **Light Mode Soft Pastel Color Gradient**: Configured bottom background gradient in light mode to fade into a light pastel shade of the dominant album color (`tr + (255 - tr) * 0.7`), while maintaining the deep darkened shade in dark mode (`0.30 * RGB`).
+
 ## [v3.9.2] - 2026-07-31
 - **Restored Dominant Album Color Bottom Gradient**: Restored bottom card gradient overlay to transition smoothly into a rich, deep darkened shade of the extracted dominant album color (`0.30 * RGB`), matching the seamless ambient album color fade (e.g., deep royal blue for Djo *End of Beginning*).
 

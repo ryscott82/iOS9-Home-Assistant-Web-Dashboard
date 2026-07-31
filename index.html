@@ -3089,7 +3089,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.9.2</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.9.3</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -4147,10 +4147,19 @@
               // Dynamically update bottom background fade to extracted dominant album color
               var bgOverlayEl = document.getElementById("card_bg_overlay_" + primaryCleanEid);
               if (bgOverlayEl) {
-                var dR = Math.round(lightRgb.r * 0.3);
-                var dG = Math.round(lightRgb.g * 0.3);
-                var dB = Math.round(lightRgb.b * 0.3);
-                var newGrad = 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + dR + ',' + dG + ',' + dB + ', 0.65) 50%, rgba(' + dR + ',' + dG + ',' + dB + ', 0.95) 100%)';
+                var isDark = document.body.classList.contains("dark-theme");
+                var newGrad = "";
+                if (isDark) {
+                  var dR = Math.round(lightRgb.r * 0.3);
+                  var dG = Math.round(lightRgb.g * 0.3);
+                  var dB = Math.round(lightRgb.b * 0.3);
+                  newGrad = 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + dR + ',' + dG + ',' + dB + ', 0.65) 50%, rgba(' + dR + ',' + dG + ',' + dB + ', 0.95) 100%)';
+                } else {
+                  var lR = Math.round(lightRgb.r + (255 - lightRgb.r) * 0.7);
+                  var lG = Math.round(lightRgb.g + (255 - lightRgb.g) * 0.7);
+                  var lB = Math.round(lightRgb.b + (255 - lightRgb.b) * 0.7);
+                  newGrad = 'linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(' + lR + ',' + lG + ',' + lB + ', 0.65) 50%, rgba(' + lR + ',' + lG + ',' + lB + ', 0.95) 100%)';
+                }
                 bgOverlayEl.style.background = newGrad;
               }
             }
@@ -4173,7 +4182,16 @@
           h += '<div class="media-card-bg-fallback"></div>';
         }
 
-        var bgOverlayStyle = 'background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.65) 50%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.95) 100%); background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.65) 50%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.95) 100%);';
+        var isDarkTheme = document.body.classList.contains("dark-theme");
+        var bgOverlayStyle = "";
+        if (isDarkTheme) {
+          bgOverlayStyle = 'background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.65) 50%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.95) 100%); background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.65) 50%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.95) 100%);';
+        } else {
+          var lightR = Math.round(tr + (255 - tr) * 0.7);
+          var lightG = Math.round(tg + (255 - tg) * 0.7);
+          var lightB = Math.round(tb + (255 - tb) * 0.7);
+          bgOverlayStyle = 'background: -webkit-linear-gradient(top, rgba(0,0,0,0.1) 0%, rgba(' + lightR + ',' + lightG + ',' + lightB + ', 0.65) 50%, rgba(' + lightR + ',' + lightG + ',' + lightB + ', 0.95) 100%); background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(' + lightR + ',' + lightG + ',' + lightB + ', 0.65) 50%, rgba(' + lightR + ',' + lightG + ',' + lightB + ', 0.95) 100%);';
+        }
         h += '<div id="card_bg_overlay_' + primaryCleanEid + '" class="media-card-bg-overlay" style="' + bgOverlayStyle + '"></div>';
 
         // Glass sweep only on playing media cards with random interval scheduling
