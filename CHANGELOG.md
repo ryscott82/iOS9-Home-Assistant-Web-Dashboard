@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.7.0] - 2026-07-31
+- **Dynamic Highlight-Color Bottom Fade Overlay**: Replaced static black/white bottom background fades with a dynamic gradient fading into a rich, deep darkened tint of the album's extracted highlight color (`0.30 * RGB`). Provides an ambient color glow across the bottom of media player cards while maintaining 100% WCAG AAA contrast ratio and legibility for white text and controls.
+
 ## [v3.6.3] - 2026-07-31
 - **Color Histogram Bucket Scoring Algorithm**: Implemented a 12-hue histogram quantization bucket algorithm weighted by saturation squared (`sat * sat`). Eliminates dull gray tinting on album covers with dark hair or shadows (such as America's *Ventura Highway* album), cleanly isolating the true vibrant golden yellow/orange sunset sky for UI controls and card glows.
 

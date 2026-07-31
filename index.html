@@ -3005,7 +3005,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.6.3</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.7.0</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -4010,6 +4010,10 @@
         var primaryEid = primary.entity_id;
         var primaryCleanEid = primaryEid.replace(/\./g, "_");
 
+        var darkR = Math.round(tr * 0.3);
+        var darkG = Math.round(tg * 0.3);
+        var darkB = Math.round(tb * 0.3);
+
         if (artSrc && !albumColorCache[artSrc]) {
           extractAlbumDominantColor(artSrc, function(extractedRgb) {
             var cardEl = document.getElementById("media_card_" + primaryCleanEid);
@@ -4039,6 +4043,15 @@
               for (var eb = 0; eb < eqBars.length; eb++) {
                 eqBars[eb].style.background = 'rgb(' + extractedRgb.r + ',' + extractedRgb.g + ',' + extractedRgb.b + ')';
               }
+              // Dynamically update bottom background fade to extracted highlight tint
+              var bgOverlayEl = document.getElementById("card_bg_overlay_" + primaryCleanEid);
+              if (bgOverlayEl) {
+                var dR = Math.round(extractedRgb.r * 0.3);
+                var dG = Math.round(extractedRgb.g * 0.3);
+                var dB = Math.round(extractedRgb.b * 0.3);
+                var newGrad = 'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + dR + ',' + dG + ',' + dB + ', 0.65) 50%, rgba(' + dR + ',' + dG + ',' + dB + ', 0.95) 100%)';
+                bgOverlayEl.style.background = newGrad;
+              }
             }
           });
         }
@@ -4060,13 +4073,15 @@
         var cardGlowStyle = 'box-shadow: 0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + tr + ',' + tg + ',' + tb + ', 0.32);';
         var h = '<div id="media_card_' + primaryCleanEid + '" class="media-page-card" style="' + cardGlowStyle + '">';
 
-        // 1. ALBUM ART FULL CARD BACKGROUND + DARKENED GRADIENT OVERLAY
+        // 1. ALBUM ART FULL CARD BACKGROUND + DYNAMIC HIGHLIGHT COLOR FADE OVERLAY
         if (artSrc) {
           h += '<div class="media-card-bg-image" style="background-image: url(\'' + escapeHtml(artSrc) + '\');"></div>';
         } else {
           h += '<div class="media-card-bg-fallback"></div>';
         }
-        h += '<div class="media-card-bg-overlay"></div>';
+
+        var bgOverlayStyle = 'background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.65) 50%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.95) 100%); background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.65) 50%, rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.95) 100%);';
+        h += '<div id="card_bg_overlay_' + primaryCleanEid + '" class="media-card-bg-overlay" style="' + bgOverlayStyle + '"></div>';
 
         // Glass sweep only on playing media cards with random interval scheduling
         if (isPlaying) {
