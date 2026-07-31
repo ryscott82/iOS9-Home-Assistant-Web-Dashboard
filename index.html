@@ -3091,7 +3091,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.9.6</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.9.7</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -4088,6 +4088,28 @@
         return { r: r, g: g, b: b };
       }
 
+      function getLightModeGlowRgb(rgb) {
+        var r = rgb.r, g = rgb.g, b = rgb.b;
+        var maxC = Math.max(r, g, b);
+        var minC = Math.min(r, g, b);
+        var sat = maxC - minC;
+
+        // Boost saturation for dull colors to produce a rich vibrant glow
+        if (sat < 60 && maxC > 0) {
+          r = Math.min(255, Math.round(r * 1.25));
+          g = Math.min(255, Math.round(g * 1.25));
+          b = Math.min(255, Math.round(b * 1.25));
+        }
+
+        // Boost brightness for luminous light-mode halo
+        var factor = Math.max(1.2, 190 / (maxC || 1));
+        var gR = Math.min(255, Math.round(r * factor));
+        var gG = Math.min(255, Math.round(g * factor));
+        var gB = Math.min(255, Math.round(b * factor));
+
+        return { r: gR, g: gG, b: gB };
+      }
+
       function renderMediaCardLayout(group, cardCount) {
         var primary = group[0] || group;
         var attrs = primary.attributes || {};
@@ -4121,7 +4143,13 @@
             var lightRgb = ensureLightVibrantTint(extractedRgb);
             var cardEl = document.getElementById("media_card_" + primaryCleanEid);
             if (cardEl) {
-              cardEl.style.boxShadow = '0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.32)';
+              var isDark = document.body.classList.contains("dark-theme");
+              if (isDark) {
+                cardEl.style.boxShadow = '0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.32)';
+              } else {
+                var gRgb = getLightModeGlowRgb(extractedRgb);
+                cardEl.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.06), 0 0 38px rgba(' + gRgb.r + ',' + gRgb.g + ',' + gRgb.b + ', 0.58), 0 2px 14px rgba(' + gRgb.r + ',' + gRgb.g + ',' + gRgb.b + ', 0.42)';
+              }
               var pillEl = cardEl.querySelector(".media-glass-play-pill");
               if (pillEl) {
                 pillEl.style.background = 'rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.85)';
@@ -4134,7 +4162,6 @@
               }
               var badgeEl = cardEl.querySelector(".media-card-speaker-badge");
               if (badgeEl) {
-                var isDark = document.body.classList.contains("dark-theme");
                 if (isDark) {
                   badgeEl.style.borderColor = 'rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.5)';
                   badgeEl.style.background = 'rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.22)';
@@ -4185,7 +4212,14 @@
         var posPct = (mediaDuration > 0) ? Math.min(100, (mediaPosition / mediaDuration) * 100) : 0;
 
         // Outer Card Glow with dynamic album tint (or default slate blue rgb(65,122,160))
-        var cardGlowStyle = 'box-shadow: 0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + tr + ',' + tg + ',' + tb + ', 0.32);';
+        var isDarkTheme = document.body.classList.contains("dark-theme");
+        var cardGlowStyle = "";
+        if (isDarkTheme) {
+          cardGlowStyle = 'box-shadow: 0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + tr + ',' + tg + ',' + tb + ', 0.32);';
+        } else {
+          var glowRgb = getLightModeGlowRgb(tintRgb);
+          cardGlowStyle = 'box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 0 38px rgba(' + glowRgb.r + ',' + glowRgb.g + ',' + glowRgb.b + ', 0.58), 0 2px 14px rgba(' + glowRgb.r + ',' + glowRgb.g + ',' + glowRgb.b + ', 0.42);';
+        }
         var h = '<div id="media_card_' + primaryCleanEid + '" class="media-page-card" style="' + cardGlowStyle + '">';
 
         // 1. ALBUM ART FULL CARD BACKGROUND + DYNAMIC DOMINANT COLOR GRADIENT OVERLAY

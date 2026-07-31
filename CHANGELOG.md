@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.9.7] - 2026-07-31
+- **Vibrant Saturated Light Mode Card Glow (`getLightModeGlowRgb`)**: Replaced heavy black drop shadows in light mode with a luminous 38px saturated color halo (`rgba(gR, gG, gB, 0.58)`), creating a neon-like ambient glow surrounding media cards in light mode while leaving dark mode untouched.
+
 ## [v3.9.6] - 2026-07-31
 - **Light Mode Album-Tinted Speaker Badge**: Tinted the light mode speaker badge background with a soft pastel blend of the extracted album color (`tr + (255 - tr) * 0.82`) and a matching color border (`rgba(tr, tg, tb, 0.35)`), leaving dark mode untouched (`rgba(tr, tg, tb, 0.22)`).
 
