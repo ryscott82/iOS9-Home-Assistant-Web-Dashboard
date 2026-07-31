@@ -2,6 +2,64 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.6.0] - 2026-07-31
+- **Skin Tone Color Avoidance (`isSkinTone`)**: Built human skin tone range detection (`R > G > B` with warm hue bounds `0° – 48°`). Filters out artist face/skin pixels in central album cover pixels so portrait artwork does not bleed skin colors onto UI buttons or card glows.
+- **Subtle Playing-Only Glass Sheen Wipes**: Reduced glass wipe sheen opacity to `0.08` and restricted animations exclusively to media cards actively playing music.
+- **Staggered Independent Wipe Scheduler (`scheduleNextGlassSweep`)**: Each active player triggers glass wipes at independent randomized 20–45s intervals, preventing simultaneous wipes across multiple media cards.
+
+## [v3.5.1] - 2026-07-31
+- **Instant Volume Slider Color Update**: Updated extraction callback to immediately query and tint `.media-large-vol-fill` elements (`rgba(r,g,b,0.35)`).
+- **Monochromatic & Grayscale Album Color Support**: Removed artificial saturation/brightness filters from canvas sampler to allow true gray, white, dark, and monochromatic album artwork color matching.
+- **iOS 9 WebKit Parse Error Fix**: Converted block-scoped function declarations inside `if/else` statements to ES5 function expressions (`var hue2rgb = function(...)`), resolving fatal parse errors on iOS 9.3.5 Safari.
+
+## [v3.5.0] - 2026-07-31
+- **HTML5 Canvas Pixel Color Extraction**: Built `extractAlbumDominantColor()` to sample 20x20 canvas thumbnails of album cover artwork, calculating the true visual dominant color.
+- **Default Slate Blue Highlight Palette (`rgb(65, 122, 160)`)**: Set `rgb(65, 122, 160)` as the default accent highlight for buttons, progress fill, speaker badges, and volume sliders.
+- **Smooth Asynchronous DOM Accent Update**: Automatically updates card glow, play pill, progress bar, and volume sliders as soon as album images finish loading.
+
+## [v3.4.0] - 2026-07-31
+- **Apple Glass Sweep Shimmer Animation**: Added `.media-card-glass-sweep` keyframe animation for a subtle diagonal light sweep across album cover backgrounds.
+- **Dynamic UI Accent Tinting**: Tinted play/pause pill buttons, progress bars, speaker badges, equalizer wave bars, and volume sliders to match album art colors.
+- **Outer Card Ambient Glow**: Added dynamic outer glow shadows to media cards (`box-shadow: 0 10px 32px rgba(0,0,0,0.42), 0 0 28px rgba(r,g,b,0.32)`).
+
+## [v3.3.0] - 2026-07-31
+- **Real-Time Optimistic Progress Bar Ticker**: Integrated `startMediaTickers()` to advance media playback progress bars and timestamps live second-by-second (`01:24`) without waiting for Home Assistant WS updates.
+- **2-Line Song Title Clamping**: Applied `-webkit-line-clamp: 2` with `text-overflow: ellipsis` on `.media-card-track-title`.
+- **Borderless Compact Controls Container**: Removed enclosing dark/frosted box around media controls (`background: transparent; border: none; box-shadow: none`), floating buttons directly over card artwork.
+- **Compact Bottom Vertical Spacing**: Reduced margins between title, progress bar, play controls, and volume sliders to `4px – 6px`.
+
+## [v3.2.3] - 2026-07-31
+- **`ipaddashboard` Labeled Media Player Inclusion**: Added `allowedEntityIds` checking and space/underscore normalization (`.replace(/[\s_]/g, "")`) to `isIpadDashboardMedia()`.
+
+## [v3.2.2] - 2026-07-31
+- **iOS 9 WebKit Height Collapse Fix**: Updated `.media-card-content` to use absolute stretching (`position: absolute; top:0; left:0; right:0; bottom:0`) so flex containers do not collapse height on older iOS 9 Safari.
+- **3-Card Side-by-Side Grid Layout**: Configured `.media-page-card` flex sizing (`-webkit-flex: 1 1 calc(33.333% - 11px); min-width: 270px`) to display up to 3 media players side-by-side in a single row.
+
+## [v3.2.0] - 2026-07-31
+- **Media Player Tab Redesign**: Rebuilt Media Player tab with full-card album cover background, top-right equalizer audio wave animation, and bottom frosted glass control bar.
+- **Theme-Adaptive Album Cover Bottom Fade**: Fades album cover to solid pitch black (`#0d1117`) in dark mode or solid pure white (`#ffffff`) in light mode.
+
+## [v3.1.1] - 2026-07-31
+- **Sparse Home Layout Flickering Fix**: Replaced pixel measurement (`offsetTop`) with immutable grid-span row math (`Math.ceil(rowUnits / 2)`) to eliminate font size flickering on home screen layout updates.
+
+## [v3.0.0] - 2026-07-31
+- **Dynamic Sparse Home Screen Layout**: Automatically scales welcome header to `68px` bold and displays a giant digital clock at the bottom of the home screen when $\le 4$ card rows are present.
+
+## [v2.99.0] - 2026-07-31
+- **10-Second Siren Tone & Harsh Full-Screen Strobe**: Updated Lightning Safety popup with a 10-second warbling siren tone (synthesized via Web Audio API) and harsh red/black full-screen flashing strobe.
+
+## [v2.96.0] - 2026-07-31
+- **Tactile Apple Click Sound Effect**: Integrated Web Audio API frequency sweep (`1400Hz → 300Hz` in 12ms) for audible button press feedback with a toggle button in the footer.
+
+## [v2.95.0] - 2026-07-31
+- **Apple San Francisco System Font Stack**: Standardized typography across all views using Apple native San Francisco fonts (`-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF UI Display", "SF UI Text"`).
+
+## [v2.93.0] - 2026-07-31
+- **iPad Dark Mode Status Bar Matching**: Dynamically updated `html.dark-theme` background to match dark site theme (`#0d1117`), fixing white status bar gaps on iPad displays.
+
+## [v2.91.0] - 2026-07-31
+- **Chemical Alert Red Button**: Added deep red chemical alert button (`#ff3b30`) with white beaker icon on Home screen for out-of-range pool/hot tub chemical readings.
+
 ## [v2.63.0] - 2026-07-21
 - **Mobile Header Optimization**: Hidden date and time display (`.header-datetime`) under `@media (max-width: 600px)` and enlarged the main welcome message font size to `28px` bold (`850` weight).
 

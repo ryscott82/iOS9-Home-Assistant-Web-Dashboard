@@ -51,12 +51,23 @@ A ultra-minimal, high-readability Home Assistant web dashboard designed specific
   - **Active (Target == 100°F)**: Button renders in glowing orange (`#ff9f0a` border & fill). Tapping it lowers the Hot Tub target temperature to **`68°F`**.
 - **0ms Optimistic Visual Feedback**: Direct DOM element targeting (`btn_fire_<eid>`) updates button styling instantly (<1ms) when pressed.
 
-### 6. Overview Media Player Cards
-- Displays speaker/room names in big bold title font (`30px`), with track title and artist (`Title • Artist`) in subtext.
-- Integrated **Play/Pause** and **Next Track (Skip)** media buttons.
-- **15-Minute Pause Expiry**: Paused media players automatically hide from the Overview tab after 15 minutes of inactivity (`last_changed` > 15 mins).
+### 6. Dynamic Media Player Tab & Canvas Color Extraction
+- **Full-Card Album Art Background**: Album covers scale across the background of media cards with a theme-adaptive linear gradient fade to solid `#0d1117` in dark mode or `#ffffff` in light mode.
+- **HTML5 Canvas Pixel Color Sampling**: Samples album cover pixels on an offscreen canvas to dynamically extract the visual dominant color for UI buttons, progress bars, volume sliders, and outer card glow.
+- **Skin Tone Avoidance**: Built-in `isSkinTone()` filter prevents human face/skin tones in central album cover pixels from bleeding onto UI accent controls.
+- **Subtle Playing-Only Glass Sheen Wipes**: Animated glass wipe sheen runs at independent randomized intervals (20–45s) exclusively on media cards actively playing music.
+- **Optimistic Second-by-Second Ticker**: Smoothly advances progress bars and playback timestamps live without waiting for Home Assistant WebSocket updates.
+- **Side-by-Side 3-Card Grid**: Displays up to 3 active media players side-by-side in a single row on iPad landscapes.
 
-### 7. Dual-Protocol Communication Engine
+### 7. Lightning Safety Emergency Alert System
+- **10-Second Synthesized Siren Tone**: Synthesizes a 10-second warbling emergency alarm tone via Web Audio API when `input_boolean.lightning_safety` is triggered.
+- **Full-Screen Harsh Red/Black Strobe**: Displays a dramatic full-screen red and black flashing strobe overlay with a bottom 1/4 acknowledge button to maximize visibility from across the room.
+
+### 8. Tactile Audio Feedback & Dynamic Sparse Home Layout
+- **Zero-Dependency Web Audio Clicks**: Synthesizes a subtle 12ms tactile frequency sweep (`1400Hz → 300Hz`) on all button/tile presses, with a footer audio toggle.
+- **Dynamic Sparse Layout**: Automatically scales welcome header font size to `68px` bold and renders a large digital clock at the bottom of the Home screen when $\le 4$ card rows are present.
+
+### 9. Dual-Protocol Communication Engine
 - **WebSocket Protocol**: Connects directly to Home Assistant WebSocket API (`ws://<HA_IP>:8123/api/websocket`) for real-time state synchronization.
 - **HTTP REST API Fallback**: Sends service commands over HTTP POST (`/api/services/<domain>/<service>`) with 300ms debouncing and 3-attempt retries for guaranteed execution.
 - **Global `getNextMsgId()` Handler**: Safe message ID generator preventing WebSocket scope crashes.
