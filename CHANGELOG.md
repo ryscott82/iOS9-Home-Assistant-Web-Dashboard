@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.11.4] - 2026-07-31
+- **Eliminated Duplicate Home Icon Button**: Updated top right `headerNavBtn` to remain strictly as the 3-line Hamburger Menu icon across all tabs instead of morphing into a Home icon, ensuring `.menu-home-btn` directly to the right of the menu bar is the single Home button on the screen.
+
 ## [v3.11.3] - 2026-07-31
 - **Full-Width Menu Bar with Single Dedicated Home Icon Button**: Expanded `.tab-bar` to stretch across the full width of the screen minus the Home button (`flex: 1; min-width: 0`), and removed the duplicate text `Home` button from inside `.tab-bar` so that `.menu-home-btn` on the right acts as the single Home button.
 
