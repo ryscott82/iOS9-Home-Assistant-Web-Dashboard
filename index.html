@@ -3185,7 +3185,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.12.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.12.1</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -7498,7 +7498,7 @@
               var basePic = (chosen.entity_picture.indexOf("http") === 0) ? chosen.entity_picture : (HA_URL + chosen.entity_picture);
               var sep = basePic.indexOf("?") !== -1 ? "&" : "?";
               var trackHash = encodeURIComponent(title + "_" + artist).replace(/[^a-zA-Z0-9]/g, "");
-              artUrl = basePic + sep + "_v=" + trackHash + "_" + Date.now();
+              artUrl = basePic + sep + "_v=" + trackHash;
             } else {
               artUrl = "";
             }
@@ -8878,7 +8878,7 @@
         h += '</div>'; // end top row
 
         if (!unavailable) {
-          h += renderVolumeControls(group, true);
+          h += renderVolumeControls(group, false);
         }
 
         h += '</div>'; // end foreground content container
