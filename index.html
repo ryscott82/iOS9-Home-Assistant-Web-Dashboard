@@ -3185,7 +3185,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.11.7</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.11.8</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -5513,9 +5513,9 @@
 
             if (activeList.length > 0) {
               html += '<div class="section"><div class="section-title">Media Players</div>';
-              html += '<div class="media-page-grid compact-grid" style="margin-bottom:20px;">';
+              html += '<div class="tile-grid" style="margin-bottom:20px;">';
               for (i = 0; i < activeList.length; i++) {
-                html += renderMediaCardLayout(activeList[i], activeList.length);
+                html += renderMediaPlayer(activeList[i]);
               }
               html += '</div></div>';
             }

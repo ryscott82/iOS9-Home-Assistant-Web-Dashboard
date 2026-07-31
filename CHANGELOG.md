@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.11.8] - 2026-07-31
+- **Fixed All Controls Media Player Rendering**: Replaced `renderMediaCardLayout` (which was rendering the large Media page background cards) with `renderMediaPlayer` inside `tile-grid` on the All Controls page (`activeTab === "controls"`). Media player cards on the All Controls page now render as clean compact tiles without album cover artwork and with buttons fitting perfectly inside.
+
 ## [v3.11.7] - 2026-07-31
 - **Compact Media Tiles on All Controls Page**: Removed album cover images from media tiles on the All Controls page (`renderMediaPlayer`). Scaled control buttons to compact 30px/34px circles (`gap: 6px`) to ensure buttons fit comfortably inside each tile without overflowing or wrapping.
 
