@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.14.2] - 2026-07-31
+- **iOS 9 WebKit Deterministic Home Screen Layout Calculation**: Replaced DOM `querySelectorAll` querying (`calculateHomeRows()`) with a deterministic count calculated directly from JavaScript array lengths (`mediaGroups` + `homeEntities`). Completely eliminates DOM reflow loops, class toggling lag, and greeting font size glitching on iOS 9 Mobile Safari.
+
 ## [v3.14.1] - 2026-07-31
 - **Eliminated Home Screen Greeting Font Glitch & Timing Flicker**: Fixed a bug where WebSocket state updates or polling rerenders wiped out the `sparse-home-layout` class on `document.body`, causing `#headerWelcome` to glitch from 68px to 22px and back every few seconds. Preserved `sparse-home-layout` during `showTab()` calls and executed `checkSparseHomeLayout()` synchronously.
 
