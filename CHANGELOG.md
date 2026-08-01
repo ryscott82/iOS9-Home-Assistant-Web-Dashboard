@@ -2,6 +2,9 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v3.14.1] - 2026-07-31
+- **Eliminated Home Screen Greeting Font Glitch & Timing Flicker**: Fixed a bug where WebSocket state updates or polling rerenders wiped out the `sparse-home-layout` class on `document.body`, causing `#headerWelcome` to glitch from 68px to 22px and back every few seconds. Preserved `sparse-home-layout` during `showTab()` calls and executed `checkSparseHomeLayout()` synchronously.
+
 ## [v3.14.0] - 2026-07-31
 - **Ground-Up Clean Rewrite of All Controls Media Cards & Purged Duplicate Function**: Completely purged a duplicate leftover `renderMediaPlayer` function definition in `index.html` that was overriding active media cards with an old plain-white compact layout. Every media player card on the All Controls page now renders as a standalone 100% full-width card (`flex: 1 1 100%`) with an 85% opacity blurred album art backdrop (`filter: blur(22px) saturate(1.4)`), a 42px Play/Pause button glowing with the album's extracted dominant color, and a full volume control slider bar.
 

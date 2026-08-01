@@ -1713,15 +1713,15 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(13,17,23,0.45) 40%, rgba(13,17,23,0.96) 72%, #0d1117 100%);
-      background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(13,17,23,0.45) 40%, rgba(13,17,23,0.96) 72%, #0d1117 100%);
+      background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.15) 0%, rgba(13, 17, 23, 0.45) 40%, rgba(13, 17, 23, 0.96) 72%, #0d1117 100%);
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0%, rgba(13, 17, 23, 0.45) 40%, rgba(13, 17, 23, 0.96) 72%, #0d1117 100%);
       z-index: 2;
     }
 
     /* Light Mode Overlay: Fades album cover to solid white at bottom */
     body:not(.dark-theme) .media-card-bg-overlay {
-      background: -webkit-linear-gradient(top, rgba(0,0,0,0.15) 0%, rgba(255,255,255,0.55) 40%, rgba(255,255,255,0.98) 72%, #ffffff 100%);
-      background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(255,255,255,0.55) 40%, rgba(255,255,255,0.98) 72%, #ffffff 100%);
+      background: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.55) 40%, rgba(255, 255, 255, 0.98) 72%, #ffffff 100%);
+      background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0%, rgba(255, 255, 255, 0.55) 40%, rgba(255, 255, 255, 0.98) 72%, #ffffff 100%);
     }
 
     /* Subtle Glass Sweep Animation Sheen */
@@ -1731,8 +1731,8 @@
       left: -120%;
       width: 60%;
       height: 200%;
-      background: -webkit-linear-gradient(left, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
-      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0) 100%);
+      background: -webkit-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0) 100%);
+      background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0) 100%);
       -webkit-transform: rotate(25deg);
       transform: rotate(25deg);
       z-index: 2;
@@ -1745,12 +1745,23 @@
     }
 
     @-webkit-keyframes glassSweep {
-      0% { left: -120%; }
-      100% { left: 180%; }
+      0% {
+        left: -120%;
+      }
+
+      100% {
+        left: 180%;
+      }
     }
+
     @keyframes glassSweep {
-      0% { left: -120%; }
-      100% { left: 180%; }
+      0% {
+        left: -120%;
+      }
+
+      100% {
+        left: 180%;
+      }
     }
 
     /* Absolute positioning ensures iOS 9 WebKit calculates 100% height correctly without collapsing */
@@ -1793,7 +1804,7 @@
       border-radius: 16px;
       border: 1px solid rgba(255, 255, 255, 0.25);
       letter-spacing: -0.2px;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
     }
 
     body:not(.dark-theme) .media-card-speaker-badge {
@@ -1827,18 +1838,44 @@
       background: rgb(65, 122, 160);
     }
 
-    .eq-bar:nth-child(1) { height: 12px; animation-delay: 0.1s; }
-    .eq-bar:nth-child(2) { height: 18px; animation-delay: 0.3s; }
-    .eq-bar:nth-child(3) { height: 10px; animation-delay: 0.2s; }
-    .eq-bar:nth-child(4) { height: 16px; animation-delay: 0.4s; }
+    .eq-bar:nth-child(1) {
+      height: 12px;
+      animation-delay: 0.1s;
+    }
+
+    .eq-bar:nth-child(2) {
+      height: 18px;
+      animation-delay: 0.3s;
+    }
+
+    .eq-bar:nth-child(3) {
+      height: 10px;
+      animation-delay: 0.2s;
+    }
+
+    .eq-bar:nth-child(4) {
+      height: 16px;
+      animation-delay: 0.4s;
+    }
 
     @-webkit-keyframes eqWave {
-      0% { height: 4px; }
-      100% { height: 20px; }
+      0% {
+        height: 4px;
+      }
+
+      100% {
+        height: 20px;
+      }
     }
+
     @keyframes eqWave {
-      0% { height: 4px; }
-      100% { height: 20px; }
+      0% {
+        height: 4px;
+      }
+
+      100% {
+        height: 20px;
+      }
     }
 
     .media-card-info-box {
@@ -3185,7 +3222,7 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.14.0</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v3.14.1</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" id="soundToggleBtn" onclick="toggleSoundFeedback()" title="Toggle Audio Feedback">🔊
@@ -4233,7 +4270,7 @@
         var darkB = Math.round(tb * 0.3);
 
         if (artSrc && !albumColorCache[artSrc]) {
-          extractAlbumDominantColor(artSrc, function(extractedRgb) {
+          extractAlbumDominantColor(artSrc, function (extractedRgb) {
             var lightRgb = ensureLightVibrantTint(extractedRgb);
             var cardEl = document.getElementById("media_card_" + primaryCleanEid);
             if (cardEl) {
@@ -4429,7 +4466,7 @@
 
           // BOTTOM COMPACT CONTROLS CONTAINER
           h += '<div class="media-card-controls-glass">';
-          
+
           // Playback Controls Row (Prev, Play/Pause Pill, Next)
           h += '<div class="media-card-controls-row">';
           h += '<button class="media-glass-btn prev-btn" onclick="mediaPrevTrack(\'' + primaryEid + '\')" title="Previous Track">';
@@ -4616,7 +4653,7 @@
           }
 
           if (artUrl && !albumColorCache[artUrl]) {
-            extractAlbumDominantColor(artUrl, function(extractedRgb) {
+            extractAlbumDominantColor(artUrl, function (extractedRgb) {
               var homeCardEl = document.getElementById("home_media_card_" + primaryCleanEid);
               if (homeCardEl) {
                 var lRgb = ensureLightVibrantTint(extractedRgb);
@@ -5306,7 +5343,8 @@
 
         // RENDER BASED ON ACTIVE TAB & DYNAMIC THEME COLOR
         var isDarkTheme = (themeOverride === "dark" || isNight);
-        document.body.className = (isDarkTheme ? "dark-theme " : "") + "tab-" + activeTab;
+        var wasSparse = document.body.classList.contains("sparse-home-layout");
+        document.body.className = (isDarkTheme ? "dark-theme " : "") + "tab-" + activeTab + (wasSparse && activeTab === "home" ? " sparse-home-layout" : "");
 
         // Dynamic status bar and html background matching site background
         var themeBgColor = isDarkTheme ? "#0d1117" : "#f2f2f7";
@@ -5658,7 +5696,7 @@
         }
 
         document.getElementById("entityContainer").innerHTML = html;
-        setTimeout(checkSparseHomeLayout, 60);
+        checkSparseHomeLayout();
       }
 
       // ======== ENTITY RENDERERS ========
@@ -7498,7 +7536,7 @@
               var basePic = (chosen.entity_picture.indexOf("http") === 0) ? chosen.entity_picture : (HA_URL + chosen.entity_picture);
               var sep = basePic.indexOf("?") !== -1 ? "&" : "?";
               var trackHash = encodeURIComponent(title + "_" + artist).replace(/[^a-zA-Z0-9]/g, "");
-              artUrl = basePic + sep + "_v=" + trackHash;
+              artUrl = basePic + sep + "_v=" + trackHash + "_" + Date.now();
             } else {
               artUrl = "";
             }
@@ -8728,141 +8766,84 @@
         var trackInfo = getGroupTrackInfo(group);
         var title = trackInfo.title;
         var artist = trackInfo.artist;
+        var isPlaying = trackInfo.isPlaying;
 
-        // Extract artwork URL from trackInfo or fallback to any media_player attribute in the group
-        var artUrl = trackInfo.artUrl || "";
-        if (!artUrl) {
-          for (var g = 0; g < group.length; g++) {
-            var mAttrs = group[g].attributes || {};
-            var mPic = mAttrs.entity_picture || mAttrs.media_image_url || mAttrs.entity_picture_local;
-            if (mPic) {
-              artUrl = (mPic.indexOf("http") === 0) ? mPic : (HA_URL.replace(/\/$/, "") + mPic);
-              break;
-            }
-          }
+        var isIdle = (state !== "playing" && state !== "paused" && !unavailable && title !== "Skipping...");
+
+        var inlineStyle = 'background:#ffffff; border-radius:18px; padding: 10px 12px; display:block; text-align:center; box-sizing:border-box;';
+        if (isNested) {
+          inlineStyle += ' -webkit-flex:none; flex:none; margin:0 0 10px 0; width:100%;';
         }
 
-        var isPlaying = trackInfo.isPlaying || (state === "playing");
-        var hasTrackInfo = (title && title !== "Not Playing" && title !== "Skipping...");
-        var isIdle = (!hasTrackInfo && state !== "playing" && state !== "paused");
-        var isDarkTheme = (themeOverride === "dark" || isNight);
+        var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="' + inlineStyle + '">';
 
-        if (isIdle || unavailable) {
-          // Standard clean compact tile for idle or unavailable media players
-          var tileBg = isDarkTheme ? '#1c2128' : '#ffffff';
-          var textColor = isDarkTheme ? '#f0f6fc' : '#1c1c1e';
+        // Header
+        h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; -webkit-align-items:center; align-items:center; margin-bottom:6px;">';
+        h += '<div style="font-weight:800; font-size:13px; color:#1c1c1e; letter-spacing:-0.2px; text-align:left; -webkit-flex:1; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-right:6px;">' + name + '</div>';
+        h += '<div style="font-size:10px; font-weight:700; color:#8e8e93; text-transform:uppercase; letter-spacing:0.5px;">' + state + '</div>';
+        h += '</div>';
 
-          var h = '<div class="tile media-tile' + (unavailable ? ' unavailable' : '') + '" style="background:' + tileBg + '; border-radius:18px; padding:12px 16px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; box-sizing:border-box; width:100%; -webkit-flex:1 1 100%; flex:1 1 100%; margin:6px 0; min-height:56px;">';
-
-          // Left: Music icon + Speaker name
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; min-width:0; -webkit-flex:1; flex:1; margin-right:12px;">';
-          h += '<div style="display:-webkit-flex; display:flex; width:36px; height:36px; border-radius:10px; background:' + (isDarkTheme ? 'rgba(255,255,255,0.08)' : '#f2f2f7') + '; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; font-size:16px; margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">🎵</div>';
-          h += '<div class="tile-name" style="font-weight:700; font-size:14px; margin:0; color:' + textColor + '; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-          h += '</div>';
-
-          // Right: Compact Play button
+        if (isIdle) {
+          // Compact layout for idle media players
           if (!unavailable) {
-            h += '<button class="footer-btn" style="background:' + (isDarkTheme ? 'rgba(255,255,255,0.12)' : '#f2f2f7') + '; color:#007aff; width:36px; height:36px; border-radius:50%; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:10px; margin-top:6px;">';
+
+            // Play Button
+            var activeBg = isPlaying ? '#e1f5fe' : '#f2f2f7';
+            var activeColor = '#007aff';
+            h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:32px; height:32px; border-radius:50%; margin:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); -webkit-flex-shrink:0; flex-shrink:0; padding:0;" onclick="mediaPlayPause(\'' + eid + '\')">';
             h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%;">';
-            h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+            h += '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
             h += '</div></button>';
+
+            // Volume Sliders Container
+            h += '<div style="-webkit-flex:1; flex:1; min-width:0; display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; gap:6px;">';
+            h += renderVolumeControls(group, true);
+            h += '</div>';
+            h += '</div>';
           }
-          h += '</div>';
-          return h;
-        }
-
-        // Active / Playing Media Player with Dynamic Blurred Album Art Background & Dominant Color Controls
-        var domRgb = { r: 0, g: 122, b: 255 }; // Default iOS blue accent
-        if (artUrl) {
-          if (albumColorCache[artUrl]) {
-            domRgb = albumColorCache[artUrl];
-          } else {
-            extractAlbumDominantColor(artUrl, function () {
-              if (activeTab === "controls") renderTab("controls");
-            });
-          }
-        }
-
-        var domRgbStr = 'rgb(' + domRgb.r + ',' + domRgb.g + ',' + domRgb.b + ')';
-        var domRgbGlow = 'rgba(' + domRgb.r + ',' + domRgb.g + ',' + domRgb.b + ', 0.55)';
-
-        var cardBg = isDarkTheme ? '#161b22' : '#ffffff';
-        // Rich semi-transparent tint overlay so blurred album artwork is vibrant and clear underneath!
-        var overlayBg = isDarkTheme 
-          ? 'linear-gradient(135deg, rgba(13, 17, 23, 0.75) 0%, rgba(13, 17, 23, 0.60) 100%)' 
-          : 'linear-gradient(135deg, rgba(255, 255, 255, 0.65) 0%, rgba(255, 255, 255, 0.45) 100%)';
-        var textColor = isDarkTheme ? '#ffffff' : '#1c1c1e';
-        var subTextColor = isDarkTheme ? 'rgba(255,255,255,0.85)' : '#55555e';
-
-        var h = '<div class="tile media-tile" style="position:relative; overflow:hidden; background:' + cardBg + '; border-radius:20px; padding:14px 16px; display:block; box-sizing:border-box; text-align:left; width:100%; -webkit-flex:1 1 100%; flex:1 1 100%; margin:8px 0; box-shadow:0 6px 20px rgba(0,0,0,0.08);">';
-
-        // 1. VIBRANT BLURRED ALBUM ART BACKDROP LAYER
-        if (artUrl) {
-          h += '<div style="position:absolute; top:-30px; left:-30px; right:-30px; bottom:-30px; background-image:url(\'' + artUrl + '\'); background-size:cover; background-position:center; -webkit-filter:blur(22px) brightness(' + (isDarkTheme ? '0.85' : '1.15') + ') saturate(1.4); filter:blur(22px) brightness(' + (isDarkTheme ? '0.85' : '1.15') + ') saturate(1.4); opacity:0.85; pointer-events:none; z-index:0;"></div>';
         } else {
-          // Fallback ambient color backdrop if no album image URL exists
-          h += '<div style="position:absolute; top:0; left:0; right:0; bottom:0; background:linear-gradient(135deg, ' + domRgbGlow + ' 0%, transparent 100%); opacity:0.3; pointer-events:none; z-index:0;"></div>';
-        }
-
-        // 2. LIGHT / DARK MODE GLASS TINT OVERLAY LAYER
-        h += '<div style="position:absolute; top:0; left:0; right:0; bottom:0; background:' + overlayBg + '; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); pointer-events:none; z-index:1;"></div>';
-
-        // 3. FOREGROUND CONTENT (z-index: 2)
-        h += '<div style="position:relative; z-index:2;">';
-
-        // Top Row: Speaker Name & Track Metadata + Playback Control Buttons
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; gap:12px; margin-bottom:12px;">';
-
-        // Left Side: Speaker Name & Track Title
-        h += '<div style="-webkit-flex:1; flex:1; min-width:0;">';
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:6px; margin-bottom:2px;">';
-        h += '<div style="font-weight:850; font-size:14px; color:' + textColor + '; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px;">' + name + '</div>';
-        h += '<div style="font-size:9.5px; font-weight:800; color:' + (isDarkTheme ? '#34c759' : '#28a745') + '; text-transform:uppercase; letter-spacing:0.6px; background:' + (isDarkTheme ? 'rgba(52,199,89,0.18)' : 'rgba(40,167,69,0.14)') + '; padding:2px 6px; border-radius:6px;">PLAYING</div>';
-        h += '</div>';
-        h += '<div style="font-size:13px; color:' + textColor + '; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.2px; line-height:1.2;">' + escapeHtml(title) + '</div>';
-        if (artist) {
-          h += '<div style="font-size:11.5px; color:' + subTextColor + '; font-weight:600; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(artist) + '</div>';
-        }
-        h += '</div>';
-
-        // Right Side: Control Buttons (Back, Play/Pause with Album Dominant Color, Next)
-        if (!unavailable) {
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:8px; -webkit-flex-shrink:0; flex-shrink:0;">';
-
-          // Back (Previous Track)
-          h += '<button class="footer-btn" style="background:' + (isDarkTheme ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.75)') + '; color:' + textColor + '; width:34px; height:34px; border-radius:50%; margin:0; border:1px solid ' + (isDarkTheme ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)') + '; padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.06);" onclick="mediaPrevious(\'' + eid + '\')" title="Previous Track">';
-          h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
-          h += '</button>';
-
-          // Play/Pause Button - Highlighted with extracted DOMINANT ALBUM COLOR!
-          var activeBg = isPlaying ? domRgbStr : (isDarkTheme ? 'rgba(255,255,255,0.25)' : 'rgba(255,255,255,0.85)');
-          var activeIconColor = isPlaying ? '#ffffff' : textColor;
-          var activeGlow = isPlaying ? 'box-shadow: 0 4px 16px ' + domRgbGlow + ';' : 'box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
-
-          h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeIconColor + '; width:42px; height:42px; border-radius:50%; margin:0; border:none; ' + activeGlow + ' padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; transition: all 0.2s ease;" onclick="mediaPlayPause(\'' + eid + '\')" title="Play / Pause">';
-          if (isPlaying) {
-            h += '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
-          } else {
-            h += '<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+          // Title & Artist Info (No Album Cover image on All Controls page)
+          h += '<div style="margin-bottom:6px; text-align:left; padding:0 2px;">';
+          h += '<div style="font-weight:800; font-size:14px; color:#1c1c1e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-0.3px; line-height:1.15;">' + escapeHtml(title) + '</div>';
+          if (artist) {
+            h += '<div style="font-size:11.5px; color:#8e8e93; font-weight:600; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + escapeHtml(artist) + '</div>';
           }
-          h += '</button>';
-
-          // Next (Skip Track)
-          h += '<button class="footer-btn" style="background:' + (isDarkTheme ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.75)') + '; color:' + textColor + '; width:34px; height:34px; border-radius:50%; margin:0; border:1px solid ' + (isDarkTheme ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.08)') + '; padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.06);" onclick="mediaNext(\'' + eid + '\')" title="Next Track">';
-          h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
-          h += '</button>';
-
           h += '</div>';
-        }
-        h += '</div>'; // end top row
 
-        // Bottom Row: Volume Control Bar
-        if (!unavailable) {
-          h += renderVolumeControls(group, false);
+          if (!unavailable) {
+            // Control Buttons Row (Back, Play/Pause, Next) - Compact 32px / 38px buttons fitting cleanly inside card
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; margin-bottom:8px; gap: 12px;">';
+
+            // Back (Previous track)
+            h += '<button class="footer-btn" style="background:#f2f2f7; color:#1c1c1e; width:32px; height:32px; border-radius:50%; margin:0; border:none; padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;" onclick="mediaPrevious(\'' + eid + '\')" title="Previous Track">';
+            h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>';
+            h += '</button>';
+
+            // Play/Pause
+            var activeBg = isPlaying ? '#e1f5fe' : '#f2f2f7';
+            var activeColor = '#007aff';
+            h += '<button class="footer-btn" style="background:' + activeBg + '; color:' + activeColor + '; width:38px; height:38px; border-radius:50%; margin:0; border:none; box-shadow:0 1px 4px rgba(0,0,0,0.08); padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;" onclick="mediaPlayPause(\'' + eid + '\')" title="Play/Pause">';
+            if (isPlaying) {
+              h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+            } else {
+              h += '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+            }
+            h += '</button>';
+
+            // Next (Skip track)
+            h += '<button class="footer-btn" style="background:#f2f2f7; color:#1c1c1e; width:32px; height:32px; border-radius:50%; margin:0; border:none; padding:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center;" onclick="mediaNext(\'' + eid + '\')" title="Next Track">';
+            h += '<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>';
+            h += '</button>';
+
+            h += '</div>';
+
+            // Volume Control Slider (Compact mode)
+            h += renderVolumeControls(group, true);
+          }
         }
 
-        h += '</div>'; // end foreground content container
-        h += '</div>'; // end tile container
+        h += '</div>';
         return h;
       }
 
@@ -8953,7 +8934,6 @@
           h += renderVolumeControls(group, false);
         }
 
-        h += '</div>';
         return h;
       }
 
