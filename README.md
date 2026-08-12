@@ -44,11 +44,11 @@ A ultra-minimal, high-readability Home Assistant web dashboard designed specific
 - **Automatic HVAC Mode Switching**: Setting a target temp above current room temp automatically switches HVAC mode to **`heat`**; setting target temp below current room temp automatically switches HVAC mode to **`cool`**.
 - **Red Outline Highlight**: Active heating/cooling tiles display a red border (`#ff3b30`). When target temperature equals actual room temperature, the tile retains the red outline but clears the inner background fill.
 
-### 5. Hot Tub 100°F Fire Quick-Boost Button
+### 5. Hot Tub 102°F Fire Quick-Boost Button
 - **Standard Flame SVG Icon**: Features a clean, standard classic Flame SVG button (`40px x 40px`).
 - **Active / Inactive Toggle State**:
-  - **Inactive (Target != 100°F)**: Button renders in muted gray (`#8e8e93`). Tapping it boosts the Hot Tub target temperature to **`100°F`**.
-  - **Active (Target == 100°F)**: Button renders in glowing orange (`#ff9f0a` border & fill). Tapping it lowers the Hot Tub target temperature to **`68°F`**.
+  - **Inactive (Target != 102°F)**: Button renders in muted gray (`#8e8e93`). Tapping it boosts the Hot Tub target temperature to **`102°F`**.
+  - **Active (Target == 102°F)**: Button renders in glowing orange (`#ff9f0a` border & fill). Tapping it lowers the Hot Tub target temperature to **`68°F`**.
 - **0ms Optimistic Visual Feedback**: Direct DOM element targeting (`btn_fire_<eid>`) updates button styling instantly (<1ms) when pressed.
 
 ### 6. Dynamic Media Player Tab & Canvas Color Extraction
@@ -60,7 +60,7 @@ A ultra-minimal, high-readability Home Assistant web dashboard designed specific
 - **Side-by-Side 3-Card Grid**: Displays up to 3 active media players side-by-side in a single row on iPad landscapes.
 
 ### 7. Lightning Safety Emergency Alert System
-- **10-Second Synthesized Siren Tone**: Synthesizes a 10-second warbling emergency alarm tone via Web Audio API when `input_boolean.lightning_safety` is triggered.
+- **4-Second Synthesized Siren Tone**: Synthesizes a 4-second warbling emergency alarm tone via Web Audio API when `input_boolean.lightning_safety` is triggered.
 - **Full-Screen Harsh Red/Black Strobe**: Displays a dramatic full-screen red and black flashing strobe overlay with a bottom 1/4 acknowledge button to maximize visibility from across the room.
 
 ### 8. Tactile Audio Feedback & Dynamic Sparse Home Layout

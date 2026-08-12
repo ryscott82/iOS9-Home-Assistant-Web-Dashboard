@@ -3758,8 +3758,8 @@
           alarmOsc1.type = "sawtooth";
           alarmOsc2.type = "sine";
 
-          // Dramatic emergency warbling siren tone (switching between 850Hz and 650Hz every 0.25s for 10 seconds)
-          for (var t = 0; t < 10; t += 0.5) {
+          // Dramatic emergency warbling siren tone (switching between 850Hz and 650Hz every 0.25s for 4 seconds)
+          for (var t = 0; t < 4; t += 0.5) {
             alarmOsc1.frequency.setValueAtTime(850, ctx.currentTime + t);
             alarmOsc1.frequency.setValueAtTime(650, ctx.currentTime + t + 0.25);
             alarmOsc2.frequency.setValueAtTime(425, ctx.currentTime + t);
@@ -3773,10 +3773,10 @@
           alarmOsc1.start(ctx.currentTime);
           alarmOsc2.start(ctx.currentTime);
 
-          // Stop automatically after 10 seconds
+          // Stop automatically after 4 seconds
           alarmTimer = setTimeout(function () {
             stopLightningEmergencyAlarm();
-          }, 10000);
+          }, 4000);
         } catch (e) { }
       }
 
@@ -4205,8 +4205,8 @@
             var displayTarget = targetTemp !== "--" ? Math.round(parseFloat(targetTemp)) + unit : "--";
             var targetNum = Math.round(parseFloat(targetTemp));
 
-            // Muted orange quick heat preset buttons (Hot Tub: 68 & 100 | Pool: 68 & 78)
-            var p1 = 68, p2 = isHotTub ? 100 : (isPool ? 78 : 72);
+            // Muted orange quick heat preset buttons (Hot Tub: 68 & 102 | Pool: 68 & 78)
+            var p1 = 68, p2 = isHotTub ? 102 : (isPool ? 78 : 72);
             var p1Active = (targetNum === p1);
             var p2Active = (targetNum === p2);
 
@@ -6489,7 +6489,7 @@
             for (i = 0; i < mediaPlayers.length; i++) {
               var mp = mediaPlayers[i];
               var state = mp.state;
-              if (state !== "playing" && state !== "paused") {
+              if (state !== "playing" && state !== "paused" && !isIpadDashboardMedia(mp)) {
                 var isIdleTooLong = true;
                 if (mp.last_changed) {
                   var lastChanged = new Date(mp.last_changed);
@@ -6516,7 +6516,7 @@
             var activeList = [];
             var idleList = [];
             for (i = 0; i < mediaGroups.length; i++) {
-              if (isGroupIdle(mediaGroups[i])) {
+              if (isGroupIdle(mediaGroups[i]) && !isIpadDashboardGroup(mediaGroups[i])) {
                 idleList.push(mediaGroups[i]);
               } else {
                 activeList.push(mediaGroups[i]);
@@ -6886,7 +6886,7 @@
             h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; gap:8px; margin-top:8px; border-top:1px solid rgba(128,128,128,0.12); padding-top:8px;">';
             h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 68)">68&deg;</button>';
             if (isHotTub) {
-              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 100)">100&deg;</button>';
+              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 102)">102&deg;</button>';
             } else if (isPool) {
               h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 76)">76&deg;</button>';
             }
@@ -8118,7 +8118,7 @@
             h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; gap:8px; margin-top:8px; border-top:1px solid rgba(128,128,128,0.12); padding-top:8px;">';
             h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 68)">68&deg;</button>';
             if (isHotTub) {
-              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 100)">100&deg;</button>';
+              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 102)">102&deg;</button>';
             } else if (isPool) {
               h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 76)">76&deg;</button>';
             }
@@ -9729,6 +9729,13 @@
         var trackInfo = getGroupTrackInfo(group);
         var title = trackInfo.title;
         return (state !== "playing" && state !== "paused" && !unavailable && title !== "Skipping...");
+      }
+
+      function isIpadDashboardGroup(group) {
+        for (var g = 0; g < group.length; g++) {
+          if (isIpadDashboardMedia(group[g])) return true;
+        }
+        return false;
       }
 
       function renderVolumeControls(group, isCompact) {
