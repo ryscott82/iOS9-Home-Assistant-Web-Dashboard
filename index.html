@@ -3815,7 +3815,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.1.9";
+      var DASHBOARD_VERSION = "v4.2.2";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -6795,9 +6795,21 @@
 
           if (mediaGroups.length > 0 || homeEntities.length > 0) {
             html += '<div class="tile-grid">';
+          if (mediaGroups.length % 2 === 1) {
+            var playingIndex = -1;
             for (i = 0; i < mediaGroups.length; i++) {
-              html += renderHomeMediaPlayerCard(mediaGroups[i], true);
+              if (getGroupTrackInfo(mediaGroups[i].length ? mediaGroups[i] : [mediaGroups[i]]).isPlaying) {
+                playingIndex = i;
+                break;
+              }
             }
+            if (playingIndex > 0) {
+              mediaGroups.unshift(mediaGroups.splice(playingIndex, 1)[0]);
+            }
+          }
+          for (i = 0; i < mediaGroups.length; i++) {
+            html += renderHomeMediaPlayerCard(mediaGroups[i], (i === 0 && mediaGroups.length % 2 === 1));
+          }
             for (i = 0; i < homeEntities.length; i++) {
               html += renderHomeCard(homeEntities[i]);
             }
