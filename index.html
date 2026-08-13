@@ -1476,6 +1476,54 @@
       border-color: #ff9f0a;
     }
 
+    /* "Check Chemicals" quick card on All Controls */
+    .chem-check-card {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      width: 100%;
+      min-height: 88px;
+      padding: 14px 20px;
+      margin: 6px 0;
+      box-sizing: border-box;
+      background: #ffffff;
+      border-radius: 24px;
+      border: 2px solid rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .chem-check-card .chem-check-label {
+      font-size: 18px;
+      font-weight: 850;
+      letter-spacing: -0.2px;
+      color: #1c1c1e;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chem-check-card .chem-check-chevron {
+      color: #9aa5b1;
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+      margin-left: 12px;
+    }
+
+    body.dark-theme .chem-check-card {
+      background: #161b22;
+      border-color: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-theme .chem-check-card .chem-check-label {
+      color: #e6edf3;
+    }
+
     body.dark-theme .ctrl-room {
       color: #9aa5b1;
     }
@@ -3721,14 +3769,18 @@
     <div id="sparseBottomClock" class="sparse-bottom-clock">
       <div id="sparseClockTime" class="sparse-clock-time"></div>
       <div id="sparseClockDate" class="sparse-clock-date"></div>
-      <button id="homeAllControlsBtn" class="home-all-controls-btn" onclick="switchTab('controls')"
-        title="Open All Controls">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px;">
-          <path
-            d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z" />
-        </svg>
-        <span>All Controls</span>
-      </button>
+      <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:10px; width:100%; margin-top:14px; padding:0 12px; box-sizing:border-box;">
+        <div id="chemLogBtnPool" style="display:none; -webkit-flex:1; flex:1; max-width:260px; min-width:0;"></div>
+        <button id="homeAllControlsBtn" class="home-all-controls-btn" onclick="switchTab('controls')"
+          title="Open All Controls" style="margin-top:0; -webkit-flex-shrink:0; flex-shrink:0;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px;">
+            <path
+              d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z" />
+          </svg>
+          <span>All Controls</span>
+        </button>
+        <div id="chemLogBtnHottub" style="display:none; -webkit-flex:1; flex:1; max-width:260px; min-width:0;"></div>
+      </div>
     </div>
 
     <!-- FOOTER CONTROLS -->
@@ -3737,8 +3789,8 @@
         <span id="statusDot" class="footer-status"></span>
         <span style="font-weight:500;">Connection Status</span>
         <span
-          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;">v4
-          Beta 51</span>
+          style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;"
+          id="versionLabel">v4.0.3</span>
       </div>
       <div style="display:-webkit-flex; display:flex; gap:8px;">
         <button class="footer-btn" onclick="showSetup()" title="Open Connection Settings">⚙️ Settings</button>
@@ -3757,6 +3809,14 @@
   <script>
     (function () {
       "use strict";
+
+      // ======== APP VERSION (bump this on every change) ========
+      var DASHBOARD_VERSION = "v4.0.6";
+      try {
+        console.log("Dashboard version: " + DASHBOARD_VERSION);
+        var versionLabelEl = document.getElementById("versionLabel");
+        if (versionLabelEl) versionLabelEl.textContent = DASHBOARD_VERSION;
+      } catch (e) { }
 
       // ======== iOS 9 POLYFILLS ========
       if (typeof Element !== "undefined") {
@@ -4069,6 +4129,50 @@
         updateClock();
       }
       window.checkSparseHomeLayout = checkSparseHomeLayout;
+
+      function updateChemLogButtons(allStates) {
+        var renderSide = function (el, vol, label) {
+          if (!el) return;
+          var nowHr = new Date().getHours();
+          var inWindow = (nowHr >= 12 && nowHr < 18);
+          if (activeTab !== "home" || !inWindow || !isChemCheckStale(vol, allStates) || isChemicalMixingActive(vol)) {
+            el.style.display = "none";
+            return;
+          }
+          var last = getChemLastChecked(vol);
+          var daysTxt = "";
+          if (last) {
+            var days = Math.max(1, Math.floor((Date.now() - last) / 86400000));
+            daysTxt = " &middot; " + days + "d";
+          }
+          el.innerHTML = '<button style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:52px; border-radius:18px; font-size:13px; font-weight:800; line-height:1.15; padding:0 8px; box-sizing:border-box; cursor:pointer; background:#007aff; color:#ffffff; border:none; box-shadow:0 4px 14px rgba(10,132,255,0.35);" onclick="openChemicalsTab(\'' + vol + '\'); return false;">Click to Log ' + label + ' Chemicals' + daysTxt + '</button>';
+          el.style.display = "-webkit-flex";
+          el.style.display = "flex";
+        };
+        renderSide(document.getElementById("chemLogBtnPool"), "pool", "Pool");
+        renderSide(document.getElementById("chemLogBtnHottub"), "hottub", "Hot Tub");
+      }
+
+      function checkDailyChemLogPrompt() {
+        if (!lastStatesCache || lastStatesCache.length === 0) return;
+        if (document.body.classList.contains("is-sleep-mode")) return;
+        var d = new Date();
+        var hr = d.getHours();
+        if (hr < 12 || hr >= 18) return;
+        var todayLocal = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+        try {
+          if (localStorage.getItem("ha_chem_auto_switch_date") === todayLocal) return;
+        } catch (e) { }
+        var staleVols = [];
+        if (isChemCheckStale("pool", lastStatesCache) && !isChemicalMixingActive("pool")) staleVols.push("pool");
+        if (isChemCheckStale("hottub", lastStatesCache) && !isChemicalMixingActive("hottub")) staleVols.push("hottub");
+        if (staleVols.length === 0) return;
+        try { localStorage.setItem("ha_chem_auto_switch_date", todayLocal); } catch (e) { }
+        if (activeTab === "chemicals") return;
+        var targetVol = staleVols[0];
+        showToast("Time to log your " + (targetVol === "pool" ? "pool" : "hot tub") + " chemicals");
+        openChemicalsTab(targetVol);
+      }
 
       function applyTabClass(tabName) {
         document.body.className = document.body.className.replace(/\btab-[a-z]+\b/g, "").replace(/\bsparse-home-layout\b/g, "").trim();
@@ -4497,29 +4601,18 @@
         var chemContext = isHotTub ? "hottub" : (isPool ? "pool" : "");
         var chemBeakerBtnHtml = "";
         if (chemContext) {
-          var isChemMixing = isChemicalMixingActive(chemContext);
           var recs = getRecommendationsData(lastStatesCache || [], chemContext);
-          var hasRedChem = false, hasYellowChem = false;
+          var hasRedChem = false;
           for (var rc = 0; rc < recs.length; rc++) {
             if (recs[rc].severity === "red") hasRedChem = true;
-            else if (recs[rc].severity === "yellow") hasYellowChem = true;
           }
-          var chemBg = "#0a84ff";
-          var chemShadow = "0 4px 12px rgba(10,132,255,0.35)";
-          var chemTitle = "Water Chemistry Normal - Tap to View Logs";
+          var chemBg = "#34c759";
+          var chemShadow = "0 4px 12px rgba(52,199,89,0.45)";
+          var chemTitle = "Chem";
 
-          if (isChemMixing) {
-            chemBg = "#34c759";
-            chemShadow = "0 4px 12px rgba(52,199,89,0.45)";
-            chemTitle = "Chemicals Mixing (2h Timer Active) - Tap to View Logs";
-          } else if (hasRedChem) {
+          if (hasRedChem) {
             chemBg = "#ff3b30";
             chemShadow = "0 4px 12px rgba(255,59,48,0.45)";
-            chemTitle = "Chemicals Critical - Tap to View Logs";
-          } else if (hasYellowChem) {
-            chemBg = "#d97706";
-            chemShadow = "0 4px 12px rgba(217,119,6,0.45)";
-            chemTitle = "Chemical Warning - Tap to View Logs";
           }
           var beakerSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; margin:auto; color:#ffffff; pointer-events:none;"><path d="M10 2v7.5L4.5 19.5A2 2 0 0 0 6.2 22h11.6a2 2 0 0 0 1.7-2.5L14 9.5V2" pointer-events="none"/><path d="M8.5 2h7" pointer-events="none"/><path d="M7 16h10" pointer-events="none"/></svg>';
           chemBeakerBtnHtml = '<button class="chem-alert-btn" onclick="openChemicalsTab(\'' + chemContext + '\', event); return false;" title="' + chemTitle + '" style="height:48px; min-width:80px; padding:0 12px; background:' + chemBg + '; color:#ffffff; border-radius:14px; display:-webkit-inline-flex; display:inline-flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; border:none; box-shadow:' + chemShadow + ';">' + beakerSvg + '<span style="font-size:15px; font-weight:900; margin-left:6px; color:#ffffff;">Chem</span></button>';
@@ -5755,6 +5848,7 @@
         updateClock();
         setInterval(updateClock, 10000);
         setInterval(pollMediaPlayersHA, 3000); // 3-second REST polling backup for Media & Track updates
+        setInterval(checkDailyChemLogPrompt, 60000);
         resetInactivityTimer();
         document.addEventListener("click", wakeFromNightDim);
         document.addEventListener("touchstart", wakeFromNightDim);
@@ -6471,19 +6565,10 @@
           }
         }
 
-        // Check 2-hour alert snooze window (after chemicals checked or recommendation checkbox ticked)
-        var isAlertSnoozed = false;
-        try {
-          var alertSnoozedTime = localStorage.getItem("ha_chem_alert_snoozed_time");
-          if (alertSnoozedTime) {
-            var elapsed = Date.now() - parseInt(alertSnoozedTime, 10);
-            if (elapsed < 2 * 60 * 60 * 1000) { // 2 hours
-              isAlertSnoozed = true;
-            } else {
-              localStorage.removeItem("ha_chem_alert_snoozed_time");
-            }
-          }
-        } catch (e) { }
+        // Check volume-aware mixing-window alert snooze (after chemicals checked or recommendation checkbox ticked)
+        var isPoolSnoozed = isChemAlertSnoozed("pool");
+        var isHtSnoozed = isChemAlertSnoozed("hottub");
+        var isAlertSnoozed = isPoolSnoozed || isHtSnoozed;
 
         // Also check if any recommendation checkbox has been checked
         var hasTickedCheckbox = false;
@@ -6494,7 +6579,7 @@
           }
         }
 
-        var hasRedWarning = (htRedRecs.length > 0 || poolRedRecs.length > 0) && !isAlertSnoozed && !hasTickedCheckbox;
+        var hasRedWarning = ((htRedRecs.length > 0 && !isHtSnoozed) || (poolRedRecs.length > 0 && !isPoolSnoozed)) && !hasTickedCheckbox;
 
         var chemBanner = document.getElementById("headerChemBanner");
         if (chemBanner) {
@@ -6777,6 +6862,37 @@
               html += '<div class="section" id="sec_' + fClean + '"><div class="section-title">' + escapeHtml(floorName) + '</div>';
               html += '<div class="controls-grid">';
 
+              var hasPoolCard = false;
+              for (var q = 0; q < floorEntities.length; q++) {
+                var qent = floorEntities[q];
+                var qdom = qent.entity_id.split(".")[0];
+                if (qdom === "climate" || qdom === "water_heater") {
+                  var qeid = (qent.entity_id || "").toLowerCase();
+                  var qname = (friendlyName(qent) || "").toLowerCase();
+                  if (qeid.indexOf("pool") !== -1 || qname.indexOf("pool") !== -1 ||
+                      qeid.indexOf("hot_tub") !== -1 || qeid.indexOf("hottub") !== -1 || qeid.indexOf("spa") !== -1 ||
+                      qname.indexOf("hot tub") !== -1 || qname.indexOf("spa") !== -1) {
+                    hasPoolCard = true;
+                    break;
+                  }
+                }
+              }
+
+              // "Check Chemicals" quick card sits next to the Pool & Hot Tub cards → Chemical Status page
+              if (hasPoolCard) {
+                html += '<div style="width:100%; box-sizing:border-box;">';
+                html += '<button class="chem-check-card" onclick="openChemicalsTab(\'\'); return false;" title="Open Chemical Status">';
+                html += '<span style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:14px; min-width:0;">';
+                html += '<span style="width:48px; height:48px; border-radius:50%; background:#007aff; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; -webkit-flex-shrink:0; flex-shrink:0;">';
+                html += '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;"><path d="M10 2v7.5L4.5 19.5A2 2 0 0 0 6.2 22h11.6a2 2 0 0 0 1.7-2.5L14 9.5V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>';
+                html += '</span>';
+                html += '<span class="chem-check-label">Check Chemicals</span>';
+                html += '</span>';
+                html += '<svg class="chem-check-chevron" width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8.6 16.6 10 18l6-6-6-6-1.4 1.4 4.6 4.6z"/></svg>';
+                html += '</button>';
+                html += '</div>';
+              }
+
               for (var j = 0; j < floorEntities.length; j++) {
                 var ent = floorEntities[j];
                 var dom = ent.entity_id.split(".")[0];
@@ -6847,7 +6963,7 @@
               if (id.indexOf("calcium") !== -1 || name.indexOf("hardness") !== -1 || name.indexOf("ch") !== -1) return 1;
               if (id.indexOf("total_chlorine") !== -1 || name.indexOf("total chlorine") !== -1 || name.indexOf("tc") !== -1) return 2;
               if (id.indexOf("free_chlorine") !== -1 || name.indexOf("free chlorine") !== -1 || name.indexOf("fc") !== -1 || (name.indexOf("chlorine") !== -1 && name.indexOf("total") === -1)) return 3;
-              if (id.indexOf("ph") !== -1 || name.indexOf("ph") !== -1) return 4;
+              if (isPhEntity(ent.entity_id, friendlyName(ent))) return 4;
               if (id.indexOf("alkalinity") !== -1 || name.indexOf("alkalinity") !== -1) return 5;
               if (id.indexOf("stabilizer") !== -1 || name.indexOf("cyanuric") !== -1 || name.indexOf("cya") !== -1) return 6;
               return 99;
@@ -6906,6 +7022,8 @@
         }
 
         document.getElementById("entityContainer").innerHTML = html;
+        updateChemLogButtons(allStates);
+        checkDailyChemLogPrompt();
         checkSparseHomeLayout();
       }
 
@@ -7173,33 +7291,30 @@
         var alertClass = "";
         var valueStyle = "";
         var lowerName = name.toLowerCase();
-        var isPH = (eid.indexOf("ph") !== -1 || lowerName.indexOf("ph") !== -1);
+        var isPH = isPhEntity(eid, lowerName);
         var isORP = (eid.indexOf("orp") !== -1 || lowerName.indexOf("orp") !== -1);
         var isSalt = (eid.indexOf("salt") !== -1 || lowerName.indexOf("salt") !== -1);
 
         var isMixing = isChemicalMixingActive(selectedRecVolume);
 
         if (isMixing) {
-          // Everything turns GREEN for 2 hours while added chemicals mix into water!
+          // Everything turns GREEN while added chemicals mix into water (24h pool / 4h hot tub)!
           alertClass = " active-green";
           valueStyle = "color: #34c759; font-weight: 900;";
         } else if (!isNaN(val)) {
           if (isPH) {
             if (val < 7.0 || val > 7.8) alertClass = " alert-red";
-            else if (val < 7.2 || val > 7.6) alertClass = " alert-yellow";
             else valueStyle = "color: #34c759;";
           } else if (isORP) {
             if (val < 500 || val > 900) alertClass = " alert-red";
-            else if (val < 650 || val > 800) alertClass = " alert-yellow";
             else valueStyle = "color: #34c759;";
           } else if (isSalt) {
             if (val < 3000) alertClass = " alert-red";
-            else if (val > 4500) alertClass = " alert-yellow";
             else valueStyle = "color: #34c759;";
           }
         }
 
-        var displayVal = isNaN(val) ? escapeHtml(entity.state) : Math.round(val);
+        var displayVal = isNaN(val) ? escapeHtml(entity.state) : (isPH ? val.toFixed(1) : Math.round(val));
         var displayUnit = unit ? ' ' + escapeHtml(unit) : '';
 
         var idealRange = "";
@@ -7260,33 +7375,27 @@
 
         if (!isNaN(currentVal)) {
           if (isAlkalinity) {
-            if (currentVal < 80 || currentVal > 120) alertClass = " alert-yellow";
+            if (currentVal < 40 || currentVal > 180) alertClass = " alert-red";
             else valueStyle = "color: #34c759; font-weight: 700;";
           } else if (isTotalChlorine) {
             if (currentVal < 0.5 || currentVal > 10.0) alertClass = " alert-red";
-            else if (currentVal < 1.0 || currentVal > 5.0) alertClass = " alert-yellow";
             else valueStyle = "color: #34c759; font-weight: 700;";
           } else if (isFreeChlorine) {
             if (isPool) {
               if (currentVal < 0.5 || currentVal > 6.0) alertClass = " alert-red";
-              else if (currentVal < 1.0 || currentVal > 3.0) alertClass = " alert-yellow";
               else valueStyle = "color: #34c759; font-weight: 700;";
             } else { // Hot Tub
               if (currentVal < 1.0 || currentVal > 8.0) alertClass = " alert-red";
-              else if (currentVal < 3.0 || currentVal > 5.0) alertClass = " alert-yellow";
               else valueStyle = "color: #34c759; font-weight: 700;";
             }
           } else if (isCalcium) { // Hardness
-            if (currentVal < 150 || currentVal > 700) alertClass = " alert-yellow";
-            else if (currentVal < 250 || currentVal > 500) alertClass = " alert-yellow";
+            if (currentVal < 150 || currentVal > 700) alertClass = " alert-red";
             else valueStyle = "color: #34c759; font-weight: 700;";
           } else if (isTubCYA) {
-            if (currentVal > 50) alertClass = " alert-yellow";
-            else if (currentVal > 30) alertClass = " alert-yellow";
+            if (currentVal > 50) alertClass = " alert-red";
             else valueStyle = "color: #34c759; font-weight: 700;";
           } else if (isPoolCYA) {
-            if (currentVal < 10 || currentVal > 150) alertClass = " alert-yellow";
-            else if (currentVal < 15 || currentVal > 100) alertClass = " alert-yellow";
+            if (currentVal < 10 || currentVal > 150) alertClass = " alert-red";
             else valueStyle = "color: #34c759; font-weight: 700;";
           }
         }
@@ -7379,6 +7488,17 @@
         return false;
       };
 
+      function isPhEntity(entityId, friendlyName) {
+        var lId = (entityId || "").toLowerCase();
+        var lName = (friendlyName || "").toLowerCase();
+        if (lId.indexOf(".ph") !== -1 || lId.indexOf("_ph") !== -1 || lId.indexOf("ph_") !== -1) return true;
+        var tokens = lName.replace(/[^a-z0-9]/g, " ").split(/\s+/);
+        for (var i = 0; i < tokens.length; i++) {
+          if (tokens[i] === "ph") return true;
+        }
+        return false;
+      }
+
       function isEntityForVolume(entityId, friendlyName, volumeType) {
         var id = entityId.toLowerCase();
         var name = friendlyName.toLowerCase();
@@ -7426,7 +7546,7 @@
           var sDomain = eid.split(".")[0];
           if (!allowedEntityIds[eid] && sDomain !== "water_heater") continue;
 
-          if (eid.indexOf("ph") !== -1 || lowerName.indexOf("ph") !== -1) phVal = val;
+          if (isPhEntity(eid, name)) phVal = val;
           else if (eid.indexOf("orp") !== -1 || lowerName.indexOf("orp") !== -1) orpVal = val;
           else if (eid.indexOf("salt") !== -1 || lowerName.indexOf("salt") !== -1) saltVal = val;
           else if (eid.indexOf("alkalinity") !== -1 || lowerName.indexOf("alkalinity") !== -1) alkVal = val;
@@ -7592,24 +7712,26 @@
           }
         }
 
-        // 2. Alkalinity Calculations
+        // 2. Alkalinity Calculations (yellow band treated as green everywhere; red only when severely out)
         if (alkVal !== null) {
-          if (alkVal < 80) {
-            var diff = 80 - alkVal;
-            var doseOz = (diff / 10) * 24 * volRatio;
-            recList.push({
-              id: "alk_low",
-              severity: "yellow",
-              text: "Add <strong>" + formatDose(doseOz, false) + "</strong> Baking Soda (raise TA to 80 ppm)."
-            });
-          } else if (alkVal > 120) {
-            var diff = alkVal - 120;
-            var doseOz = (diff / 10) * 26 * volRatio;
-            recList.push({
-              id: "alk_high",
-              severity: "yellow",
-              text: "Add <strong>" + formatDose(doseOz, true, false, true) + "</strong> Muriatic Acid (lower TA to 120 ppm)."
-            });
+          if (alkVal < 40 || alkVal > 180) {
+            if (alkVal < 40) {
+              var diff = 80 - alkVal;
+              var doseOz = (diff / 10) * 24 * volRatio;
+              recList.push({
+                id: "alk_low",
+                severity: "red",
+                text: "Add <strong>" + formatDose(doseOz, false) + "</strong> Baking Soda (raise TA to 80 ppm)."
+              });
+            } else {
+              var diff = alkVal - 120;
+              var doseOz = (diff / 10) * 26 * volRatio;
+              recList.push({
+                id: "alk_high",
+                severity: "red",
+                text: "Add <strong>" + formatDose(doseOz, true, false, true) + "</strong> Muriatic Acid (lower TA to 120 ppm)."
+              });
+            }
           }
         }
 
@@ -7795,48 +7917,48 @@
           }
         }
 
-        // 5. Hardness / Calcium Calculations
+        // 5. Hardness / Calcium Calculations (yellow band treated as green everywhere; red only when severely out)
         if (calVal !== null) {
-          if (calVal < 250) {
+          if (calVal < 150) {
             var diff = 375 - calVal;
             var doseOz = (diff / 10) * 19.2 * volRatio;
             recList.push({
               id: "cal_low",
-              severity: "yellow",
+              severity: "red",
               text: "Add <strong>" + formatDose(doseOz, false) + "</strong> Calcium Chloride (raise CH to 375 ppm)."
             });
-          } else if (calVal > 500) {
+          } else if (calVal > 700) {
             recList.push({
               id: "cal_high",
-              severity: "yellow",
+              severity: "red",
               text: "Dilute water (lower Hardness from " + calVal + " ppm to 500 ppm)."
             });
           }
         }
 
-        // 6. Stabilizer (CYA) Calculations
+        // 6. Stabilizer (CYA) Calculations (yellow band treated as green everywhere; red only when severely out)
         if (cyaVal !== null) {
           if (volumeType === "hottub") {
-            if (cyaVal > 30) {
+            if (cyaVal > 50) {
               recList.push({
                 id: "cya_high",
-                severity: "yellow",
+                severity: "red",
                 text: "Partially drain and refill water (lower CYA to 30 ppm)."
               });
             }
           } else { // Pool
-            if (cyaVal < 15) {
+            if (cyaVal < 10) {
               var diff = 50 - cyaVal;
               var doseOz = (diff / 10) * 13 * volRatio;
               recList.push({
                 id: "cya_low",
-                severity: "yellow",
+                severity: "red",
                 text: "Add <strong>" + formatDose(doseOz, false) + "</strong> Cyanuric Acid (raise CYA to 50 ppm)."
               });
-            } else if (cyaVal > 100) {
+            } else if (cyaVal > 150) {
               recList.push({
                 id: "cya_high",
-                severity: "yellow",
+                severity: "red",
                 text: "Partially drain and refill water (lower CYA to 100 ppm)."
               });
             }
@@ -7854,18 +7976,64 @@
         }
       } catch (e) { }
 
+      function getMixingWindowMs(vol) {
+        return (vol === "pool") ? 24 * 60 * 60 * 1000 : 4 * 60 * 60 * 1000;
+      }
+
+      function getChemLastChecked(vol) {
+        try {
+          var v = localStorage.getItem("ha_chem_last_checked_" + vol);
+          return v ? parseInt(v, 10) : 0;
+        } catch (e) { return 0; }
+      }
+
+      function setChemLastChecked(vol) {
+        try { localStorage.setItem("ha_chem_last_checked_" + vol, String(Date.now())); } catch (e) { }
+      }
+
+      function isChemCheckStale(vol, allStates) {
+        var staleMs = 48 * 60 * 60 * 1000;
+        var last = getChemLastChecked(vol);
+        if (last) {
+          return (Date.now() - last) > staleMs;
+        }
+        var checkedToday = false;
+        if (allStates) {
+          for (var i = 0; i < allStates.length; i++) {
+            if (allStates[i].entity_id === "input_boolean.chemicals_checked_today") {
+              checkedToday = (allStates[i].state === "on" || allStates[i].state === "On");
+              break;
+            }
+          }
+        }
+        return !checkedToday;
+      }
+
+      function isChemAlertSnoozed(vol) {
+        try {
+          var t = localStorage.getItem("ha_chem_alert_snoozed_" + vol);
+          if (!t) t = localStorage.getItem("ha_chem_alert_snoozed_time");
+          if (t) {
+            var elapsed = Date.now() - parseInt(t, 10);
+            if (elapsed < getMixingWindowMs(vol)) return true;
+            localStorage.removeItem("ha_chem_alert_snoozed_" + vol);
+          }
+        } catch (e) { }
+        return false;
+      }
+
       function isChemicalMixingActive(volumeType) {
         if (!checkedRecItems) return false;
         var vol = volumeType || selectedRecVolume || "hottub";
         var now = Date.now();
-        var twoHoursMs = 2 * 60 * 60 * 1000; // 2 hours in ms
+        var mixingWindowMs = getMixingWindowMs(vol);
 
         for (var k in checkedRecItems) {
           if (checkedRecItems.hasOwnProperty(k) && k.indexOf(vol) === 0) {
             var val = checkedRecItems[k];
             var timestamp = typeof val === "number" ? val : (val ? now : 0);
-            if (timestamp && (now - timestamp < twoHoursMs)) {
-              return true; // Still within 2 hours of chemical mixing!
+            if (timestamp && (now - timestamp < mixingWindowMs)) {
+              return true; // Still within the mixing window!
             }
           }
         }
@@ -7876,14 +8044,14 @@
         if (!checkedRecItems) return "";
         var vol = volumeType || selectedRecVolume || "hottub";
         var now = Date.now();
-        var twoHoursMs = 2 * 60 * 60 * 1000;
+        var mixingWindowMs = getMixingWindowMs(vol);
 
         for (var k in checkedRecItems) {
           if (checkedRecItems.hasOwnProperty(k) && k.indexOf(vol) === 0) {
             var val = checkedRecItems[k];
             var timestamp = typeof val === "number" ? val : (val ? now : 0);
-            if (timestamp && (now - timestamp < twoHoursMs)) {
-              var remainingMs = twoHoursMs - (now - timestamp);
+            if (timestamp && (now - timestamp < mixingWindowMs)) {
+              var remainingMs = mixingWindowMs - (now - timestamp);
               var remainingMins = Math.ceil(remainingMs / 60000);
               var hrs = Math.floor(remainingMins / 60);
               var mins = remainingMins % 60;
@@ -7899,21 +8067,24 @@
 
       window.toggleRecCheckbox = function (recId) {
         var now = Date.now();
-        var twoHoursMs = 2 * 60 * 60 * 1000;
+        var volPrefix = (recId.indexOf("pool_") === 0) ? "pool" : ((recId.indexOf("hottub_") === 0) ? "hottub" : (selectedRecVolume || "hottub"));
+        var mixingWindowMs = getMixingWindowMs(volPrefix);
         var currentVal = checkedRecItems[recId];
-        var isCurrentlyActive = typeof currentVal === "number" ? (now - currentVal < twoHoursMs) : !!currentVal;
+        var isCurrentlyActive = typeof currentVal === "number" ? (now - currentVal < mixingWindowMs) : !!currentVal;
 
         if (isCurrentlyActive) {
           delete checkedRecItems[recId];
           showToast("Chemical mixing timer cancelled");
         } else {
-          checkedRecItems[recId] = now; // Store timestamp for 2-hour mixing window!
-          showToast("Chemicals added! 2-hour mixing timer active — all status indicators green");
+          checkedRecItems[recId] = now;
+          setChemLastChecked(volPrefix);
+          var mixHrs = mixingWindowMs / 3600000;
+          showToast("Chemicals added! " + mixHrs + "-hour mixing timer active — all status indicators green");
         }
 
         try {
           localStorage.setItem("ha_checked_rec_items", JSON.stringify(checkedRecItems));
-          localStorage.setItem("ha_chem_alert_snoozed_time", now);
+          localStorage.setItem("ha_chem_alert_snoozed_" + volPrefix, now);
         } catch (e) { }
 
         if (lastStatesCache && lastStatesCache.length > 0) {
@@ -7960,6 +8131,29 @@
           }
         }
 
+        // Find the next pending recommendation (same priority order, skipping topRec)
+        var nextRec = null;
+        if (recs && recs.length > 1) {
+          for (var s2 = 0; s2 < recs.length; s2++) {
+            if (recs[s2].id && recs[s2].id.indexOf("salt") !== -1 && recs[s2].id !== topRec.id) { nextRec = recs[s2]; break; }
+          }
+          if (!nextRec) {
+            for (var p2 = 0; p2 < recs.length; p2++) {
+              if (recs[p2].id && recs[p2].id.indexOf("ph") !== -1 && recs[p2].id !== topRec.id) { nextRec = recs[p2]; break; }
+            }
+          }
+          if (!nextRec) {
+            for (var c2 = 0; c2 < recs.length; c2++) {
+              if (recs[c2].id && (recs[c2].id.indexOf("cl") !== -1 || recs[c2].id.indexOf("chlor") !== -1 || recs[c2].id.indexOf("orp") !== -1) && recs[c2].id !== topRec.id) { nextRec = recs[c2]; break; }
+            }
+          }
+          if (!nextRec) {
+            for (var f2 = 0; f2 < recs.length; f2++) {
+              if (recs[f2].id !== topRec.id) { nextRec = recs[f2]; break; }
+            }
+          }
+        }
+
         var cardStyle = "border-radius:20px; padding:22px 20px; box-sizing:border-box;";
         if (isMixing) {
           cardStyle += " background:rgba(52,199,89,0.14); border:1.5px solid rgba(52,199,89,0.55); box-shadow: 0 4px 18px rgba(52,199,89,0.25);";
@@ -7995,22 +8189,38 @@
           }
           h += '</div>';
           h += '</div>';
-        }
-
-        if (selectedRecVolume === "hottub" && !isMixing) {
-          var hasSuperchlorinateRec = false;
-          for (var r = 0; r < recs.length; r++) {
-            if (recs[r].text.indexOf("Superchlorinate") !== -1) {
-              hasSuperchlorinateRec = true;
-              break;
+          if (isMixing && nextRec) {
+            var nextKey = selectedRecVolume + "_" + nextRec.id;
+            var nextChecked = !!checkedRecItems[nextKey];
+            var nextBoxStyle = "width:36px; height:36px; border-radius:10px; margin-right:16px; -webkit-flex-shrink:0; flex-shrink:0; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; ";
+            if (nextChecked) {
+              nextBoxStyle += "background:#34c759; border:2px solid #34c759; box-shadow: 0 2px 10px rgba(52,199,89,0.45);";
+            } else {
+              nextBoxStyle += "background:transparent; border:2.5px solid #8e8e93;";
             }
-          }
-
-          if (hasSuperchlorinateRec) {
-            h += '<div class="rec-divider" style="margin-top: 18px; text-align: center; border-top: 1px solid rgba(128,128,128,0.18); padding-top: 14px;">';
-            h += '<button class="confirm-btn" style="background:#007aff; color:#ffffff; font-size:18px; font-weight:850; padding:12px 24px; border-radius:14px; margin:0;" onclick="fixHotTubChlorine()">Fix Hot Tub Chlorine Levels</button>';
+            h += '<div style="margin-top:16px; padding-top:14px; border-top:1px solid rgba(128,128,128,0.18);">';
+            h += '<div style="font-size:15px; font-weight:700; color:#8e8e93; margin-bottom:10px;">Next Up</div>';
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; cursor:pointer;" onclick="window.toggleRecCheckbox(\'' + nextKey + '\')">';
+            h += '<div class="rec-checkbox' + (nextChecked ? ' checked' : '') + '" style="' + nextBoxStyle + '">';
+            if (nextChecked) {
+              h += '<svg style="width:22px; height:22px; fill:#ffffff; display:block;" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+            }
+            h += '</div>';
+            h += '<div style="-webkit-flex:1; flex:1; min-width:0;">';
+            h += '<div class="rec-item-text' + (nextChecked ? ' checked' : '') + '" style="font-size:22px; font-weight:850; line-height:1.25; color:currentColor;">' + nextRec.text + '</div>';
+            if (nextChecked) {
+              h += '<div style="font-size:16px; font-weight:700; color:#34c759; margin-top:4px;">🧪 Chemicals Added • Mixing into Water</div>';
+            }
+            h += '</div>';
+            h += '</div>';
             h += '</div>';
           }
+        }
+
+        if (selectedRecVolume === "hottub") {
+          h += '<div class="rec-divider" style="margin-top: 18px; text-align: center; border-top: 1px solid rgba(128,128,128,0.18); padding-top: 14px;">';
+          h += '<button class="confirm-btn" style="background:#007aff; color:#ffffff; font-size:18px; font-weight:850; padding:12px 24px; border-radius:14px; margin:0;" onclick="fixHotTubChlorine()">Fix Hot Tub Chlorine Levels</button>';
+          h += '</div>';
         }
 
         h += '</div>';
@@ -9294,13 +9504,18 @@
             showToast("Updated value");
             delete sensorHistory[entityId];
 
+            var lowerEid = entityId.toLowerCase();
+            var isTubEnt = (lowerEid.indexOf("hot_tub") !== -1 || lowerEid.indexOf("hottub") !== -1 || lowerEid.indexOf("spa") !== -1 || lowerEid.indexOf("tub") !== -1);
+            var isPoolEnt = (lowerEid.indexOf("pool") !== -1);
+            if (isTubEnt) setChemLastChecked("hottub");
+            else if (isPoolEnt) setChemLastChecked("pool");
+
             // Optimistically turn on chemicals checked today helper switch
             haRequest("POST", "/api/services/input_boolean/turn_on", {
               entity_id: "input_boolean.chemicals_checked_today"
             }, function () { });
 
             // Turn on chlorine_logged_since_changing if updating hot tub free chlorine
-            var lowerEid = entityId.toLowerCase();
             var isTub = (lowerEid.indexOf("hot_tub") !== -1 || lowerEid.indexOf("hottub") !== -1 || lowerEid.indexOf("spa") !== -1 || lowerEid.indexOf("tub") !== -1);
             var isFC = (lowerEid.indexOf("free_chlorine") !== -1 || lowerEid.indexOf("fc") !== -1 || (lowerEid.indexOf("chlorine") !== -1 && lowerEid.indexOf("total") === -1));
             if (isTub && isFC) {
@@ -9382,6 +9597,7 @@
 
               if (completedCount === totalCount) {
                 showToast("Logged " + completedCount + " chemical values successfully!");
+                setChemLastChecked(selectedRecVolume);
                 chemicalsCheckedToday = true;
                 try {
                   var todayStr = new Date().toISOString().split('T')[0];
