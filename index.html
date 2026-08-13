@@ -1278,6 +1278,8 @@
       display: flex;
       -webkit-flex-wrap: wrap;
       flex-wrap: wrap;
+      -webkit-align-items: flex-start;
+      align-items: flex-start;
       margin: 0 -6px;
       width: 100%;
       max-width: 100%;
@@ -1335,6 +1337,13 @@
 
     .ctrl-tile.ctrl-light-tile > div + div {
       margin-top: 3px;
+    }
+
+    /* Cards with no controls below the header render at half height */
+    .ctrl-tile.ctrl-tile-half {
+      height: 130px;
+      -webkit-justify-content: center;
+      justify-content: center;
     }
 
     /* Adaptive card text (light theme defaults) */
@@ -6941,7 +6950,7 @@
         var brightness = attrs.brightness || 0;
         var pct = Math.round((brightness / 255) * 100);
 
-        var tileClass = "tile ctrl-tile ctrl-light-tile" + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
+        var tileClass = "tile ctrl-tile ctrl-light-tile" + (!hasBrightness && !hasRgb && !hasEffects ? " ctrl-tile-half" : "") + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
         var iconName = getEntityIcon(entity, "light");
         var icon = getSvg(iconName, isOn ? getActiveSvgColor("light", entity.state) : "");
 
@@ -6951,12 +6960,12 @@
 
         if (hasBrightness && isOn && !unavailable) {
           h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:22px; -webkit-flex-shrink:0; flex-shrink:0;">';
-          h += '<button class="footer-btn ctrl-btn-round" style="width:56px; height:56px; font-size:30px; line-height:56px; margin:0;" onclick="event.stopPropagation(); adjustBrightness(\'' + eid + '\', -25.5)">&minus;</button>';
-          h += '<div style="text-align:center; min-width:120px;">';
+          h += '<button class="footer-btn ctrl-btn-round" style="width:56px; height:56px; font-size:30px; line-height:56px; margin:0; border-radius:16px; -webkit-flex:0 0 auto; flex:0 0 auto;" onclick="event.stopPropagation(); adjustBrightness(\'' + eid + '\', -25.5)">&minus;</button>';
+          h += '<div style="text-align:center; min-width:120px; -webkit-flex:0 0 auto; flex:0 0 auto;">';
           h += '<div style="font-size:48px; font-weight:900; line-height:1;">' + pct + '%</div>';
           h += '<div style="font-size:15px; font-weight:600; color:#8e8e93; margin-top:5px;">Brightness</div>';
           h += '</div>';
-          h += '<button class="footer-btn ctrl-btn-round" style="width:56px; height:56px; font-size:30px; line-height:56px; margin:0;" onclick="event.stopPropagation(); adjustBrightness(\'' + eid + '\', 25.5)">&plus;</button>';
+          h += '<button class="footer-btn ctrl-btn-round" style="width:56px; height:56px; font-size:30px; line-height:56px; margin:0; border-radius:16px; -webkit-flex:0 0 auto; flex:0 0 auto;" onclick="event.stopPropagation(); adjustBrightness(\'' + eid + '\', 25.5)">&plus;</button>';
           h += '</div>';
         }
 
@@ -7009,7 +7018,7 @@
         var activeClass = (domain === "fan" || iconName === "hottub" || iconName === "waterfall" || iconName === "bubbles") ? " active-blue" : " active-green";
         var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state) : "");
 
-        var tileClass = "tile ctrl-tile" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
+        var tileClass = "tile ctrl-tile ctrl-tile-half" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
         var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')">';
 
         h += buildCtrlHeader(icon, room, name, "");
@@ -7054,12 +7063,12 @@
 
           // Temperature readout + steppers
           h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:16px; -webkit-flex-shrink:0; flex-shrink:0;">';
-          h += '<button class="footer-btn ctrl-btn-round" style="width:48px; height:48px; font-size:26px; line-height:48px; margin:0;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
+          h += '<button class="footer-btn ctrl-btn-round" style="width:48px; height:48px; font-size:26px; line-height:48px; margin:0; border-radius:14px; -webkit-flex:0 0 auto; flex:0 0 auto;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
           h += '<div style="text-align:center; min-width:88px;">';
           h += '<div class="ctrl-readout" style="font-size:34px; font-weight:900; line-height:1;">' + tarDisplay + '</div>';
           h += '<div style="font-size:13px; font-weight:600; color:#8e8e93; margin-top:3px;">Current ' + curDisplay + '</div>';
           h += '</div>';
-          h += '<button class="footer-btn ctrl-btn-round" style="width:48px; height:48px; font-size:26px; line-height:48px; margin:0;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', 0.5)">&plus;</button>';
+          h += '<button class="footer-btn ctrl-btn-round" style="width:48px; height:48px; font-size:26px; line-height:48px; margin:0; border-radius:14px; -webkit-flex:0 0 auto; flex:0 0 auto;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', 0.5)">&plus;</button>';
           h += '</div>';
 
           // Mode buttons
