@@ -1272,59 +1272,237 @@
       min-height: 52px !important;
     }
 
-    /* ======== REDESIGNED CONTROLS GRID LOGIC ======== */
+    /* ======== REDESIGNED CONTROLS GRID (flexbox, iOS 9 compatible) ======== */
     .controls-grid {
-      display: grid !important;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 12px !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      box-sizing: border-box !important;
-      overflow: hidden !important;
-      height: auto !important;
-      max-height: none !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      align-items: start !important;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-wrap: wrap;
+      flex-wrap: wrap;
+      margin: 0 -6px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
     }
 
-    .controls-grid .tile {
-      margin: 0 !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      min-width: 0 !important;
-      box-sizing: border-box !important;
-      overflow: hidden !important;
-      align-self: start !important;
-      -webkit-flex: none !important;
-      flex: none !important;
+    /* Every All Controls card: single column width x double height (matches Home heater tile) */
+    .ctrl-tile {
+      -webkit-flex: 0 0 calc(50% - 12px);
+      flex: 0 0 calc(50% - 12px);
+      margin: 6px;
+      height: 260px;
+      box-sizing: border-box;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      padding: 16px;
+      background: #ffffff;
+      border-radius: 24px;
+      border: 2px solid rgba(0, 0, 0, 0.04);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+      position: relative;
+      overflow: hidden;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .card-1x1 {
-      grid-column: span 1 !important;
-      grid-row: span 1 !important;
-      min-height: 84px !important;
-      height: auto !important;
-      align-self: start !important;
-      box-sizing: border-box !important;
+    .ctrl-tile.active {
+      background: rgba(255, 214, 10, 0.16);
+      border-color: #ffcc00;
     }
 
-    .card-2x1 {
-      grid-column: span 2 !important;
-      grid-row: span 1 !important;
-      min-height: 84px !important;
-      height: auto !important;
-      align-self: start !important;
-      box-sizing: border-box !important;
+    .ctrl-tile.active-blue {
+      background: rgba(0, 122, 255, 0.14);
+      border-color: #007aff;
     }
 
-    .card-2x2 {
-      grid-column: span 2 !important;
-      grid-row: span 1 !important;
-      min-height: 140px !important;
-      height: auto !important;
-      align-self: start !important;
-      box-sizing: border-box !important;
+    .ctrl-tile.active-green {
+      background: rgba(52, 199, 89, 0.14);
+      border-color: #34c759;
+    }
+
+    .ctrl-tile.active-orange {
+      background: rgba(255, 159, 10, 0.14);
+      border-color: #ff9f0a;
+    }
+
+    /* Light cards: stack header + option rows tightly (3px between) instead of spreading them */
+    .ctrl-tile.ctrl-light-tile {
+      -webkit-justify-content: flex-start;
+      justify-content: flex-start;
+    }
+
+    .ctrl-tile.ctrl-light-tile > div + div {
+      margin-top: 3px;
+    }
+
+    /* Adaptive card text (light theme defaults) */
+    .ctrl-room {
+      font-size: 14px;
+      font-weight: 650;
+      color: #8e8e93;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ctrl-name {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1c1c1e;
+      line-height: 1.12;
+      margin-top: 1px;
+      max-height: 2.24em;
+      overflow: hidden;
+      word-wrap: break-word;
+    }
+
+    .ctrl-state {
+      font-size: 16px;
+      font-weight: 600;
+      color: #8e8e93;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ctrl-media-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #1c1c1e;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Adaptive control buttons */
+    .ctrl-btn {
+      background: #f2f2f7;
+      color: #1c1c1e;
+      border: none;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .ctrl-btn-round {
+      background: #f2f2f7;
+      color: #1c1c1e;
+      border: none;
+      border-radius: 50%;
+      font-weight: 800;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .ctrl-mode {
+      background: #f2f2f7;
+      color: #1c1c1e;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .ctrl-mode.active {
+      background: rgba(0, 122, 255, 0.15);
+      color: #007aff;
+    }
+
+    .ctrl-preset {
+      background: rgba(255, 159, 10, 0.14);
+      border: 1px solid rgba(255, 159, 10, 0.3);
+      color: #c76a00;
+      border-radius: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .ctrl-preset.active {
+      background: rgba(255, 159, 10, 0.35);
+      border: 2px solid #ff9f0a;
+      color: #d97706;
+    }
+
+    .ctrl-select {
+      width: 100%;
+      background: #f2f2f7;
+      color: #1c1c1e;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: 700;
+      padding: 12px 14px;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    /* Dark theme overrides for All Controls */
+    body.dark-theme .ctrl-tile {
+      background: #161b22;
+      border-color: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-theme .ctrl-tile.active {
+      background: rgba(255, 214, 10, 0.18);
+      border-color: #ffd60a;
+    }
+
+    body.dark-theme .ctrl-tile.active-blue {
+      background: rgba(10, 132, 255, 0.18);
+      border-color: #0a84ff;
+    }
+
+    body.dark-theme .ctrl-tile.active-green {
+      background: rgba(48, 209, 88, 0.18);
+      border-color: #30d158;
+    }
+
+    body.dark-theme .ctrl-tile.active-orange {
+      background: rgba(255, 159, 10, 0.18);
+      border-color: #ff9f0a;
+    }
+
+    body.dark-theme .ctrl-room {
+      color: #9aa5b1;
+    }
+
+    body.dark-theme .ctrl-name {
+      color: #e6edf3;
+    }
+
+    body.dark-theme .ctrl-state {
+      color: #9aa5b1;
+    }
+
+    body.dark-theme .ctrl-media-title {
+      color: #e6edf3;
+    }
+
+    body.dark-theme .ctrl-btn,
+    body.dark-theme .ctrl-btn-round,
+    body.dark-theme .ctrl-mode,
+    body.dark-theme .ctrl-select {
+      background: rgba(255, 255, 255, 0.08);
+      color: #e6edf3;
+    }
+
+    body.dark-theme .ctrl-mode.active {
+      background: rgba(10, 132, 255, 0.2);
+      color: #0a84ff;
+    }
+
+    body.dark-theme .ctrl-preset {
+      color: #ffb340;
+    }
+
+    body.dark-theme .ctrl-preset.active {
+      background: rgba(255, 159, 10, 0.28);
+      color: #ffb340;
     }
 
 
@@ -1460,20 +1638,10 @@
         border-radius: 12px !important;
       }
 
-      /* Mobile Controls Page Grid */
-      .controls-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
-      }
-
-      .card-1x1 {
-        grid-column: span 1 !important;
-        grid-row: span 1 !important;
-      }
-
-      .card-2x1,
-      .card-2x2 {
-        grid-column: span 2 !important;
+      /* Mobile Controls Page: single card per row */
+      .controls-grid .ctrl-tile {
+        -webkit-flex: 0 0 calc(100% - 12px) !important;
+        flex: 0 0 calc(100% - 12px) !important;
       }
     }
 
@@ -4199,118 +4367,7 @@
           var isPool = (eid.indexOf("pool") !== -1 || name.toLowerCase().indexOf("pool") !== -1);
 
           if (isHotTub || isPool) {
-            var unit = attrs.unit_of_measurement || "°";
-            if (unit === "°F" || unit === "°C") unit = "°";
-            var displayCurrent = currentTemp !== "--" ? Math.round(parseFloat(currentTemp)) + unit : "--";
-            var displayTarget = targetTemp !== "--" ? Math.round(parseFloat(targetTemp)) + unit : "--";
-            var targetNum = Math.round(parseFloat(targetTemp));
-
-            // Muted orange quick heat preset buttons (Hot Tub: 68 & 102 | Pool: 68 & 78)
-            var p1 = 68, p2 = isHotTub ? 102 : (isPool ? 78 : 72);
-            var p1Active = (targetNum === p1);
-            var p2Active = (targetNum === p2);
-
-            var p1Bg = p1Active ? "rgba(255,159,10,0.35)" : "rgba(255,159,10,0.14)";
-            var p1Border = p1Active ? "2px solid #ff9f0a" : "1px solid rgba(255,159,10,0.3)";
-            var p1Color = p1Active ? "#d97706" : "#c76a00";
-
-            var p2Bg = p2Active ? "rgba(255,159,10,0.35)" : "rgba(255,159,10,0.14)";
-            var p2Border = p2Active ? "2px solid #ff9f0a" : "1px solid rgba(255,159,10,0.3)";
-            var p2Color = p2Active ? "#d97706" : "#c76a00";
-
-            // Chemical status beaker button
-            var chemContext = isHotTub ? "hottub" : (isPool ? "pool" : "");
-            var chemBeakerBtnHtml = "";
-            if (chemContext) {
-              var isChemMixing = isChemicalMixingActive(chemContext);
-              var recs = getRecommendationsData(lastStatesCache || [], chemContext);
-              var hasRedChem = false, hasYellowChem = false;
-              for (var rc = 0; rc < recs.length; rc++) {
-                if (recs[rc].severity === "red") hasRedChem = true;
-                else if (recs[rc].severity === "yellow") hasYellowChem = true;
-              }
-              var chemBg = "#0a84ff";
-              var chemShadow = "0 4px 12px rgba(10,132,255,0.35)";
-              var chemTitle = "Water Chemistry Normal - Tap to View Logs";
-
-              if (isChemMixing) {
-                chemBg = "#34c759";
-                chemShadow = "0 4px 12px rgba(52,199,89,0.45)";
-                chemTitle = "Chemicals Mixing (2h Timer Active) - Tap to View Logs";
-              } else if (hasRedChem) {
-                chemBg = "#ff3b30";
-                chemShadow = "0 4px 12px rgba(255,59,48,0.45)";
-                chemTitle = "Chemicals Critical - Tap to View Logs";
-              } else if (hasYellowChem) {
-                chemBg = "#d97706";
-                chemShadow = "0 4px 12px rgba(217,119,6,0.45)";
-                chemTitle = "Chemical Warning - Tap to View Logs";
-              }
-              var beakerSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; margin:auto; color:#ffffff; pointer-events:none;"><path d="M10 2v7.5L4.5 19.5A2 2 0 0 0 6.2 22h11.6a2 2 0 0 0 1.7-2.5L14 9.5V2" pointer-events="none"/><path d="M8.5 2h7" pointer-events="none"/><path d="M7 16h10" pointer-events="none"/></svg>';
-              chemBeakerBtnHtml = '<button class="chem-alert-btn" onclick="openChemicalsTab(\'' + chemContext + '\', event); return false;" title="' + chemTitle + '" style="height:48px; min-width:80px; padding:0 12px; background:' + chemBg + '; color:#ffffff; border-radius:14px; display:-webkit-inline-flex; display:inline-flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; border:none; box-shadow:' + chemShadow + ';">' + beakerSvg + '<span style="font-size:15px; font-weight:900; margin-left:6px; color:#ffffff;">Chem</span></button>';
-            }
-
-            // Combine Feature Buttons & Quick Presets in a SINGLE HORIZONTAL ROW
-            var allButtonsHtml = chemBeakerBtnHtml;
-            if (isPool) {
-              var wfEnt = findFeatureEntity("waterfall");
-              var wfEid = wfEnt ? wfEnt.entity_id : "switch.pool_waterfall";
-              var wfDom = wfEid.split('.')[0];
-              var wfOn = wfEnt ? (wfEnt.state === "on" || wfEnt.state === "On") : false;
-              var wfBg = wfOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
-              var wfBorder = wfOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
-              var wfColor = wfOn ? "#0a84ff" : "currentColor";
-              allButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
-            } else if (isHotTub) {
-              var jEnt = findFeatureEntity("jets");
-              var jEid = jEnt ? jEnt.entity_id : "switch.scott_jets_high";
-              var jDom = jEid.split('.')[0];
-              var jOn = jEnt ? (jEnt.state === "on" || jEnt.state === "On") : false;
-              var jBg = jOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
-              var jBorder = jOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
-              var jColor = jOn ? "#0a84ff" : "currentColor";
-              allButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 8px; font-size:14px; font-weight:800; border-radius:12px; background:' + jBg + '; border:' + jBorder + '; color:' + jColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">Jets</button>';
-
-              var aEnt = findFeatureEntity("air");
-              var aEid = aEnt ? aEnt.entity_id : "switch.hot_tub_air_blower";
-              var aDom = aEid.split('.')[0];
-              var aOn = aEnt ? (aEnt.state === "on" || aEnt.state === "On") : false;
-              var aBg = aOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
-              var aBorder = aOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
-              var aColor = aOn ? "#0a84ff" : "currentColor";
-              allButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 8px; font-size:14px; font-weight:800; border-radius:12px; background:' + aBg + '; border:' + aBorder + '; color:' + aColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + aEid + '\', \'' + aDom + '\')" title="Toggle Air Blower">Air</button>';
-            }
-
-            // Append Quick Presets to single feature row
-            allButtonsHtml += '<button class="preset-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + p1Bg + '; border:' + p1Border + '; color:' + p1Color + ';" onclick="event.stopPropagation(); setTargetTemp(\'' + eid + '\', ' + p1 + ')" title="Set to ' + p1 + '°F">' + p1 + '°</button>';
-            allButtonsHtml += '<button class="preset-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + p2Bg + '; border:' + p2Border + '; color:' + p2Color + ';" onclick="event.stopPropagation(); setTargetTemp(\'' + eid + '\', ' + p2 + ')" title="Set to ' + p2 + '°F">' + p2 + '°</button>';
-
-            var cardDisplayName = isHotTub ? "Hot Tub" : "Pool";
-
-            var poolCardHtml = '<div class="tile overview-big-tile' + activeClass + ' is-heater-tile" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer; display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-justify-content:space-between; justify-content:space-between; padding:16px 14px; box-sizing:border-box;">';
-
-            // TOP ROW: Stepper (-) + Side-by-Side Readout [Huge 78px Current° / 32px Gray Set°] + Stepper (+)
-            poolCardHtml += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%;">';
-            poolCardHtml += '<button class="stepper-btn" style="width:48px; height:48px; font-size:28px; font-weight:800; border-radius:14px; padding:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', -1)">&minus;</button>';
-
-            poolCardHtml += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:baseline; align-items:baseline; gap:6px; text-align:center;">';
-            poolCardHtml += '<span style="font-size:78px; font-weight:900; line-height:1; letter-spacing:-2px;">' + displayCurrent + '</span>';
-            poolCardHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:32px; font-weight:850; color:#8e8e93; line-height:1;">/ ' + displayTarget + '</span>';
-            poolCardHtml += '</div>';
-
-            poolCardHtml += '<button class="stepper-btn" style="width:48px; height:48px; font-size:28px; font-weight:800; border-radius:14px; padding:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', 1)">+</button>';
-            poolCardHtml += '</div>'; // end top row
-
-            // MIDDLE SECTION: SINGLE ROW WITH ALL BUTTONS (Beaker + Features + Presets)
-            poolCardHtml += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:6px; width:100%; margin:12px 0;">';
-            poolCardHtml += allButtonsHtml;
-            poolCardHtml += '</div>'; // end middle section
-
-            // BOTTOM SECTION: CENTERED TITLE ("Hot Tub" / "Pool" in Title Case)
-            poolCardHtml += '<div style="text-align:center; font-size:36px; font-weight:900; letter-spacing:-0.5px; width:100%; margin-top:auto; padding-bottom:2px;">' + cardDisplayName + '</div>';
-
-            poolCardHtml += '</div>';
-            return poolCardHtml;
+            return renderPoolHotTubCard(entity);
           }
         }
 
@@ -4373,6 +4430,153 @@
         h += '</div>';
         h += '</div>';
         return h;
+      }
+
+      // Shared renderer: Pool & Hot Tub heater cards. Identical markup on Home and All Controls pages.
+      function renderPoolHotTubCard(entity) {
+        var domain = entity.entity_id.split(".")[0];
+        var eid = escapeHtml(entity.entity_id);
+        var name = escapeHtml(friendlyName(entity));
+        var attrs = entity.attributes || {};
+        var state = entity.state || "off";
+        var unavailable = state === "unavailable";
+        var currentTemp = attrs.current_temperature || "--";
+        var targetTemp = attrs.temperature || "--";
+
+        var isActivelyHeating = false;
+        if (targetTemp !== "--" && currentTemp !== "--") {
+          var curNum = parseFloat(currentTemp);
+          var tarNum = parseFloat(targetTemp);
+          if (!isNaN(curNum) && !isNaN(tarNum)) {
+            if (curNum < tarNum) isActivelyHeating = true;
+          }
+        }
+
+        var isOn = (state !== "off" && state !== "Off" && !unavailable);
+        var activeClass = "";
+        if (isOn) {
+          if (isActivelyHeating) {
+            activeClass = " active-red"; // Inside background highlight fill + outline when set temp > current temp
+          } else {
+            activeClass = " active-red-outline"; // Card outline ONLY when heater is ON but set temp <= current temp
+          }
+        }
+
+        var isHotTub = (eid.indexOf("hot_tub") !== -1 || name.toLowerCase().indexOf("hot tub") !== -1);
+        var isPool = (eid.indexOf("pool") !== -1 || name.toLowerCase().indexOf("pool") !== -1);
+
+        var unit = attrs.unit_of_measurement || "°";
+        if (unit === "°F" || unit === "°C") unit = "°";
+        var displayCurrent = currentTemp !== "--" ? Math.round(parseFloat(currentTemp)) + unit : "--";
+        var displayTarget = targetTemp !== "--" ? Math.round(parseFloat(targetTemp)) + unit : "--";
+        var targetNum = Math.round(parseFloat(targetTemp));
+
+        // Muted orange quick heat preset buttons (Hot Tub: 68 & 102 | Pool: 68 & 78)
+        var p1 = 68, p2 = isHotTub ? 102 : (isPool ? 78 : 72);
+        var p1Active = (targetNum === p1);
+        var p2Active = (targetNum === p2);
+
+        var p1Bg = p1Active ? "rgba(255,159,10,0.35)" : "rgba(255,159,10,0.14)";
+        var p1Border = p1Active ? "2px solid #ff9f0a" : "1px solid rgba(255,159,10,0.3)";
+        var p1Color = p1Active ? "#d97706" : "#c76a00";
+
+        var p2Bg = p2Active ? "rgba(255,159,10,0.35)" : "rgba(255,159,10,0.14)";
+        var p2Border = p2Active ? "2px solid #ff9f0a" : "1px solid rgba(255,159,10,0.3)";
+        var p2Color = p2Active ? "#d97706" : "#c76a00";
+
+        // Chemical status beaker button
+        var chemContext = isHotTub ? "hottub" : (isPool ? "pool" : "");
+        var chemBeakerBtnHtml = "";
+        if (chemContext) {
+          var isChemMixing = isChemicalMixingActive(chemContext);
+          var recs = getRecommendationsData(lastStatesCache || [], chemContext);
+          var hasRedChem = false, hasYellowChem = false;
+          for (var rc = 0; rc < recs.length; rc++) {
+            if (recs[rc].severity === "red") hasRedChem = true;
+            else if (recs[rc].severity === "yellow") hasYellowChem = true;
+          }
+          var chemBg = "#0a84ff";
+          var chemShadow = "0 4px 12px rgba(10,132,255,0.35)";
+          var chemTitle = "Water Chemistry Normal - Tap to View Logs";
+
+          if (isChemMixing) {
+            chemBg = "#34c759";
+            chemShadow = "0 4px 12px rgba(52,199,89,0.45)";
+            chemTitle = "Chemicals Mixing (2h Timer Active) - Tap to View Logs";
+          } else if (hasRedChem) {
+            chemBg = "#ff3b30";
+            chemShadow = "0 4px 12px rgba(255,59,48,0.45)";
+            chemTitle = "Chemicals Critical - Tap to View Logs";
+          } else if (hasYellowChem) {
+            chemBg = "#d97706";
+            chemShadow = "0 4px 12px rgba(217,119,6,0.45)";
+            chemTitle = "Chemical Warning - Tap to View Logs";
+          }
+          var beakerSvg = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block; margin:auto; color:#ffffff; pointer-events:none;"><path d="M10 2v7.5L4.5 19.5A2 2 0 0 0 6.2 22h11.6a2 2 0 0 0 1.7-2.5L14 9.5V2" pointer-events="none"/><path d="M8.5 2h7" pointer-events="none"/><path d="M7 16h10" pointer-events="none"/></svg>';
+          chemBeakerBtnHtml = '<button class="chem-alert-btn" onclick="openChemicalsTab(\'' + chemContext + '\', event); return false;" title="' + chemTitle + '" style="height:48px; min-width:80px; padding:0 12px; background:' + chemBg + '; color:#ffffff; border-radius:14px; display:-webkit-inline-flex; display:inline-flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer; border:none; box-shadow:' + chemShadow + ';">' + beakerSvg + '<span style="font-size:15px; font-weight:900; margin-left:6px; color:#ffffff;">Chem</span></button>';
+        }
+
+        // Combine Feature Buttons & Quick Presets in a SINGLE HORIZONTAL ROW
+        var allButtonsHtml = chemBeakerBtnHtml;
+        if (isPool) {
+          var wfEnt = findFeatureEntity("waterfall");
+          var wfEid = wfEnt ? wfEnt.entity_id : "switch.pool_waterfall";
+          var wfDom = wfEid.split('.')[0];
+          var wfOn = wfEnt ? (wfEnt.state === "on" || wfEnt.state === "On") : false;
+          var wfBg = wfOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
+          var wfBorder = wfOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
+          var wfColor = wfOn ? "#0a84ff" : "currentColor";
+          allButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
+        } else if (isHotTub) {
+          var jEnt = findFeatureEntity("jets");
+          var jEid = jEnt ? jEnt.entity_id : "switch.scott_jets_high";
+          var jDom = jEid.split('.')[0];
+          var jOn = jEnt ? (jEnt.state === "on" || jEnt.state === "On") : false;
+          var jBg = jOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
+          var jBorder = jOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
+          var jColor = jOn ? "#0a84ff" : "currentColor";
+          allButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 8px; font-size:14px; font-weight:800; border-radius:12px; background:' + jBg + '; border:' + jBorder + '; color:' + jColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">Jets</button>';
+
+          var aEnt = findFeatureEntity("air");
+          var aEid = aEnt ? aEnt.entity_id : "switch.hot_tub_air_blower";
+          var aDom = aEid.split('.')[0];
+          var aOn = aEnt ? (aEnt.state === "on" || aEnt.state === "On") : false;
+          var aBg = aOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
+          var aBorder = aOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
+          var aColor = aOn ? "#0a84ff" : "currentColor";
+          allButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 8px; font-size:14px; font-weight:800; border-radius:12px; background:' + aBg + '; border:' + aBorder + '; color:' + aColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + aEid + '\', \'' + aDom + '\')" title="Toggle Air Blower">Air</button>';
+        }
+
+        // Append Quick Presets to single feature row
+        allButtonsHtml += '<button class="preset-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + p1Bg + '; border:' + p1Border + '; color:' + p1Color + ';" onclick="event.stopPropagation(); setTargetTemp(\'' + eid + '\', ' + p1 + ')" title="Set to ' + p1 + '°F">' + p1 + '°</button>';
+        allButtonsHtml += '<button class="preset-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + p2Bg + '; border:' + p2Border + '; color:' + p2Color + ';" onclick="event.stopPropagation(); setTargetTemp(\'' + eid + '\', ' + p2 + ')" title="Set to ' + p2 + '°F">' + p2 + '°</button>';
+
+        var cardDisplayName = isHotTub ? "Hot Tub" : "Pool";
+
+        var poolCardHtml = '<div class="tile overview-big-tile' + activeClass + ' is-heater-tile" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="cursor:pointer; display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-justify-content:space-between; justify-content:space-between; padding:16px 14px; box-sizing:border-box;">';
+
+        // TOP ROW: Stepper (-) + Side-by-Side Readout [Huge 78px Current° / 32px Gray Set°] + Stepper (+)
+        poolCardHtml += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%;">';
+        poolCardHtml += '<button class="stepper-btn" style="width:48px; height:48px; font-size:28px; font-weight:800; border-radius:14px; padding:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', -1)">&minus;</button>';
+
+        poolCardHtml += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:baseline; align-items:baseline; gap:6px; text-align:center;">';
+        poolCardHtml += '<span style="font-size:78px; font-weight:900; line-height:1; letter-spacing:-2px;">' + displayCurrent + '</span>';
+        poolCardHtml += '<span id="set_temp_' + eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '" style="font-size:32px; font-weight:850; color:#8e8e93; line-height:1;">/ ' + displayTarget + '</span>';
+        poolCardHtml += '</div>';
+
+        poolCardHtml += '<button class="stepper-btn" style="width:48px; height:48px; font-size:28px; font-weight:800; border-radius:14px; padding:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', 1)">+</button>';
+        poolCardHtml += '</div>'; // end top row
+
+        // MIDDLE SECTION: SINGLE ROW WITH ALL BUTTONS (Beaker + Features + Presets)
+        poolCardHtml += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:6px; width:100%; margin:12px 0;">';
+        poolCardHtml += allButtonsHtml;
+        poolCardHtml += '</div>'; // end middle section
+
+        // BOTTOM SECTION: CENTERED TITLE ("Hot Tub" / "Pool" in Title Case)
+        poolCardHtml += '<div style="text-align:center; font-size:36px; font-weight:900; letter-spacing:-0.5px; width:100%; margin-top:auto; padding-bottom:2px;">' + cardDisplayName + '</div>';
+
+        poolCardHtml += '</div>';
+        return poolCardHtml;
       }
 
       function renderSleepModeGrid(allStates) {
@@ -6569,10 +6773,18 @@
                 var dom = ent.entity_id.split(".")[0];
                 if (dom === "light") {
                   html += renderLight(ent);
-                } else if (dom === "climate") {
-                  html += renderClimate(ent);
-                } else if (dom === "water_heater") {
-                  html += renderWaterHeater(ent);
+                } else if (dom === "climate" || dom === "water_heater") {
+                  var entEid = (ent.entity_id || "").toLowerCase();
+                  var entName = (friendlyName(ent) || "").toLowerCase();
+                  var isPoolHeater = (entEid.indexOf("pool") !== -1 || entName.indexOf("pool") !== -1);
+                  var isHotTubHeater = (entEid.indexOf("hot_tub") !== -1 || entEid.indexOf("hottub") !== -1 || entEid.indexOf("spa") !== -1 || entName.indexOf("hot tub") !== -1 || entName.indexOf("spa") !== -1);
+                  if (isPoolHeater || isHotTubHeater) {
+                    html += renderPoolHotTubCard(ent);
+                  } else if (dom === "climate") {
+                    html += renderClimate(ent);
+                  } else {
+                    html += renderWaterHeater(ent);
+                  }
                 } else if (dom === "cover") {
                   html += renderCover(ent);
                 } else if (dom === "lock") {
@@ -6729,64 +6941,60 @@
         var brightness = attrs.brightness || 0;
         var pct = Math.round((brightness / 255) * 100);
 
-        var is2x2Card = hasEffects || hasRgb;
-        var spanClass = is2x2Card ? " card-2x2" : " card-1x1";
-        var tileClass = "tile" + spanClass + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
+        var tileClass = "tile ctrl-tile ctrl-light-tile" + (isOn ? " active" : "") + (unavailable ? " unavailable" : "");
         var iconName = getEntityIcon(entity, "light");
         var icon = getSvg(iconName, isOn ? getActiveSvgColor("light", entity.state) : "");
 
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')" style="padding:14px 16px;">';
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'light\')">';
 
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
-        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        if (room) {
-          h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
-        }
-        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        var stateText = escapeHtml(entity.state);
-        if (isOn && currentEffect) stateText += ' &middot; ' + escapeHtml(currentEffect);
-        else if (isOn && hasBrightness && pct > 0) stateText += ' &middot; ' + pct + '%';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + stateText + '</div>';
-        h += '</div>';
-        h += '</div>';
+        h += buildCtrlHeader(icon, room, name, "", hasBrightness);
 
         if (hasBrightness && isOn && !unavailable) {
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:16px; margin-top:8px;">';
-          h += '<button class="footer-btn" style="background:#f2f2f7; color:#1c1c1e; width:34px; height:34px; border-radius:50%; padding:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin:0;" onclick="adjustBrightness(\'' + eid + '\', -25.5)">';
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%; font-weight:700; font-size:16px;">&minus;</div>';
-          h += '</button>';
-          h += '<span style="font-size:11px; font-weight:700; color:#8e8e93; min-width:32px; text-align:center;">' + pct + '%</span>';
-          h += '<button class="footer-btn" style="background:#f2f2f7; color:#1c1c1e; width:34px; height:34px; border-radius:50%; padding:0; border:none; box-shadow:0 1px 3px rgba(0,0,0,0.05); margin:0;" onclick="adjustBrightness(\'' + eid + '\', 25.5)">';
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:100%; font-weight:700; font-size:16px;">&plus;</div>';
-          h += '</button>';
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:22px; -webkit-flex-shrink:0; flex-shrink:0;">';
+          h += '<button class="footer-btn ctrl-btn-round" style="width:56px; height:56px; font-size:30px; line-height:56px; margin:0;" onclick="event.stopPropagation(); adjustBrightness(\'' + eid + '\', -25.5)">&minus;</button>';
+          h += '<div style="text-align:center; min-width:120px;">';
+          h += '<div style="font-size:48px; font-weight:900; line-height:1;">' + pct + '%</div>';
+          h += '<div style="font-size:15px; font-weight:600; color:#8e8e93; margin-top:5px;">Brightness</div>';
+          h += '</div>';
+          h += '<button class="footer-btn ctrl-btn-round" style="width:56px; height:56px; font-size:30px; line-height:56px; margin:0;" onclick="event.stopPropagation(); adjustBrightness(\'' + eid + '\', 25.5)">&plus;</button>';
           h += '</div>';
         }
 
         if (hasRgb && isOn && !unavailable) {
-          h += '<div style="margin-top:10px; border-top:1px solid rgba(128,128,128,0.15); padding-top:8px;">';
-          h += '<div style="font-size:10px; font-weight:700; color:#8e8e93; text-transform:uppercase; margin-bottom:6px; letter-spacing:0.5px;">Color Presets</div>';
-          h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:space-between; justify-content:space-between; margin:0 -2px;">';
-          h += '<button class="footer-btn" style="background:#ffffff; color:#1c1c1e; border:1px solid rgba(0,0,0,0.15); padding:5px 8px; border-radius:7px; font-weight:700; font-size:10.5px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 255, 255, 255)">Bright</button>';
-          h += '<button class="footer-btn" style="background:#ffe8c6; color:#8a5300; border:none; padding:5px 8px; border-radius:7px; font-weight:700; font-size:10.5px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 255, 214, 170)">Warm</button>';
-          h += '<button class="footer-btn" style="background:#ff3b30; color:#ffffff; border:none; padding:5px 8px; border-radius:7px; font-weight:700; font-size:10.5px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 255, 59, 48)">Red</button>';
-          h += '<button class="footer-btn" style="background:#007aff; color:#ffffff; border:none; padding:5px 8px; border-radius:7px; font-weight:700; font-size:10.5px; cursor:pointer; margin:2px;" onclick="setLightColor(\'' + eid + '\', 0, 122, 255)">Blue</button>';
-          h += '</div></div>';
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; gap:5px; -webkit-flex-shrink:0; flex-shrink:0;">';
+          h += '<button class="footer-btn" style="background:#ffffff; color:#1c1c1e; border:1px solid rgba(0,0,0,0.15); padding:5px 10px; border-radius:9px; font-weight:700; font-size:12px; cursor:pointer; margin:0;" onclick="event.stopPropagation(); setLightColor(\'' + eid + '\', 255, 255, 255)">Bright</button>';
+          h += '<button class="footer-btn" style="background:#ffe8c6; color:#8a5300; border:none; padding:5px 10px; border-radius:9px; font-weight:700; font-size:12px; cursor:pointer; margin:0;" onclick="event.stopPropagation(); setLightColor(\'' + eid + '\', 255, 214, 170)">Warm</button>';
+          h += '<button class="footer-btn" style="background:#ff3b30; color:#ffffff; border:none; padding:5px 10px; border-radius:9px; font-weight:700; font-size:12px; cursor:pointer; margin:0;" onclick="event.stopPropagation(); setLightColor(\'' + eid + '\', 255, 59, 48)">Red</button>';
+          h += '<button class="footer-btn" style="background:#007aff; color:#ffffff; border:none; padding:5px 10px; border-radius:9px; font-weight:700; font-size:12px; cursor:pointer; margin:0;" onclick="event.stopPropagation(); setLightColor(\'' + eid + '\', 0, 122, 255)">Blue</button>';
+          h += '</div>';
         }
 
         if (hasEffects && !unavailable) {
-          h += '<div class="effect-section">';
-          h += '<div class="effect-label">Effect</div>';
-          h += '<div class="effect-grid">';
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-flex-wrap:wrap; flex-wrap:wrap; -webkit-justify-content:center; justify-content:center; gap:6px; -webkit-flex-shrink:0; flex-shrink:0;">';
           for (var e = 0; e < effectList.length; e++) {
             var eff = effectList[e];
             var effActive = (eff === currentEffect && isOn) ? " active" : "";
-            h += '<button class="effect-btn' + effActive + '" onclick="setEffect(\'' + eid + '\', \'' + escapeHtml(eff.replace(/'/g, "\\'")) + '\')">' + escapeHtml(eff) + '</button>';
+            h += '<button class="ctrl-mode' + effActive + '" style="padding:4px 8px; font-size:12px;" onclick="event.stopPropagation(); setEffect(\'' + eid + '\', \'' + escapeHtml(eff.replace(/'/g, "\\'")) + '\')">' + escapeHtml(eff) + '</button>';
           }
-          h += '</div>';
           h += '</div>';
         }
 
+        h += '</div>';
+        return h;
+      }
+
+      function buildCtrlHeader(icon, room, name, stateText, large) {
+        var h = '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%; -webkit-flex-shrink:0; flex-shrink:0;">';
+        h += '<div class="tile-icon ctrl-icon" style="width:' + (large ? '72px' : '56px') + '; height:' + (large ? '72px' : '56px') + '; margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0; font-size:' + (large ? '36px' : '28px') + ';">' + icon + '</div>';
+        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
+        if (room) {
+          h += '<div class="ctrl-room" style="' + (large ? 'font-size:17px; margin-bottom:2px;' : '') + '">' + room + '</div>';
+        }
+        h += '<div class="ctrl-name">' + name + '</div>';
+        if (stateText) {
+          h += '<div class="ctrl-state" style="' + (large ? 'font-size:19px; margin-top:5px;' : '') + '">' + stateText + '</div>';
+        }
+        h += '</div>';
         h += '</div>';
         return h;
       }
@@ -6801,19 +7009,10 @@
         var activeClass = (domain === "fan" || iconName === "hottub" || iconName === "waterfall" || iconName === "bubbles") ? " active-blue" : " active-green";
         var icon = getSvg(iconName, isOn ? getActiveSvgColor(domain, entity.state) : "");
 
-        var tileClass = "tile card-1x1" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
-        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')" style="padding:14px 16px;">';
+        var tileClass = "tile ctrl-tile" + (isOn ? activeClass : "") + (unavailable ? " unavailable" : "");
+        var h = '<div class="' + tileClass + '" onclick="handleCardClick(event, \'' + eid + '\', \'' + domain + '\')">';
 
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
-        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        if (room) {
-          h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
-        }
-        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
-        h += '</div>';
-        h += '</div>';
+        h += buildCtrlHeader(icon, room, name, "");
 
         h += '</div>';
         return h;
@@ -6845,35 +7044,30 @@
         var iconName = getEntityIcon(entity, "climate");
         var icon = getSvg(iconName, isActive ? getActiveSvgColor("climate", hvacMode) : "");
 
-        var h = '<div class="tile card-2x1' + activeClass + (unavailable ? ' unavailable' : '') + '" style="padding: 10px 12px;">';
+        var h = '<div class="tile ctrl-tile' + activeClass + (unavailable ? ' unavailable' : '') + '">';
 
-        h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; width:100%;">';
-        h += '<div class="tile-icon" style="margin-right:12px; -webkit-flex-shrink:0; flex-shrink:0;">' + icon + '</div>';
-        h += '<div style="-webkit-flex:1; flex:1; min-width:0; text-align:left;">';
-        if (room) {
-          h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
-        }
-        h += '<div class="tile-name" style="font-weight:700; font-size:13.5px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        var stateText = escapeHtml(hvacMode);
-        if (!unavailable) {
-          stateText += ' &middot; Current: ' + escapeHtml(String(currentTemp)) + escapeHtml(unit);
-        }
-        h += '<div class="tile-state" style="margin-top:2px; font-size:11.5px; font-weight:500;">' + stateText + '</div>';
-        h += '</div>';
-        h += '</div>';
+        h += buildCtrlHeader(icon, room, name, "");
 
         if (!unavailable) {
-          h += '<div class="thermostat-controls" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:16px; margin: 8px 0 10px 0; border:none; padding:0; margin-top:10px;">';
-          h += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
-          h += '<span class="thermostat-temp-val" style="font-size:20px; font-weight:700; min-width:70px; text-align:center;">' + escapeHtml(String(targetTemp)) + escapeHtml(unit) + '</span>';
-          h += '<button class="thermostat-btn" style="width:36px; height:36px; line-height:36px; font-size:18px; margin:0;" onclick="adjustTemp(\'' + eid + '\', 0.5)">+</button>';
+          var curDisplay = (currentTemp !== "--") ? Math.round(parseFloat(currentTemp)) + unit : "--";
+          var tarDisplay = (targetTemp !== "--") ? Math.round(parseFloat(targetTemp)) + unit : "--";
+
+          // Temperature readout + steppers
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:16px; -webkit-flex-shrink:0; flex-shrink:0;">';
+          h += '<button class="footer-btn ctrl-btn-round" style="width:48px; height:48px; font-size:26px; line-height:48px; margin:0;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', -0.5)">&minus;</button>';
+          h += '<div style="text-align:center; min-width:88px;">';
+          h += '<div class="ctrl-readout" style="font-size:34px; font-weight:900; line-height:1;">' + tarDisplay + '</div>';
+          h += '<div style="font-size:13px; font-weight:600; color:#8e8e93; margin-top:3px;">Current ' + curDisplay + '</div>';
+          h += '</div>';
+          h += '<button class="footer-btn ctrl-btn-round" style="width:48px; height:48px; font-size:26px; line-height:48px; margin:0;" onclick="event.stopPropagation(); adjustTemp(\'' + eid + '\', 0.5)">&plus;</button>';
           h += '</div>';
 
-          h += '<div class="mode-selector" style="margin-top:8px; border-top:1px solid rgba(128,128,128,0.12); padding-top:8px;">';
+          // Mode buttons
+          h += '<div style="display:-webkit-flex; display:flex; -webkit-flex-wrap:wrap; flex-wrap:wrap; -webkit-justify-content:center; justify-content:center; gap:6px; -webkit-flex-shrink:0; flex-shrink:0;">';
           for (var m = 0; m < hvacModes.length; m++) {
             var mode = hvacModes[m];
             var mActive = mode === hvacMode ? " active" : "";
-            h += '<button class="mode-btn' + mActive + '" style="padding:4px 6px; font-size:10px;" onclick="setHvacMode(\'' + eid + '\', \'' + escapeHtml(mode) + '\')">' + escapeHtml(mode) + '</button>';
+            h += '<button class="ctrl-mode' + mActive + '" style="padding:7px 12px; font-size:13px;" onclick="event.stopPropagation(); setHvacMode(\'' + eid + '\', \'' + escapeHtml(mode) + '\')">' + escapeHtml(mode) + '</button>';
           }
           h += '</div>';
 
@@ -6883,13 +7077,11 @@
           var isHotTub = (lowerEid.indexOf("hot_tub") !== -1 || lowerEid.indexOf("hottub") !== -1 || lowerEid.indexOf("spa") !== -1 || lowerName.indexOf("hot tub") !== -1 || lowerName.indexOf("spa") !== -1);
 
           if (isPool || isHotTub) {
-            h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; gap:8px; margin-top:8px; border-top:1px solid rgba(128,128,128,0.12); padding-top:8px;">';
-            h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 68)">68&deg;</button>';
-            if (isHotTub) {
-              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 102)">102&deg;</button>';
-            } else if (isPool) {
-              h += '<button class="footer-btn" style="padding:4px 6px; font-size:10px; font-weight:700; background:#f2f2f7; border:none; border-radius:6px; color:#007aff; margin:0;" onclick="setClimateTemp(\'' + eid + '\', 76)">76&deg;</button>';
-            }
+            var targetNum = (targetTemp !== "--") ? Math.round(parseFloat(targetTemp)) : -1;
+            var p1 = 68, p2 = isHotTub ? 102 : 76;
+            h += '<div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; gap:8px; -webkit-flex-shrink:0; flex-shrink:0;">';
+            h += '<button class="ctrl-preset' + (targetNum === p1 ? ' active' : '') + '" style="padding:7px 16px; font-size:17px;" onclick="event.stopPropagation(); setClimateTemp(\'' + eid + '\', ' + p1 + ')">' + p1 + '&deg;</button>';
+            h += '<button class="ctrl-preset' + (targetNum === p2 ? ' active' : '') + '" style="padding:7px 16px; font-size:17px;" onclick="event.stopPropagation(); setClimateTemp(\'' + eid + '\', ' + p2 + ')">' + p2 + '&deg;</button>';
             h += '</div>';
           }
         }
@@ -6917,8 +7109,7 @@
         if (room) {
           h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
         }
-        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:24px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         h += '</div>';
 
         if (!unavailable) {
@@ -6954,11 +7145,10 @@
         if (room) {
           h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
         }
-        h += '<div class="tile-name" style="font-weight:700; font-size:16px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
-        h += '<div class="tile-state" style="margin-top:2px; font-size:13px; font-weight:500;">' + escapeHtml(entity.state) + '</div>';
-        h += '</div>';
+        h += '<div class="tile-name" style="font-weight:700; font-size:24px; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + name + '</div>';
         h += '</div>';
 
+        h += '</div>';
         h += '</div>';
         return h;
       }
@@ -8028,7 +8218,6 @@
         h += '</div>';
         h += '<div class="tile-bottom">';
         h += '<div class="tile-name">' + name + '</div>';
-        h += '<div class="tile-state">' + escapeHtml(currentOption) + '</div>';
         h += '</div>';
 
         if (!unavailable && options.length > 0) {
@@ -8085,11 +8274,6 @@
           h += '<div class="tile-room" style="font-size:11px; font-weight:650; color:#8e8e93; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">' + room + '</div>';
         }
         h += '<div class="tile-name">' + name + '</div>';
-        var stateText = escapeHtml(opMode);
-        if (!unavailable) {
-          stateText += ' &middot; Current: ' + escapeHtml(String(currentTemp)) + escapeHtml(unit);
-        }
-        h += '<div class="tile-state">' + stateText + '</div>';
         h += '</div>';
 
         if (!unavailable) {
