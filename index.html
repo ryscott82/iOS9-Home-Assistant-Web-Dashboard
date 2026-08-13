@@ -3811,7 +3811,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.0.6";
+      var DASHBOARD_VERSION = "v4.1.0";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -6971,14 +6971,27 @@
             return getOrderIndex(a) - getOrderIndex(b);
           });
 
-          // 2. Sensor Cards (Directly Below Top Selector - Full Width Row Spanning)
-          if (volSensors.length > 0) {
-            html += '<div class="section"><div class="section-title" style="font-size:24px; font-weight:850; margin-bottom:14px;">Live Water Sensors</div>';
-            html += '<div class="chem-sensors-row" style="display:-webkit-flex; display:flex; width:100%; margin:0 -6px;">';
-            for (i = 0; i < volSensors.length; i++) {
-              html += renderSensor(volSensors[i], false);
+          // 2. Quick Information Cards (headerless strip directly below the top selector)
+          var quickCardHtml = "";
+          if (selectedRecVolume === "pool") {
+            // Pool: exactly Salt, pH, Free Chlorine
+            var quickMetrics = [
+              { key: "salt", label: "Salt" },
+              { key: "ph", label: "pH" },
+              { key: "free_chlorine", label: "Free Chlorine" }
+            ];
+            for (var qmi = 0; qmi < quickMetrics.length; qmi++) {
+              var qEnt = findQuickMetricEntity(quickMetrics[qmi].key, volSensors, volInputs);
+              if (qEnt) quickCardHtml += renderSensor(qEnt, false, true);
             }
-            html += '</div></div>';
+          } else {
+            // Hot Tub: its own sensors
+            for (i = 0; i < volSensors.length; i++) {
+              quickCardHtml += renderSensor(volSensors[i], false);
+            }
+          }
+          if (quickCardHtml) {
+            html += '<div class="chem-sensors-row">' + quickCardHtml + '</div>';
           }
 
           // 3. Chemical Recommendation (Directly Below Sensors - Single Top-Priority Item)
@@ -7280,7 +7293,7 @@
         return h;
       }
 
-      function renderSensor(entity, showGraph) {
+      function renderSensor(entity, showGraph, showLastLogged) {
         var name = escapeHtml(friendlyName(entity));
         var attrs = entity.attributes || {};
         var unit = attrs.unit_of_measurement || "";
@@ -7294,6 +7307,7 @@
         var isPH = isPhEntity(eid, lowerName);
         var isORP = (eid.indexOf("orp") !== -1 || lowerName.indexOf("orp") !== -1);
         var isSalt = (eid.indexOf("salt") !== -1 || lowerName.indexOf("salt") !== -1);
+        var isFC = (eid.indexOf("free_chlorine") !== -1 || lowerName.indexOf("free chlorine") !== -1 || lowerName.indexOf("fc") !== -1 || (lowerName.indexOf("chlorine") !== -1 && lowerName.indexOf("total") === -1));
 
         var isMixing = isChemicalMixingActive(selectedRecVolume);
 
@@ -7311,10 +7325,18 @@
           } else if (isSalt) {
             if (val < 3000) alertClass = " alert-red";
             else valueStyle = "color: #34c759;";
+          } else if (isFC) {
+            if (selectedRecVolume === "hottub") {
+              if (val < 1.0 || val > 8.0) alertClass = " alert-red";
+              else valueStyle = "color: #34c759;";
+            } else {
+              if (val < 0.5 || val > 6.0) alertClass = " alert-red";
+              else valueStyle = "color: #34c759;";
+            }
           }
         }
 
-        var displayVal = isNaN(val) ? escapeHtml(entity.state) : (isPH ? val.toFixed(1) : Math.round(val));
+        var displayVal = isNaN(val) ? escapeHtml(entity.state) : (isPH || isFC ? val.toFixed(1) : Math.round(val));
         var displayUnit = unit ? ' ' + escapeHtml(unit) : '';
 
         var idealRange = "";
@@ -7324,6 +7346,7 @@
           if (isPH) idealRange = "Ideal: 7.2 - 7.6";
           else if (isORP) idealRange = "Ideal: 650 - 800";
           else if (isSalt) idealRange = "Ideal: 3000 - 4500";
+          else if (isFC) idealRange = (selectedRecVolume === "hottub") ? "Ideal: 3.0 - 5.0" : "Ideal: 1.0 - 3.0";
         }
 
         var tileStyle = "padding:22px 18px; text-align:center; min-height:170px; border-radius:20px; box-sizing:border-box; display:-webkit-flex; display:flex; -webkit-flex-direction:column; flex-direction:column; -webkit-justify-content:center; justify-content:center; -webkit-align-items:center; align-items:center; -webkit-flex:1 1 0; flex:1 1 0; min-width:0; width:100%;";
@@ -7342,6 +7365,12 @@
         // 3. Ideal Range Directly Below Label (16px)
         if (idealRange) {
           h += '<div style="font-size:16px; font-weight:600; color:' + (isMixing ? '#34c759' : '#8e8e93') + '; margin-top:4px;">' + idealRange + '</div>';
+        }
+
+        // 4. Last Logged (optional, shown on pool quick cards)
+        if (showLastLogged) {
+          var lastLoggedTs = getChemLogTimeForEntity(eid) || getChemLastChecked(selectedRecVolume);
+          h += '<div style="font-size:16px; font-weight:600; color:#8e8e93; margin-top:6px;">Last logged: ' + formatLastLoggedStr(lastLoggedTs) + '</div>';
         }
 
         h += '</div>';
@@ -7425,6 +7454,10 @@
           h += '<div style="font-size:16px; color:#8e8e93; margin-top:4px; font-weight:600; -webkit-flex-shrink:0; flex-shrink:0;">' + idealText + '</div>';
         }
 
+        // Last logged (incentive row: per-chemical, only shows a real time once this value has been logged)
+        var lastLoggedInputTs = getChemLogTimeForEntity(entity.entity_id);
+        h += '<div style="font-size:16px; color:#8e8e93; margin-top:4px; font-weight:600; -webkit-flex-shrink:0; flex-shrink:0;">Last logged: ' + formatLastLoggedStr(lastLoggedInputTs) + '</div>';
+
         if (!unavailable) {
           var isPH = (eid.indexOf("ph") !== -1 || name.toLowerCase().indexOf("ph") !== -1);
           var presets = [];
@@ -7468,6 +7501,37 @@
 
         h += '</div>';
         return h;
+      }
+
+      // Find the quick-info entity for a metric (prefer live sensor, fall back to logged input_number)
+      function findQuickMetricEntity(key, sensorsList, inputsList) {
+        var lists = [sensorsList, inputsList];
+        for (var l = 0; l < lists.length; l++) {
+          for (var i = 0; i < lists[l].length; i++) {
+            try {
+              var ent = lists[l][i];
+              var id = ent.entity_id.toLowerCase();
+              var nm = (friendlyName(ent) || "").toLowerCase();
+              if (key === "salt" && (id.indexOf("salt") !== -1 || nm.indexOf("salt") !== -1)) return ent;
+              if (key === "ph" && isPhEntity(ent.entity_id, nm)) return ent;
+              if (key === "free_chlorine" && (id.indexOf("free_chlorine") !== -1 || nm.indexOf("free chlorine") !== -1 || nm.indexOf("fc") !== -1 || (nm.indexOf("chlorine") !== -1 && nm.indexOf("total") === -1))) return ent;
+            } catch (e) { }
+          }
+        }
+        return null;
+      }
+
+      function formatLastLoggedStr(ts) {
+        if (!ts) return "--";
+        var diffMs = Date.now() - ts;
+        var mins = Math.floor(diffMs / 60000);
+        if (mins < 1) return "Just now";
+        var hrs = Math.floor(mins / 60);
+        if (hrs < 1) return mins + "m ago";
+        var days = Math.floor(hrs / 24);
+        if (days < 1) return hrs + "h ago";
+        if (days === 1) return "1 day ago";
+        return days + " days ago";
       }
 
       window.hasRedChemicalAlert = function (entityId) {
@@ -7991,6 +8055,20 @@
         try { localStorage.setItem("ha_chem_last_checked_" + vol, String(Date.now())); } catch (e) { }
       }
 
+      function getChemLogTimeForEntity(entityId) {
+        var key = "ha_chem_log_time_" + entityId.replace(/[^a-zA-Z0-9_-]/g, "_");
+        try {
+          var v = localStorage.getItem(key);
+          if (v) return parseInt(v, 10) || 0;
+        } catch (e) { }
+        return 0;
+      }
+
+      function setChemLogTimeForEntity(entityId) {
+        var key = "ha_chem_log_time_" + entityId.replace(/[^a-zA-Z0-9_-]/g, "_");
+        try { localStorage.setItem(key, String(Date.now())); } catch (e) { }
+      }
+
       function isChemCheckStale(vol, allStates) {
         var staleMs = 48 * 60 * 60 * 1000;
         var last = getChemLastChecked(vol);
@@ -8218,8 +8296,11 @@
         }
 
         if (selectedRecVolume === "hottub") {
+          var chlorineChangedSinceLog = false;
+          var chlLoggedBoolean = entities["input_boolean.chlorine_logged_since_changing"];
+          if (chlLoggedBoolean && chlLoggedBoolean.state === "off") chlorineChangedSinceLog = true;
           h += '<div class="rec-divider" style="margin-top: 18px; text-align: center; border-top: 1px solid rgba(128,128,128,0.18); padding-top: 14px;">';
-          h += '<button class="confirm-btn" style="background:#007aff; color:#ffffff; font-size:18px; font-weight:850; padding:12px 24px; border-radius:14px; margin:0;" onclick="fixHotTubChlorine()">Fix Hot Tub Chlorine Levels</button>';
+          h += '<button class="confirm-btn" style="background:' + (chlorineChangedSinceLog ? '#8e8e93' : '#007aff') + '; color:#ffffff; font-size:18px; font-weight:850; padding:12px 24px; border-radius:14px; margin:0;' + (chlorineChangedSinceLog ? ' box-shadow:none;' : '') + '" onclick="fixHotTubChlorine()">Fix Hot Tub Chlorine Levels</button>';
           h += '</div>';
         }
 
@@ -9509,6 +9590,7 @@
             var isPoolEnt = (lowerEid.indexOf("pool") !== -1);
             if (isTubEnt) setChemLastChecked("hottub");
             else if (isPoolEnt) setChemLastChecked("pool");
+            setChemLogTimeForEntity(entityId);
 
             // Optimistically turn on chemicals checked today helper switch
             haRequest("POST", "/api/services/input_boolean/turn_on", {
@@ -9579,6 +9661,7 @@
             }, function (err) {
               completedCount++;
               delete sensorHistory[cardEntity];
+              setChemLogTimeForEntity(cardEntity);
 
               // Optimistically turn on chemicals checked today helper switch
               haRequest("POST", "/api/services/input_boolean/turn_on", {
