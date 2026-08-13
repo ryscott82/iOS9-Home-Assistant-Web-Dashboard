@@ -3770,7 +3770,7 @@
       <div id="sparseClockTime" class="sparse-clock-time"></div>
       <div id="sparseClockDate" class="sparse-clock-date"></div>
       <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:10px; width:100%; margin-top:14px; padding:0 12px; box-sizing:border-box;">
-        <div id="chemLogBtnPool" style="display:none; -webkit-flex:1; flex:1; max-width:260px; min-width:0;"></div>
+        <div id="chemLogBtn" style="display:none; -webkit-flex:1; flex:1; max-width:260px; min-width:0;"></div>
         <button id="homeAllControlsBtn" class="home-all-controls-btn" onclick="switchTab('controls')"
           title="Open All Controls" style="margin-top:0; -webkit-flex-shrink:0; flex-shrink:0;">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px;">
@@ -3779,7 +3779,6 @@
           </svg>
           <span>All Controls</span>
         </button>
-        <div id="chemLogBtnHottub" style="display:none; -webkit-flex:1; flex:1; max-width:260px; min-width:0;"></div>
       </div>
     </div>
 
@@ -3811,7 +3810,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.1.3";
+      var DASHBOARD_VERSION = "v4.1.7";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -4130,48 +4129,49 @@
       }
       window.checkSparseHomeLayout = checkSparseHomeLayout;
 
+      var chemBtnShowUntil = 0;
+      var chemBtnHideUntil = 0;
       function updateChemLogButtons(allStates) {
-        var renderSide = function (el, vol, label) {
-          if (!el) return;
-          var nowHr = new Date().getHours();
-          var inWindow = (nowHr >= 12 && nowHr < 18);
-          if (activeTab !== "home" || !inWindow || !isChemCheckStale(vol, allStates) || isChemicalMixingActive(vol)) {
+        var el = document.getElementById("chemLogBtn");
+        if (!el) return;
+        var now = Date.now();
+        var nowHr = new Date().getHours();
+        var inWindow = (nowHr >= 12 && nowHr < 18);
+        var staleVols = [];
+        if (isChemCheckStale("pool", allStates) && !isChemicalMixingActive("pool")) staleVols.push("pool");
+        if (isChemCheckStale("hottub", allStates) && !isChemicalMixingActive("hottub")) staleVols.push("hottub");
+        if (activeTab !== "home" || !inWindow || staleVols.length === 0) {
+          el.style.display = "none";
+          return;
+        }
+
+        // Randomly hide/show the button throughout the day so it isn't always present.
+        // A show phase (15-45 min) is followed by a hide phase (30-90 min), decided at random.
+        if (chemBtnHideUntil > now) {
+          el.style.display = "none";
+          return;
+        }
+        if (chemBtnShowUntil <= now) {
+          if (Math.random() < 0.5) {
+            chemBtnShowUntil = now + (15 + Math.floor(Math.random() * 30)) * 60000;
+            chemBtnHideUntil = 0;
+          } else {
+            chemBtnHideUntil = now + (30 + Math.floor(Math.random() * 60)) * 60000;
+            chemBtnShowUntil = 0;
             el.style.display = "none";
             return;
           }
-          var last = getChemLastChecked(vol);
-          var daysTxt = "";
-          if (last) {
-            var days = Math.max(1, Math.floor((Date.now() - last) / 86400000));
-            daysTxt = " &middot; " + days + "d";
-          }
-          el.innerHTML = '<button style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:52px; border-radius:18px; font-size:13px; font-weight:800; line-height:1.15; padding:0 8px; box-sizing:border-box; cursor:pointer; background:#007aff; color:#ffffff; border:none; box-shadow:0 4px 14px rgba(10,132,255,0.35);" onclick="openChemicalsTab(\'' + vol + '\'); return false;">Click to Log ' + label + ' Chemicals' + daysTxt + '</button>';
-          el.style.display = "-webkit-flex";
-          el.style.display = "flex";
-        };
-        renderSide(document.getElementById("chemLogBtnPool"), "pool", "Pool");
-        renderSide(document.getElementById("chemLogBtnHottub"), "hottub", "Hot Tub");
-      }
+        }
 
-      function checkDailyChemLogPrompt() {
-        if (!lastStatesCache || lastStatesCache.length === 0) return;
-        if (document.body.classList.contains("is-sleep-mode")) return;
-        var d = new Date();
-        var hr = d.getHours();
-        if (hr < 12 || hr >= 18) return;
-        var todayLocal = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-        try {
-          if (localStorage.getItem("ha_chem_auto_switch_date") === todayLocal) return;
-        } catch (e) { }
-        var staleVols = [];
-        if (isChemCheckStale("pool", lastStatesCache) && !isChemicalMixingActive("pool")) staleVols.push("pool");
-        if (isChemCheckStale("hottub", lastStatesCache) && !isChemicalMixingActive("hottub")) staleVols.push("hottub");
-        if (staleVols.length === 0) return;
-        try { localStorage.setItem("ha_chem_auto_switch_date", todayLocal); } catch (e) { }
-        if (activeTab === "chemicals") return;
-        var targetVol = staleVols[0];
-        showToast("Time to log your " + (targetVol === "pool" ? "pool" : "hot tub") + " chemicals");
-        openChemicalsTab(targetVol);
+        var last = getChemLastChecked(staleVols[0]);
+        var daysTxt = "";
+        if (last) {
+          var days = Math.max(1, Math.floor((now - last) / 86400000));
+          daysTxt = " &middot; " + days + "d";
+        }
+        el.innerHTML = '<button style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:52px; border-radius:18px; font-size:17px; font-weight:800; line-height:1.15; padding:0 8px; box-sizing:border-box; cursor:pointer; background:#8e8e93; color:#ffffff; border:none; box-shadow:0 4px 14px rgba(0,0,0,0.2);" onclick="openChemicalsTab(\'' + staleVols[0] + '\'); return false;">Click to Log Chemicals' + daysTxt + '</button>';
+        el.style.display = "-webkit-flex";
+        el.style.display = "flex";
       }
 
       function applyTabClass(tabName) {
@@ -5866,9 +5866,24 @@
       }
 
       var idleTimer = null;
+      var returnHomeTimer = null;
+      function scheduleReturnHome(delayMs) {
+        if (returnHomeTimer) clearTimeout(returnHomeTimer);
+        returnHomeTimer = setTimeout(function () {
+          returnHomeTimer = null;
+          if (activeTab !== "home") {
+            switchTab("home");
+            showToast("Media paused — returned to Home page");
+          }
+        }, delayMs);
+      }
       function resetInactivityTimer(customTimeoutMs) {
         if (idleTimer) {
           clearTimeout(idleTimer);
+        }
+        if (returnHomeTimer) {
+          clearTimeout(returnHomeTimer);
+          returnHomeTimer = null;
         }
         // Strict 5-minute inactivity return timer when on Media page (300,000 ms = 5 mins)
         var timeoutMs = (activeTab === "media") ? (5 * 60 * 1000) : (customTimeoutMs || (5 * 60 * 1000));
@@ -5891,7 +5906,6 @@
         updateClock();
         setInterval(updateClock, 10000);
         setInterval(pollMediaPlayersHA, 3000); // 3-second REST polling backup for Media & Track updates
-        setInterval(checkDailyChemLogPrompt, 60000);
         resetInactivityTimer();
         document.addEventListener("click", wakeFromNightDim);
         document.addEventListener("touchstart", wakeFromNightDim);
@@ -6001,6 +6015,21 @@
               }
               resetInactivityTimer(5 * 60 * 1000); // 5 minutes countdown to return to Home
             }
+          } else if (oldSt === "playing" && newSt !== "playing") {
+            // Playback paused or stopped — return to Home in 30s if no other player is still playing
+            var stillPlaying = false;
+            if (lastStatesCache) {
+              for (var pm = 0; pm < lastStatesCache.length; pm++) {
+                var pmState = lastStatesCache[pm];
+                if (pmState.entity_id.indexOf("media_player.") === 0 && pmState.state === "playing") {
+                  stillPlaying = true;
+                  break;
+                }
+              }
+            }
+            if (!stillPlaying) {
+              scheduleReturnHome(30 * 1000);
+            }
           }
         }
 
@@ -6057,7 +6086,7 @@
         }
 
         // If media player or Home State / House Mode / Sun entity state changed, re-render tab theme/layout
-        var isThemeEntity = (eid.indexOf("home_state") !== -1 || eid.indexOf("house_mode") !== -1 || eid.indexOf("home_mode") !== -1 || eid.indexOf("house_state") !== -1 || eid.indexOf("time_of_day") !== -1 || eid.indexOf("day_phase") !== -1 || eid === "sun.sun");
+        var isThemeEntity = (eid.indexOf("home_state") !== -1 || eid.indexOf("house_mode") !== -1 || eid.indexOf("home_mode") !== -1 || eid.indexOf("house_state") !== -1 || eid.indexOf("time_of_day") !== -1 || eid.indexOf("day_phase") !== -1 || eid === "sun.sun" || eid === "input_text.dashboard_welcome_message");
         if ((eid.indexOf("media_player") !== -1 || isThemeEntity) && oldState !== newState.state) {
           window.renderCurrentTab();
           return;
@@ -6462,6 +6491,7 @@
         if (headerWelcomeEl) {
           headerWelcomeEl.textContent = welcomeMessage;
         }
+        var welcomeIsGreeting = ((welcomeMessage || "").toLowerCase().indexOf("welcome home") !== -1);
 
         var isNight = computeIsNight(allStates);
 
@@ -6703,8 +6733,13 @@
             }
           }
 
+          // Welcome greeting (e.g. "Welcome Home...") forces sparse layout and hides media cards
+          if (welcomeIsGreeting) {
+            mediaGroups = [];
+          }
+
           var totalHomeCards = mediaGroups.length + homeEntities.length;
-          var isSparseHome = (totalHomeCards > 0 && totalHomeCards <= 6);
+          var isSparseHome = ((totalHomeCards > 0 && totalHomeCards <= 6) || welcomeIsGreeting);
           if (isSparseHome) {
             document.body.classList.add("sparse-home-layout");
           } else {
@@ -7035,7 +7070,6 @@
 
         document.getElementById("entityContainer").innerHTML = html;
         updateChemLogButtons(allStates);
-        checkDailyChemLogPrompt();
         checkSparseHomeLayout();
       }
 
