@@ -3242,6 +3242,14 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
     }
 
+    body.tab-home .tile.overview-tile {
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10), 0 0 22px rgba(255, 255, 255, 0.30);
+    }
+
+    body.tab-home .tile.overview-big-tile {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 28px rgba(255, 255, 255, 0.32);
+    }
+
     body.dark-theme .tile.media-tile {
       background: #161b22 !important;
     }
@@ -3815,7 +3823,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.2.3";
+      var DASHBOARD_VERSION = "v4.2.4";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -5152,7 +5160,7 @@
       // available in the iOS 9 browser this dashboard targets).
       function buildAlbumTintGradient(colors) {
         if (colors.length === 1) {
-          return 'linear-gradient(180deg, ' + albumPastelWash(colors[0]) + ' 0%, #ffffff 70%, #ffffff 100%)';
+          return 'linear-gradient(90deg, ' + albumPastelWash(colors[0]) + ' 0%, #ffffff 70%, #ffffff 100%)';
         }
         var lchColors = [];
         for (var i = 0; i < colors.length; i++) {
@@ -5172,7 +5180,7 @@
         }
         var last = perceptualToSrgb(lchColors[lchColors.length - 1][0], lchColors[lchColors.length - 1][1], lchColors[lchColors.length - 1][2]);
         stops.push(albumPastelWash(last) + ' 100%');
-        return 'linear-gradient(180deg, ' + stops.join(', ') + ')';
+        return 'linear-gradient(90deg, ' + stops.join(', ') + ')';
       }
 
       function applyAlbumPageTint(bgOrNull) {
@@ -5774,12 +5782,12 @@
           var tr = lightRgb.r, tg = lightRgb.g, tb = lightRgb.b;
           var isDarkTheme = document.body.classList.contains("dark-theme");
           if (isDarkTheme) {
-            homeCardStyle += ' background: rgba(' + tr + ',' + tg + ',' + tb + ', 0.22); border: 1.5px solid rgba(' + tr + ',' + tg + ',' + tb + ', 0.55); box-shadow: 0 4px 18px rgba(' + tr + ',' + tg + ',' + tb + ', 0.35);';
+            homeCardStyle += ' background: rgba(' + tr + ',' + tg + ',' + tb + ', 0.22); border: 1.5px solid rgba(' + tr + ',' + tg + ',' + tb + ', 0.55); box-shadow: 0 4px 18px rgba(' + tr + ',' + tg + ',' + tb + ', 0.35), 0 0 32px rgba(' + tr + ',' + tg + ',' + tb + ', 0.25);';
           } else {
             var lR = Math.round(tr + (255 - tr) * 0.35);
             var lG = Math.round(tg + (255 - tg) * 0.35);
             var lB = Math.round(tb + (255 - tb) * 0.35);
-            homeCardStyle += ' background: rgba(' + lR + ',' + lG + ',' + lB + ', 0.28); border: 1.5px solid rgba(' + tr + ',' + tg + ',' + tb + ', 0.45); box-shadow: 0 4px 18px rgba(' + tr + ',' + tg + ',' + tb + ', 0.22);';
+            homeCardStyle += ' background: rgba(' + lR + ',' + lG + ',' + lB + ', 0.28); border: 1.5px solid rgba(' + tr + ',' + tg + ',' + tb + ', 0.45); box-shadow: 0 4px 18px rgba(' + tr + ',' + tg + ',' + tb + ', 0.22), 0 0 32px rgba(' + tr + ',' + tg + ',' + tb + ', 0.16);';
           }
 
           if (artUrl && !albumColorCache[artUrl]) {
@@ -5793,14 +5801,14 @@
                 if (isDark) {
                   homeCardEl.style.background = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.22)';
                   homeCardEl.style.borderColor = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.55)';
-                  homeCardEl.style.boxShadow = '0 4px 18px rgba(' + eR + ',' + eG + ',' + eB + ', 0.35)';
+                  homeCardEl.style.boxShadow = '0 4px 18px rgba(' + eR + ',' + eG + ',' + eB + ', 0.35), 0 0 32px rgba(' + eR + ',' + eG + ',' + eB + ', 0.25)';
                 } else {
                   var hlR = Math.round(eR + (255 - eR) * 0.35);
                   var hlG = Math.round(eG + (255 - eG) * 0.35);
                   var hlB = Math.round(eB + (255 - eB) * 0.35);
                   homeCardEl.style.background = 'rgba(' + hlR + ',' + hlG + ',' + hlB + ', 0.28)';
                   homeCardEl.style.borderColor = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.45)';
-                  homeCardEl.style.boxShadow = '0 4px 18px rgba(' + eR + ',' + eG + ',' + eB + ', 0.22)';
+                  homeCardEl.style.boxShadow = '0 4px 18px rgba(' + eR + ',' + eG + ',' + eB + ', 0.22), 0 0 32px rgba(' + eR + ',' + eG + ',' + eB + ', 0.16)';
                 }
               }
             });
