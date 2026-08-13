@@ -3811,7 +3811,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.1.0";
+      var DASHBOARD_VERSION = "v4.1.3";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -5620,7 +5620,7 @@
 
         var widthOverride = isExtended ? ' -webkit-flex: 0 0 calc(100% - 12px); flex: 0 0 calc(100% - 12px); width: calc(100% - 12px);' : '';
         var homeCardStyle = 'cursor:pointer; padding: 14px 18px; min-height: 116px;' + widthOverride;
-        if (isPlaying) {
+        if (!unavailable) {
           var tintRgb = (artUrl && albumColorCache[artUrl]) ? albumColorCache[artUrl] : { r: 65, g: 122, b: 160 };
           var lightRgb = ensureLightVibrantTint(tintRgb);
           var tr = lightRgb.r, tg = lightRgb.g, tb = lightRgb.b;
@@ -5725,13 +5725,13 @@
         topClockEl.style.display = "block";
       }
 
-      function isKitchenLightsOff() {
-        if (!lastStatesCache || !lastStatesCache.length) return true;
-        for (var i = 0; i < lastStatesCache.length; i++) {
-          var s = lastStatesCache[i];
-          var eid = (s.entity_id || "").toLowerCase();
-          var name = (friendlyName(s) || "").toLowerCase();
-          if ((eid.indexOf("kitchen") !== -1 || name.indexOf("kitchen") !== -1) && eid.indexOf("light.") === 0) {
+      var KITCHEN_LIGHT_ENTITY = "light.kitchen_kitchen_ceiling_lights";
+      function isKitchenLightsOff(states) {
+        var list = states || lastStatesCache || [];
+        if (!list.length) return true;
+        for (var i = 0; i < list.length; i++) {
+          var s = list[i];
+          if ((s.entity_id || "").toLowerCase() === KITCHEN_LIGHT_ENTITY) {
             if (s.state === "on") return false;
           }
         }
@@ -5803,18 +5803,61 @@
         }
       }
 
+      function computeIsNight(allStates) {
+        var isNight = false;
+        if (themeOverride === "dark") {
+          isNight = true;
+        } else if (themeOverride === "light") {
+          isNight = false;
+        } else {
+          // Check for Home State / House Mode / Time of Day entity switches to "evening", "night", "dusk", "sleep", etc.
+          var homeStateFound = false;
+          for (var i = 0; i < allStates.length; i++) {
+            var entId = allStates[i].entity_id;
+            if (entId.indexOf("home_state") !== -1 || entId.indexOf("house_mode") !== -1 || entId.indexOf("home_mode") !== -1 || entId.indexOf("house_state") !== -1 || entId.indexOf("time_of_day") !== -1 || entId.indexOf("day_phase") !== -1) {
+              var stVal = (allStates[i].state || "").toLowerCase().trim();
+              if (stVal === "evening" || stVal === "night" || stVal === "nighttime" || stVal === "late_night" || stVal === "dusk" || stVal === "below_horizon" || stVal === "sleep" || stVal === "bedtime") {
+                isNight = true;
+                homeStateFound = true;
+                break;
+              } else if (stVal === "day" || stVal === "morning" || stVal === "afternoon" || stVal === "above_horizon" || stVal === "awake") {
+                isNight = false;
+                homeStateFound = true;
+                break;
+              }
+            }
+          }
+
+          if (!homeStateFound) {
+            var sunFound = false;
+            for (var i = 0; i < allStates.length; i++) {
+              if (allStates[i].entity_id === "sun.sun") {
+                isNight = allStates[i].state === "below_horizon";
+                sunFound = true;
+                break;
+              }
+            }
+            if (!sunFound) {
+              var hr = new Date().getHours();
+              isNight = (hr >= 18 || hr < 6);
+            }
+          }
+        }
+        return isNight;
+      }
+
       function checkNightDimming(statesArray) {
         var states = statesArray || lastStatesCache || [];
-        checkDimDashboardState(states);
 
-        if (!isDimDashboardActive) {
-          document.body.classList.remove("night-dimmed");
-          document.documentElement.classList.remove("night-dimmed");
-          document.body.classList.remove("dashboard-dimmed-65pct");
-          document.documentElement.classList.remove("dashboard-dimmed-65pct");
-          document.body.classList.remove("dashboard-dimmed-active-80pct");
-          document.documentElement.classList.remove("dashboard-dimmed-active-80pct");
-        }
+        // Manual override: input_boolean.dim_dashboard (always dim when on)
+        checkDimDashboardState(states);
+        var manualDim = isDimDashboardActive;
+
+        // Automatic dim: night time + kitchen lights off (nobody in the room)
+        var autoDim = computeIsNight(states) && isKitchenLightsOff(states);
+
+        isDimDashboardActive = manualDim || autoDim;
+        applyDimDashboardStyle();
       }
 
       function wakeFromNightDim() {
@@ -6009,7 +6052,7 @@
         // Auto-page rotation triggers (Media playback & Hot Tub chemical red alert)
         checkAutoPageRotation(newState, oldState);
 
-        if (eid === "input_boolean.dim_dashboard") {
+        if (eid === "input_boolean.dim_dashboard" || eid.indexOf("light.") === 0) {
           checkNightDimming();
         }
 
@@ -6408,7 +6451,6 @@
       // ======== RENDER ========
       function renderDashboard(allStates) {
         checkLightningSafety(allStates);
-        checkNightDimming(allStates);
         var welcomeMessage = "Welcome Home";
         for (var i = 0; i < allStates.length; i++) {
           if (allStates[i].entity_id === "input_text.dashboard_welcome_message") {
@@ -6421,45 +6463,7 @@
           headerWelcomeEl.textContent = welcomeMessage;
         }
 
-        var isNight = false;
-        if (themeOverride === "dark") {
-          isNight = true;
-        } else if (themeOverride === "light") {
-          isNight = false;
-        } else {
-          // Check for Home State / House Mode / Time of Day entity switches to "evening", "night", "dusk", "sleep", etc.
-          var homeStateFound = false;
-          for (var i = 0; i < allStates.length; i++) {
-            var entId = allStates[i].entity_id;
-            if (entId.indexOf("home_state") !== -1 || entId.indexOf("house_mode") !== -1 || entId.indexOf("home_mode") !== -1 || entId.indexOf("house_state") !== -1 || entId.indexOf("time_of_day") !== -1 || entId.indexOf("day_phase") !== -1) {
-              var stVal = (allStates[i].state || "").toLowerCase().trim();
-              if (stVal === "evening" || stVal === "night" || stVal === "nighttime" || stVal === "late_night" || stVal === "dusk" || stVal === "below_horizon" || stVal === "sleep" || stVal === "bedtime") {
-                isNight = true;
-                homeStateFound = true;
-                break;
-              } else if (stVal === "day" || stVal === "morning" || stVal === "afternoon" || stVal === "above_horizon" || stVal === "awake") {
-                isNight = false;
-                homeStateFound = true;
-                break;
-              }
-            }
-          }
-
-          if (!homeStateFound) {
-            var sunFound = false;
-            for (var i = 0; i < allStates.length; i++) {
-              if (allStates[i].entity_id === "sun.sun") {
-                isNight = allStates[i].state === "below_horizon";
-                sunFound = true;
-                break;
-              }
-            }
-            if (!sunFound) {
-              var hr = new Date().getHours();
-              isNight = (hr >= 18 || hr < 6);
-            }
-          }
-        }
+        var isNight = computeIsNight(allStates);
 
         if (isNight) {
           document.documentElement.className = "dark-theme";
@@ -6674,6 +6678,10 @@
             if (hasHomeTagDefined && !isHomeScreenEntity(mp)) continue;
 
             if (mp.state === "playing" || mp.state === "paused") {
+              if (mp.state === "paused" && mp.last_changed) {
+                var mpPausedTs = new Date(mp.last_changed).getTime();
+                if (!isNaN(mpPausedTs) && (Date.now() - mpPausedTs > 900000)) continue;
+              }
               var key = getMediaGroupKey(mp);
               if (key) {
                 if (!songGroups[key]) {
@@ -6703,23 +6711,10 @@
             document.body.classList.remove("sparse-home-layout");
           }
 
-          // Calculate total occupied grid slots (Double-height heater cards count as 2 slots)
-          var totalGridSlots = mediaGroups.length;
-          for (i = 0; i < homeEntities.length; i++) {
-            var ent = homeEntities[i];
-            var entEid = (ent.entity_id || "").toLowerCase();
-            var entName = (friendlyName(ent) || "").toLowerCase();
-            var isHeater = (entEid.indexOf("pool") !== -1 || entEid.indexOf("hot_tub") !== -1 || entName.indexOf("pool") !== -1 || entName.indexOf("hot tub") !== -1);
-            totalGridSlots += isHeater ? 2 : 1;
-          }
-
-          var isOddSlots = (totalGridSlots % 2 !== 0);
-
           if (mediaGroups.length > 0 || homeEntities.length > 0) {
             html += '<div class="tile-grid">';
             for (i = 0; i < mediaGroups.length; i++) {
-              var extendFirstMedia = (i === 0 && isOddSlots);
-              html += renderHomeMediaPlayerCard(mediaGroups[i], extendFirstMedia);
+              html += renderHomeMediaPlayerCard(mediaGroups[i], true);
             }
             for (i = 0; i < homeEntities.length; i++) {
               html += renderHomeCard(homeEntities[i]);
@@ -7033,6 +7028,10 @@
           var houseIcon = getSvg("house");
           html = '<div class="empty-state"><div class="empty-icon">' + houseIcon + '</div><p>No entities with the <strong>ipaddashboard</strong> label found.<br>Add the label in Home Assistant to see devices here.</p></div>';
         }
+
+        // Dimming must run AFTER all tab branches (some branches rebuild body.className),
+        // otherwise the "dashboard-dimmed-65pct" class gets wiped by the className assignment.
+        checkNightDimming(allStates);
 
         document.getElementById("entityContainer").innerHTML = html;
         updateChemLogButtons(allStates);
