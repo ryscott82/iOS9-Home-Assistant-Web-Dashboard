@@ -42,8 +42,12 @@
       -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
-    /* Black background at night / dark mode for html and body */
-    html.dark-theme,
+    /* Black page background at night / dark mode. html flips to white so the
+       overscroll/bounce area matches the white scrollable top bar in dark mode. */
+    html.dark-theme {
+      background: #ffffff !important;
+    }
+
     body.dark-theme {
       background: #000000 !important;
       color: #ffffff;
@@ -91,6 +95,24 @@
       opacity: 0.85 !important;
       -webkit-filter: brightness(0.85) !important;
       filter: brightness(0.85) !important;
+    }
+
+    /* ======== SCROLLABLE TOP BAR ========
+       Sits at the very top of the page content. While the page is at the top
+       (scrollY 0) it covers the iOS status bar area. In light mode it is black
+       (white status text readable on it); in dark mode it is white so the white
+       status text blends into it. The app auto-scrolls the page down past it so
+       it hides above the viewport; the iOS status text then blends into the
+       page background. Height matches the iOS status bar (20px). */
+    #scrollBlackBar {
+      width: 100%;
+      height: 20px;
+      background: #000000;
+    }
+
+    html.dark-theme #scrollBlackBar,
+    body.dark-theme #scrollBlackBar {
+      background: #ffffff;
     }
 
     /* ======== NIGHT / AWAY SPLASH LOCK SCREEN ======== */
@@ -4052,6 +4074,9 @@
     <button id="splashUnlockBtn" onclick="unlockSplash()">Tap to Unlock</button>
   </div>
 
+  <!-- SCROLLABLE TOP BLACK BAR: covers the iOS status bar while at page top; auto-scrolled out of view -->
+  <div id="scrollBlackBar"></div>
+
   <!-- APP -->
   <main class="app-content" id="appContent" style="display:none; padding-top: 0px;">
 
@@ -4109,7 +4134,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.4.7";
+      var DASHBOARD_VERSION = "v4.5.2";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -4167,6 +4192,7 @@
       var bannerDismissed = false;
       var selectedRecVolume = "hottub";
       var lastStatesCache = [];
+      var didInitialBlackBarScroll = false;
       var activeStickyGroups = [];
       var entityAreaMap = {};
       var areaNameMap = {};
@@ -4513,9 +4539,9 @@
         } catch (e) { }
 
         if (tabName === "home") {
-          window.scrollTo(0, 0);
           setTimeout(checkSparseHomeLayout, 50);
         }
+        window.scrollTo(0, 24);
       }
 
       window.switchTab = function (tabName) {
@@ -6365,11 +6391,15 @@
         var now = new Date();
         var hr = now.getHours();
         var min = now.getMinutes();
+
+        // Before 12:30 AM it's day/evening: never show the night splash (auto-unlocked while home)
         var past1230 = (hr > 0) || (hr === 0 && min >= 30);
         if (!past1230) return false;
 
-        // Stay locked until the house state reports "morning" / "day" (or the sun is up)
-        var morningDetected = false;
+        // After 12:30 AM: only stay locked when the house is genuinely in a night state.
+        // A daytime / home state ("morning", "day", "afternoon", "home", sun up, etc.) unlocks the display.
+        var dayStateFound = false;
+        var nightStateFound = false;
         var hasModeEntity = false;
         for (var i = 0; i < allStates.length; i++) {
           var entId = allStates[i].entity_id;
@@ -6378,14 +6408,19 @@
             entId.indexOf("time_of_day") !== -1 || entId.indexOf("day_phase") !== -1 || entId === "sun.sun") {
             hasModeEntity = true;
             var stVal = (allStates[i].state || "").toLowerCase().trim();
-            if (stVal === "morning" || stVal === "day" || stVal === "daytime" || stVal === "above_horizon" || stVal === "awake") {
-              morningDetected = true;
+            if (stVal === "morning" || stVal === "day" || stVal === "daytime" || stVal === "afternoon" ||
+              stVal === "above_horizon" || stVal === "awake" || stVal === "home" || stVal === "occupied" || stVal === "present") {
+              dayStateFound = true;
+            } else if (stVal === "night" || stVal === "nighttime" || stVal === "evening" || stVal === "dusk" ||
+              stVal === "sleep" || stVal === "bedtime" || stVal === "below_horizon" || stVal === "late_night") {
+              nightStateFound = true;
             }
           }
         }
-        if (morningDetected) return false;
+        if (dayStateFound) return false;
+        if (nightStateFound) return true;
 
-        // No house-mode entity available: fall back to assuming morning at 7:00 AM
+        // No house-mode entity at all: fall back to an early-morning window (12:30 AM - 7:00 AM)
         if (!hasModeEntity && hr >= 7) return false;
         return true;
       }
@@ -7424,9 +7459,11 @@
         var isDarkTheme = (themeOverride === "dark" || isNight);
         document.body.className = (isDarkTheme ? "dark-theme " : "") + "tab-" + activeTab;
 
-        // Dynamic body background matching theme (#000000 night / #ffffff day); html + theme-color stay black so the top bar never flashes white
+        // Dynamic backgrounds matching theme: body is black at night / white by day.
+        // html flips the opposite way so the overscroll/bounce area matches the
+        // scrollable top bar (black in light mode, white in dark mode).
         var themeBgColor = isDarkTheme ? "#000000" : "#ffffff";
-        document.documentElement.style.backgroundColor = "#000000";
+        document.documentElement.style.backgroundColor = (isDarkTheme ? "#ffffff" : "#000000");
         document.body.style.backgroundColor = themeBgColor;
         if (isDarkTheme) {
           document.documentElement.classList.add("dark-theme");
@@ -7438,6 +7475,13 @@
         var themeMetaEl = document.querySelector('meta[name="theme-color"]');
         if (themeMetaEl) {
           themeMetaEl.setAttribute("content", "#000000");
+        }
+        // Status bar text: white (black-translucent) in light mode so it blends
+        // into the white page; black (default) in dark mode so it shows on the
+        // white scrollable top bar and blends into the black page when scrolled.
+        var statusBarMetaEl = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+        if (statusBarMetaEl) {
+          statusBarMetaEl.setAttribute("content", isDarkTheme ? "default" : "black-translucent");
         }
 
         var appFooterEl = document.querySelector("footer.app-footer");
@@ -7857,6 +7901,13 @@
         updateChemLogButtons(allStates);
         updateAlbumPageTint(allStates);
         checkSparseHomeLayout();
+
+        // Auto-scroll the page down past the scrollable black bar once, so the bar
+        // hides above the viewport and the iOS status text blends into the page.
+        if (!didInitialBlackBarScroll) {
+          didInitialBlackBarScroll = true;
+          window.scrollTo(0, 24);
+        }
       }
 
       // ======== ENTITY RENDERERS ========
