@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#f2f2f7">
+  <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-touch-fullscreen" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <title>Home Controls</title>
@@ -25,7 +25,7 @@
 
     html {
       height: 100%;
-      background: #ffffff;
+      background: #000000;
     }
 
     body,
@@ -49,7 +49,7 @@
       color: #ffffff;
     }
 
-    /* ======== INPUT BOOLEAN DIM DASHBOARD (65% MINIMUM IDLE / 80% INTERACTION BOOST) ======== */
+    /* ======== INPUT BOOLEAN DIM DASHBOARD (75% MINIMUM IDLE / 85% INTERACTION BOOST) ======== */
     #dashboardDimOverlay {
       position: fixed;
       top: 0;
@@ -67,30 +67,30 @@
 
     body.dashboard-dimmed-65pct #dashboardDimOverlay,
     html.dashboard-dimmed-65pct #dashboardDimOverlay {
-      opacity: 0.35;
+      opacity: 0.25;
       visibility: visible;
     }
 
     body.dashboard-dimmed-65pct #appContent,
     html.dashboard-dimmed-65pct #appContent {
-      opacity: 0.65 !important;
-      -webkit-filter: brightness(0.65) !important;
-      filter: brightness(0.65) !important;
+      opacity: 0.75 !important;
+      -webkit-filter: brightness(0.75) !important;
+      filter: brightness(0.75) !important;
       -webkit-transition: opacity 0.4s ease, -webkit-filter 0.4s ease;
       transition: opacity 0.4s ease, filter 0.4s ease;
     }
 
-    /* ======== 80% BRIGHTNESS INTERACTION BOOST IN DIM MODE ======== */
+    /* ======== 85% BRIGHTNESS INTERACTION BOOST IN DIM MODE ======== */
     body.dashboard-dimmed-65pct.dashboard-dimmed-active-80pct #dashboardDimOverlay,
     html.dashboard-dimmed-65pct.dashboard-dimmed-active-80pct #dashboardDimOverlay {
-      opacity: 0.20 !important;
+      opacity: 0.15 !important;
     }
 
     body.dashboard-dimmed-65pct.dashboard-dimmed-active-80pct #appContent,
     html.dashboard-dimmed-65pct.dashboard-dimmed-active-80pct #appContent {
-      opacity: 0.80 !important;
-      -webkit-filter: brightness(0.80) !important;
-      filter: brightness(0.80) !important;
+      opacity: 0.85 !important;
+      -webkit-filter: brightness(0.85) !important;
+      filter: brightness(0.85) !important;
     }
 
     /* ======== SETUP OVERLAY ======== */
@@ -1702,6 +1702,42 @@
       }
     }
 
+    /* 601-800px: taller Pool & Hot Tub cards with stacked feature/preset button rows (temp / chem+features / quick temp / name) */
+    @media (min-width: 601px) and (max-width: 800px) {
+      .tile.overview-big-tile.is-heater-tile {
+        min-height: 330px !important;
+        height: auto !important;
+      }
+
+      .tile.overview-big-tile.is-heater-tile .pool-btn-outer {
+        -webkit-flex-direction: column !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+    }
+
+    /* iPad landscape / largest site width (768px+ viewport): Home page Pool & Hot Tub cards keep a single button row */
+    @media (min-width: 768px) and (max-width: 800px) {
+      body.tab-home .tile.overview-big-tile.is-heater-tile {
+        min-height: 260px !important;
+        height: auto !important;
+      }
+
+      body.tab-home .tile.overview-big-tile.is-heater-tile .pool-btn-outer {
+        -webkit-flex-direction: row !important;
+        flex-direction: row !important;
+        gap: 6px !important;
+      }
+    }
+
+    /* Very wide viewports: never let the Pool & Hot Tub button rows wrap into two lines */
+    @media (min-width: 801px) {
+      body.tab-home .tile.overview-big-tile.is-heater-tile .pool-btn-outer {
+        -webkit-flex-wrap: nowrap !important;
+        flex-wrap: nowrap !important;
+      }
+    }
+
     /* ======== LIGHTNING SAFETY ALERT OVERLAY & HARSH FLASHING STROBE ======== */
     .lightning-overlay {
       position: fixed;
@@ -1868,6 +1904,10 @@
     }
 
     /* ======== SPARSE HOME LAYOUT (4 OR LESS CARD ROWS) ======== */
+    body.tab-home.sparse-home-layout #appHeader {
+      margin-top: 32px !important;
+    }
+
     body.tab-home.sparse-home-layout #headerWelcome {
       font-size: 68px !important;
       font-weight: 900 !important;
@@ -3585,6 +3625,27 @@
       color: #ffffff;
     }
 
+    body.dark-theme #settingsOverlay .settings-section {
+      background: #2c2c2e !important;
+      color: #e6edf3 !important;
+    }
+
+    body.dark-theme #settingsOverlay .settings-section span {
+      color: #ffffff !important;
+    }
+
+    body.dark-theme #settingsOverlay .settings-section input {
+      background: #1c1c1e !important;
+      color: #ffffff !important;
+      border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+
+    body.dark-theme #settingsOverlay .settings-section .confirm-btn {
+      background: rgba(255, 255, 255, 0.12) !important;
+      color: #ffffff !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+
     /* ======== KEYPAD MODAL ======== */
     .keypad-btn {
       background: rgba(0, 0, 0, 0.05);
@@ -3670,7 +3731,7 @@
       <div
         style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
         Appearance</div>
-      <div style="background:#f2f2f7; border-radius:14px; padding:14px;">
+      <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <span style="font-weight:600;">Theme</span>
@@ -3701,7 +3762,7 @@
       <div
         style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
         Audio</div>
-      <div style="background:#f2f2f7; border-radius:14px; padding:14px;">
+      <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
@@ -3717,7 +3778,7 @@
       <div
         style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
         Lightning</div>
-      <div style="background:#f2f2f7; border-radius:14px; padding:14px;">
+      <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
@@ -3738,7 +3799,7 @@
       <div
         style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
         Pool &amp; Hot Tub</div>
-      <div style="background:#f2f2f7; border-radius:14px; padding:14px;">
+      <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div style="font-weight:700; margin-bottom:6px;">Pool Presets (°F)</div>
         <div style="display:-webkit-flex; display:flex; gap:8px; margin-bottom:10px;">
           <input type="number" id="settingsPoolP1"
@@ -3785,7 +3846,7 @@
       <div
         style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
         Connection</div>
-      <div style="background:#f2f2f7; border-radius:14px; padding:14px;">
+      <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div style="display:-webkit-flex; display:flex; gap:10px; -webkit-flex-wrap:wrap; flex-wrap:wrap;">
           <button class="media-control-btn"
             style="padding:10px 12px; font-size:13px; -webkit-flex:1; flex:1; border-radius:10px; margin:0; min-width:0;"
@@ -3957,7 +4018,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.3.0";
+      var DASHBOARD_VERSION = "v4.4.2";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -4786,7 +4847,7 @@
         }
 
         // Combine Feature Buttons & Quick Presets in a SINGLE HORIZONTAL ROW
-        var allButtonsHtml = chemBeakerBtnHtml;
+        var featureButtonsHtml = chemBeakerBtnHtml;
         if (isPool) {
           var wfEnt = findFeatureEntity("waterfall");
           var wfEid = wfEnt ? wfEnt.entity_id : "switch.pool_waterfall";
@@ -4795,7 +4856,7 @@
           var wfBg = wfOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
           var wfBorder = wfOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
           var wfColor = wfOn ? "#0a84ff" : "currentColor";
-          allButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
+          featureButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + wfBg + '; border:' + wfBorder + '; color:' + wfColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + wfEid + '\', \'' + wfDom + '\')" title="Toggle Waterfall">Waterfall</button>';
         } else if (isHotTub) {
           var jEnt = findFeatureEntity("jets");
           var jEid = jEnt ? jEnt.entity_id : "switch.scott_jets_high";
@@ -4804,7 +4865,7 @@
           var jBg = jOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
           var jBorder = jOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
           var jColor = jOn ? "#0a84ff" : "currentColor";
-          allButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 8px; font-size:14px; font-weight:800; border-radius:12px; background:' + jBg + '; border:' + jBorder + '; color:' + jColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">Jets</button>';
+          featureButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 8px; font-size:14px; font-weight:800; border-radius:12px; background:' + jBg + '; border:' + jBorder + '; color:' + jColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + jEid + '\', \'' + jDom + '\')" title="Toggle Jets">Jets</button>';
 
           var aEnt = findFeatureEntity("air");
           var aEid = aEnt ? aEnt.entity_id : "switch.hot_tub_air_blower";
@@ -4813,12 +4874,13 @@
           var aBg = aOn ? "rgba(10,132,255,0.35)" : "rgba(120,120,128,0.16)";
           var aBorder = aOn ? "2px solid #0a84ff" : "1px solid rgba(120,120,128,0.35)";
           var aColor = aOn ? "#0a84ff" : "currentColor";
-          allButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 8px; font-size:14px; font-weight:800; border-radius:12px; background:' + aBg + '; border:' + aBorder + '; color:' + aColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + aEid + '\', \'' + aDom + '\')" title="Toggle Air Blower">Air</button>';
+          featureButtonsHtml += '<button class="feature-btn" style="height:42px; padding:0 8px; font-size:14px; font-weight:800; border-radius:12px; background:' + aBg + '; border:' + aBorder + '; color:' + aColor + ';" onclick="event.stopPropagation(); toggleEntity(\'' + aEid + '\', \'' + aDom + '\')" title="Toggle Air Blower">Air</button>';
         }
 
-        // Append Quick Presets to single feature row
-        allButtonsHtml += '<button class="preset-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + p1Bg + '; border:' + p1Border + '; color:' + p1Color + ';" onclick="event.stopPropagation(); setTargetTemp(\'' + eid + '\', ' + p1 + ')" title="Set to ' + p1 + '°F">' + p1 + '°</button>';
-        allButtonsHtml += '<button class="preset-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + p2Bg + '; border:' + p2Border + '; color:' + p2Color + ';" onclick="event.stopPropagation(); setTargetTemp(\'' + eid + '\', ' + p2 + ')" title="Set to ' + p2 + '°F">' + p2 + '°</button>';
+        // Quick Presets go in their own row (stacked below features at 768-800px)
+        var presetButtonsHtml = '';
+        presetButtonsHtml += '<button class="preset-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + p1Bg + '; border:' + p1Border + '; color:' + p1Color + ';" onclick="event.stopPropagation(); setTargetTemp(\'' + eid + '\', ' + p1 + ')" title="Set to ' + p1 + '°F">' + p1 + '°</button>';
+        presetButtonsHtml += '<button class="preset-btn" style="height:42px; padding:0 10px; font-size:14px; font-weight:800; border-radius:12px; background:' + p2Bg + '; border:' + p2Border + '; color:' + p2Color + ';" onclick="event.stopPropagation(); setTargetTemp(\'' + eid + '\', ' + p2 + ')" title="Set to ' + p2 + '°F">' + p2 + '°</button>';
 
         var cardDisplayName = isHotTub ? "Hot Tub" : "Pool";
         var inWinterMode = (isHotTub && hottubWinterMode) || (isPool && poolWinterMode);
@@ -4838,9 +4900,10 @@
         poolCardHtml += '<button class="stepper-btn" style="width:48px; height:48px; font-size:28px; font-weight:800; border-radius:14px; padding:0;" onclick="event.stopPropagation(); ' + (domain === 'water_heater' ? 'adjustWaterHeaterTemp' : 'adjustTemp') + '(\'' + eid + '\', 1)">+</button>';
         poolCardHtml += '</div>'; // end top row
 
-        // MIDDLE SECTION: SINGLE ROW WITH ALL BUTTONS (Beaker + Features + Presets)
-        poolCardHtml += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:6px; width:100%; margin:12px 0;">';
-        poolCardHtml += allButtonsHtml;
+        // MIDDLE SECTION: FEATURES (Beaker + Features) and QUICK PRESETS as sub-rows, side-by-side by default, stacked at 768-800px
+        poolCardHtml += '<div class="pool-btn-outer" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:6px; width:100%; margin:12px 0; -webkit-flex-wrap:wrap; flex-wrap:wrap;">';
+        poolCardHtml += '<div class="pool-feature-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:6px; -webkit-flex-wrap:nowrap; flex-wrap:nowrap;">' + featureButtonsHtml + '</div>';
+        poolCardHtml += '<div class="pool-preset-row" style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:6px; -webkit-flex-wrap:nowrap; flex-wrap:nowrap;">' + presetButtonsHtml + '</div>';
         poolCardHtml += '</div>'; // end middle section
 
         // BOTTOM SECTION: CENTERED TITLE ("Hot Tub" / "Pool" in Title Case)
@@ -5837,7 +5900,12 @@
         for (var j = 0; j < mediaPlayers.length; j++) {
           var mp = mediaPlayers[j];
           var st = mp.state;
-          if (st === "playing" || st === "paused") {
+          var pausedTooLong = false;
+          if (st === "paused" && mp.last_changed) {
+            var pausedTs = new Date(mp.last_changed).getTime();
+            if (!isNaN(pausedTs) && (Date.now() - pausedTs > 1200000)) pausedTooLong = true;
+          }
+          if ((st === "playing" || st === "paused") && !pausedTooLong) {
             var attrs = mp.attributes || {};
             var key = (attrs.media_title || "") + "___" + (attrs.media_artist || "");
             if (key !== "___") {
@@ -5911,6 +5979,15 @@
         var state = primary.state;
         var unavailable = state === "unavailable";
 
+        var canOpenMediaPage = false;
+        if (group && group.length) {
+          for (var mi = 0; mi < group.length; mi++) {
+            if (isHomeScreenEntity(group[mi])) { canOpenMediaPage = true; break; }
+          }
+        } else {
+          canOpenMediaPage = isHomeScreenEntity(primary);
+        }
+
         var trackInfo = getGroupTrackInfo(group.length ? group : [primary]);
         var title = trackInfo.title;
         var artist = trackInfo.artist;
@@ -5976,7 +6053,7 @@
           }
         }
 
-        var h = '<div id="home_media_card_' + primaryCleanEid + '" class="tile overview-big-tile" onclick="switchTab(\'media\')" style="' + homeCardStyle + '" title="Open Media Page">';
+        var h = '<div id="home_media_card_' + primaryCleanEid + '" class="tile overview-big-tile"' + (canOpenMediaPage ? ' onclick="switchTab(\'media\')"' : '') + ' style="' + homeCardStyle + '"' + (canOpenMediaPage ? ' title="Open Media Page"' : '') + '>';
         h += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%;">';
 
         // LEFT: Album Art + Track Title & Speaker Subtext
@@ -6948,16 +7025,12 @@
 
         var isNight = computeIsNight(allStates);
 
-        if (isNight) {
+        if (themeOverride === "dark" || isNight) {
           document.documentElement.className = "dark-theme";
           document.body.className = "dark-theme";
-          var metaStatus = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-          if (metaStatus) metaStatus.setAttribute('content', 'black-translucent');
         } else {
           document.documentElement.className = "";
           document.body.className = "";
-          var metaStatus = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
-          if (metaStatus) metaStatus.setAttribute('content', 'default');
         }
 
         var themeToggleBtn = document.getElementById("themeToggleBtn");
@@ -7098,6 +7171,9 @@
           html += '<button class="card-home-btn" onclick="openSettings()" title="Open Settings" ' + subViewHomeBtnStyle + '>';
           html += '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>';
           html += '</button>';
+          html += '<button class="card-home-btn" onclick="location.reload()" title="Reload Dashboard" ' + subViewHomeBtnStyle + '>';
+          html += '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>';
+          html += '</button>';
           html += '<button class="card-home-btn" onclick="switchTab(\'home\')" title="Go to Home" ' + subViewHomeBtnStyle + '>';
           html += '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>';
           html += '</button>';
@@ -7109,9 +7185,9 @@
         var isDarkTheme = (themeOverride === "dark" || isNight);
         document.body.className = (isDarkTheme ? "dark-theme " : "") + "tab-" + activeTab;
 
-        // Dynamic status bar and html background matching site background (#000000 night / #ffffff day)
+        // Dynamic body background matching theme (#000000 night / #ffffff day); html + theme-color stay black so the top bar never flashes white
         var themeBgColor = isDarkTheme ? "#000000" : "#ffffff";
-        document.documentElement.style.backgroundColor = themeBgColor;
+        document.documentElement.style.backgroundColor = "#000000";
         document.body.style.backgroundColor = themeBgColor;
         if (isDarkTheme) {
           document.documentElement.classList.add("dark-theme");
@@ -7122,7 +7198,7 @@
         }
         var themeMetaEl = document.querySelector('meta[name="theme-color"]');
         if (themeMetaEl) {
-          themeMetaEl.setAttribute("content", themeBgColor);
+          themeMetaEl.setAttribute("content", "#000000");
         }
 
         var appFooterEl = document.querySelector("footer.app-footer");
