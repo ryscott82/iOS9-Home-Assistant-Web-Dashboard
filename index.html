@@ -93,6 +93,61 @@
       filter: brightness(0.85) !important;
     }
 
+    /* ======== NIGHT / AWAY SPLASH LOCK SCREEN ======== */
+    #splashOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #000000;
+      z-index: 9997;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      gap: 28px;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    #splashOverlay.hidden {
+      display: none;
+    }
+
+    #splashMessage {
+      font-size: 64px;
+      font-weight: 900;
+      color: #ffffff;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      white-space: normal;
+      word-break: break-word;
+      max-width: 92%;
+    }
+
+    #splashUnlockBtn {
+      min-height: 0;
+      background: #007aff;
+      color: #ffffff;
+      border: none;
+      padding: 14px 40px;
+      border-radius: 14px;
+      font-size: 24px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(0, 122, 255, 0.35);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #splashUnlockBtn:active {
+      opacity: 0.85;
+    }
+
     /* ======== SETUP OVERLAY ======== */
     .setup-overlay {
       position: fixed;
@@ -3758,6 +3813,36 @@
         </div>
       </div>
 
+      <!-- DISPLAY -->
+      <div
+        style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
+        Display</div>
+      <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
+        <div
+          style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
+          <div>
+            <div style="font-weight:600;">Lock Screen</div>
+            <div style="font-size:12px; color:#8e8e93;">Shows lock screen at night / when away</div>
+          </div>
+          <input type="checkbox" id="settingsLockChk" onchange="setSplashEnabled(this)"
+            style="width:22px; height:22px;" />
+        </div>
+        <div
+          style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
+          <div>
+            <div style="font-weight:600;">Dim Screen</div>
+            <div style="font-size:12px; color:#8e8e93;">Controls input_boolean.dim_dashboard</div>
+          </div>
+          <input type="checkbox" id="settingsDimChk" onchange="setDimDashboardSetting(this)"
+            style="width:22px; height:22px;" />
+        </div>
+        <div
+          style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; padding:6px 0 0;">
+          <button id="settingsLockNowBtn" onclick="lockScreenNow()"
+            style="background:#007aff; color:#ffffff; border:none; padding:10px 24px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; width:100%;">🔒 Lock Now</button>
+        </div>
+      </div>
+
       <!-- AUDIO -->
       <div
         style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
@@ -3961,6 +4046,12 @@
   <!-- 5% BRIGHTNESS DIM OVERLAY -->
   <div id="dashboardDimOverlay"></div>
 
+  <!-- NIGHT / AWAY SPLASH LOCK SCREEN -->
+  <div id="splashOverlay" class="splash-overlay hidden">
+    <div id="splashMessage">Welcome Home</div>
+    <button id="splashUnlockBtn" onclick="unlockSplash()">Tap to Unlock</button>
+  </div>
+
   <!-- APP -->
   <main class="app-content" id="appContent" style="display:none; padding-top: 0px;">
 
@@ -4018,7 +4109,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.4.2";
+      var DASHBOARD_VERSION = "v4.4.7";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -4110,6 +4201,19 @@
       var poolWinterMode = false;
       var hottubWinterMode = false;
       var winterTemp = 50;
+
+      var splashUnlockedUntil = 0;
+      var SPLASH_UNLOCK_MS = 30 * 60 * 1000;
+      var splashEnabled = true;
+      var splashForced = false;
+      try {
+        var cachedSplashEn = localStorage.getItem("ha_splash_enabled");
+        if (cachedSplashEn === "false") splashEnabled = false;
+        var cachedForced = localStorage.getItem("ha_splash_forced");
+        if (cachedForced === "true") splashForced = true;
+        var cachedUnlockTs = parseInt(localStorage.getItem("ha_splash_unlocked_until") || "0", 10);
+        if (!isNaN(cachedUnlockTs) && cachedUnlockTs > 0) splashUnlockedUntil = cachedUnlockTs;
+      } catch (e) { }
 
       try {
         var cachedDir = localStorage.getItem("ha_gradient_direction");
@@ -6152,6 +6256,7 @@
             dimWakeTimer = null;
           }
         }
+        window.updateSettingsDimChk();
       }
 
       function checkDimDashboardState(entityOrStates) {
@@ -6240,6 +6345,112 @@
         }
         return isNight;
       }
+
+      // ======== NIGHT / AWAY SPLASH LOCK SCREEN ========
+      function isAwayOrVacation(allStates) {
+        for (var i = 0; i < allStates.length; i++) {
+          var entId = allStates[i].entity_id;
+          var stVal = (allStates[i].state || "").toLowerCase().trim();
+          if (entId.indexOf("alarm_control_panel") === 0) {
+            if (stVal === "armed_away" || stVal === "armed_vacation" || stVal === "armed_vacation_away") return true;
+          } else if (entId.indexOf("home_state") !== -1 || entId.indexOf("house_mode") !== -1 ||
+            entId.indexOf("home_mode") !== -1 || entId.indexOf("house_state") !== -1) {
+            if (stVal === "away" || stVal === "vacation" || stVal === "vacation_mode" || stVal === "armed_away") return true;
+          }
+        }
+        return false;
+      }
+
+      function isNightSplashActive(allStates) {
+        var now = new Date();
+        var hr = now.getHours();
+        var min = now.getMinutes();
+        var past1230 = (hr > 0) || (hr === 0 && min >= 30);
+        if (!past1230) return false;
+
+        // Stay locked until the house state reports "morning" / "day" (or the sun is up)
+        var morningDetected = false;
+        var hasModeEntity = false;
+        for (var i = 0; i < allStates.length; i++) {
+          var entId = allStates[i].entity_id;
+          if (entId.indexOf("home_state") !== -1 || entId.indexOf("house_mode") !== -1 ||
+            entId.indexOf("home_mode") !== -1 || entId.indexOf("house_state") !== -1 ||
+            entId.indexOf("time_of_day") !== -1 || entId.indexOf("day_phase") !== -1 || entId === "sun.sun") {
+            hasModeEntity = true;
+            var stVal = (allStates[i].state || "").toLowerCase().trim();
+            if (stVal === "morning" || stVal === "day" || stVal === "daytime" || stVal === "above_horizon" || stVal === "awake") {
+              morningDetected = true;
+            }
+          }
+        }
+        if (morningDetected) return false;
+
+        // No house-mode entity available: fall back to assuming morning at 7:00 AM
+        if (!hasModeEntity && hr >= 7) return false;
+        return true;
+      }
+
+      function shouldShowSplash(allStates) {
+        if (!splashEnabled) return false;
+        if (splashForced) return true;
+        if (Date.now() < splashUnlockedUntil) return false;
+        return isAwayOrVacation(allStates) || isNightSplashActive(allStates);
+      }
+
+      function updateSplashScreen(allStates, welcomeMessage) {
+        var overlay = document.getElementById("splashOverlay");
+        if (!overlay) return;
+        var showIt = shouldShowSplash(allStates);
+        if (showIt) {
+          var msgEl = document.getElementById("splashMessage");
+          if (msgEl && welcomeMessage) msgEl.textContent = welcomeMessage;
+        }
+        if (showIt) {
+          overlay.classList.remove("hidden");
+        } else {
+          overlay.classList.add("hidden");
+        }
+      }
+
+      window.unlockSplash = function () {
+        splashForced = false;
+        try { localStorage.removeItem("ha_splash_forced"); } catch (e) { }
+        splashUnlockedUntil = Date.now() + SPLASH_UNLOCK_MS;
+        try { localStorage.setItem("ha_splash_unlocked_until", String(splashUnlockedUntil)); } catch (e) { }
+        var overlay = document.getElementById("splashOverlay");
+        if (overlay) overlay.classList.add("hidden");
+        if (window.__splashRelockTimer) clearTimeout(window.__splashRelockTimer);
+        window.__splashRelockTimer = setTimeout(function () {
+          splashUnlockedUntil = 0;
+          try { localStorage.removeItem("ha_splash_unlocked_until"); } catch (e) { }
+          if (lastStatesCache && lastStatesCache.length > 0) renderDashboard(lastStatesCache);
+        }, SPLASH_UNLOCK_MS + 1000);
+        resetInactivityTimer();
+      };
+
+      window.lockScreenNow = function () {
+        splashEnabled = true;
+        splashForced = true;
+        try {
+          localStorage.setItem("ha_splash_enabled", "true");
+          localStorage.setItem("ha_splash_forced", "true");
+        } catch (e) { }
+        splashUnlockedUntil = 0;
+        try { localStorage.removeItem("ha_splash_unlocked_until"); } catch (e) { }
+        if (window.__splashRelockTimer) { clearTimeout(window.__splashRelockTimer); window.__splashRelockTimer = null; }
+        var msgEl = document.getElementById("splashMessage");
+        if (msgEl && lastStatesCache && lastStatesCache.length) {
+          for (var i = 0; i < lastStatesCache.length; i++) {
+            if (lastStatesCache[i].entity_id === "input_text.dashboard_welcome_message") {
+              msgEl.textContent = lastStatesCache[i].state || "Welcome Home";
+              break;
+            }
+          }
+        }
+        var overlay = document.getElementById("splashOverlay");
+        if (overlay) overlay.classList.remove("hidden");
+        closeSettings();
+      };
 
       function checkNightDimming(statesArray) {
         var states = statesArray || lastStatesCache || [];
@@ -6858,6 +7069,31 @@
         if (soundFeedbackEnabled) playClickSound();
       };
 
+      window.setSplashEnabled = function (el) {
+        splashEnabled = !!el.checked;
+        try { localStorage.setItem("ha_splash_enabled", splashEnabled ? "true" : "false"); } catch (e) { }
+        renderCurrentTab();
+        showToast(splashEnabled ? "Lock screen enabled" : "Lock screen disabled");
+      };
+
+      window.setDimDashboardSetting = function (el) {
+        var wantDim = !!el.checked;
+        haRequest("POST", "/api/services/input_boolean/" + (wantDim ? "turn_on" : "turn_off"), {
+          entity_id: "input_boolean.dim_dashboard"
+        }, function (err) {
+          if (err) {
+            showToast("Dim entity not found: input_boolean.dim_dashboard");
+          } else {
+            showToast(wantDim ? "Screen dimmed" : "Screen at full brightness");
+          }
+        });
+      };
+
+      window.updateSettingsDimChk = function () {
+        var chk = document.getElementById("settingsDimChk");
+        if (chk) chk.checked = isDimDashboardActive;
+      };
+
       window.setLightningDisabled = function (el) {
         lightningDisabled = !el.checked;
         try { localStorage.setItem("ha_lightning_disabled", lightningDisabled ? "true" : "false"); } catch (e) { }
@@ -6913,6 +7149,8 @@
         var wT = document.getElementById("settingsWinterTemp"); if (wT) wT.value = winterTemp;
         var pwChk = document.getElementById("settingsPoolWinter"); if (pwChk) pwChk.checked = poolWinterMode;
         var twChk = document.getElementById("settingsTubWinter"); if (twChk) twChk.checked = hottubWinterMode;
+        var lockChk = document.getElementById("settingsLockChk"); if (lockChk) lockChk.checked = splashEnabled;
+        window.updateSettingsDimChk();
         window.updateSettingsThemeBtn();
         window.updateSettingsLightningBtn();
         document.getElementById("settingsOverlay").className = "setup-overlay";
@@ -7017,6 +7255,7 @@
             break;
           }
         }
+        updateSplashScreen(allStates, welcomeMessage);
         var headerWelcomeEl = document.getElementById("headerWelcome");
         if (headerWelcomeEl) {
           headerWelcomeEl.textContent = welcomeMessage;
