@@ -123,6 +123,9 @@
       right: 0;
       bottom: 0;
       background: #000000;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
       z-index: 9997;
       display: -webkit-flex;
       display: flex;
@@ -135,13 +138,31 @@
       gap: 28px;
       box-sizing: border-box;
       text-align: center;
+      overflow: hidden;
     }
 
     #splashOverlay.hidden {
       display: none;
     }
 
+    /* Subtle dark gradient over the lock screen camera feed to keep the
+       welcome message and unlock button readable on bright scenes. */
+    #splashOverlay::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      background: -webkit-linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.6));
+      background: linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.6));
+      pointer-events: none;
+    }
+
     #splashMessage {
+      position: relative;
+      z-index: 1;
       font-size: 64px;
       font-weight: 900;
       color: #ffffff;
@@ -153,6 +174,8 @@
     }
 
     #splashUnlockBtn {
+      position: relative;
+      z-index: 1;
       min-height: 0;
       background: #007aff;
       color: #ffffff;
@@ -168,6 +191,16 @@
 
     #splashUnlockBtn:active {
       opacity: 0.85;
+    }
+
+    #splashCamStatus {
+      position: relative;
+      z-index: 1;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.75);
+      letter-spacing: 0.3px;
+      min-height: 16px;
     }
 
     /* ======== SETUP OVERLAY ======== */
@@ -3833,6 +3866,15 @@
           <input type="checkbox" id="settingsVerticalChk" onchange="setGradientDirection(this)"
             style="width:22px; height:22px;" />
         </div>
+        <div
+          style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
+          <div>
+            <div style="font-weight:600;">Adaptive Day Theme</div>
+            <div style="font-size:12px; color:#8e8e93;">Dark when kitchen overheads are off</div>
+          </div>
+          <input type="checkbox" id="settingsAdaptiveChk" onchange="setAdaptiveDayTheme(this)"
+            style="width:22px; height:22px;" />
+        </div>
       </div>
 
       <!-- DISPLAY -->
@@ -3844,7 +3886,7 @@
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
             <div style="font-weight:600;">Lock Screen</div>
-            <div style="font-size:12px; color:#8e8e93;">Shows lock screen at night / when away</div>
+            <div style="font-size:12px; color:#8e8e93;">Locks after 12:30 AM until the kitchen lights turn on</div>
           </div>
           <input type="checkbox" id="settingsLockChk" onchange="setSplashEnabled(this)"
             style="width:22px; height:22px;" />
@@ -3862,6 +3904,23 @@
           style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; padding:6px 0 0;">
           <button id="settingsLockNowBtn" onclick="lockScreenNow()"
             style="background:#007aff; color:#ffffff; border:none; padding:10px 24px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; width:100%;">🔒 Lock Now</button>
+        </div>
+        <div
+          style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
+          <div>
+            <div style="font-weight:600;">Lock Screen Camera</div>
+            <div style="font-size:12px; color:#8e8e93;">Shows a camera snapshot behind the lock screen</div>
+          </div>
+        </div>
+        <div style="display:-webkit-flex; display:flex; gap:8px; -webkit-flex-wrap:wrap; flex-wrap:wrap;">
+          <input type="text" id="settingsCamEntity" placeholder="camera.driveway" autocapitalize="off" autocorrect="off"
+            style="-webkit-flex:2; flex:2; min-width:140px; border:1px solid rgba(0,0,0,0.15); border-radius:10px; padding:10px; font-size:14px;" />
+          <input type="number" id="settingsCamRefresh" placeholder="5" min="1" step="1"
+            style="-webkit-flex:1; flex:1; width:70px; border:1px solid rgba(0,0,0,0.15); border-radius:10px; padding:10px; font-size:14px;" />
+        </div>
+        <div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; padding:6px 0 0;">
+          <button id="settingsCamSaveBtn" onclick="saveCameraSettings()"
+            style="background:#007aff; color:#ffffff; border:none; padding:10px 24px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; width:100%;">Save Camera</button>
         </div>
       </div>
 
@@ -4072,6 +4131,7 @@
   <div id="splashOverlay" class="splash-overlay hidden">
     <div id="splashMessage">Welcome Home</div>
     <button id="splashUnlockBtn" onclick="unlockSplash()">Tap to Unlock</button>
+    <div id="splashCamStatus" style="display:none;"></div>
   </div>
 
   <!-- SCROLLABLE TOP BLACK BAR: covers the iOS status bar while at page top; auto-scrolled out of view -->
@@ -4097,6 +4157,12 @@
         Loading...
       </div>
     </div>
+
+    <!-- Media page lives in its OWN persistent container so entityContainer
+         rebuilds (every 15s / on any state change) don't destroy and re-decode
+         the album-art images on iOS 9, which caused visible flicker. It is only
+         repopulated when the media data actually changes. -->
+    <div id="mediaPageHost" style="display:none;"></div>
 
     <!-- BIG BOTTOM CLOCK FOR HOME PAGE WITH ALL CONTROLS BUTTON -->
     <div id="sparseBottomClock" class="sparse-bottom-clock">
@@ -4134,7 +4200,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.5.2";
+      var DASHBOARD_VERSION = "v4.6.7";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -4193,6 +4259,7 @@
       var selectedRecVolume = "hottub";
       var lastStatesCache = [];
       var didInitialBlackBarScroll = false;
+      var mediaHostLastSig = "";
       var activeStickyGroups = [];
       var entityAreaMap = {};
       var areaNameMap = {};
@@ -4221,6 +4288,7 @@
 
       var gradientDirection = "horizontal";
       var tintEnabled = true;
+      var adaptiveDayThemeEnabled = true;
       var lightningDisabled = false;
       var poolPresets = { p1: 68, p2: 78 };
       var hottubPresets = { p1: 68, p2: 102 };
@@ -4232,6 +4300,9 @@
       var SPLASH_UNLOCK_MS = 30 * 60 * 1000;
       var splashEnabled = true;
       var splashForced = false;
+      // Lock screen camera snapshot background ("" = disabled)
+      var CAMERA_ENTITY = "camera.album_slideshow_kitchen_icloud_album";
+      var CAMERA_REFRESH_MS = 5 * 60 * 1000;
       try {
         var cachedSplashEn = localStorage.getItem("ha_splash_enabled");
         if (cachedSplashEn === "false") splashEnabled = false;
@@ -4239,6 +4310,10 @@
         if (cachedForced === "true") splashForced = true;
         var cachedUnlockTs = parseInt(localStorage.getItem("ha_splash_unlocked_until") || "0", 10);
         if (!isNaN(cachedUnlockTs) && cachedUnlockTs > 0) splashUnlockedUntil = cachedUnlockTs;
+        var cachedCam = localStorage.getItem("ha_splash_camera");
+        if (cachedCam) CAMERA_ENTITY = cachedCam;
+        var cachedCamMin = parseInt(localStorage.getItem("ha_splash_camera_refresh_min") || "0", 10);
+        if (!isNaN(cachedCamMin) && cachedCamMin >= 1) CAMERA_REFRESH_MS = Math.max(60000, cachedCamMin * 60 * 1000);
       } catch (e) { }
 
       try {
@@ -4246,6 +4321,8 @@
         if (cachedDir === "vertical" || cachedDir === "horizontal") gradientDirection = cachedDir;
         var cachedTint = localStorage.getItem("ha_tint_enabled");
         if (cachedTint === "false") tintEnabled = false;
+        var cachedAdaptive = localStorage.getItem("ha_adaptive_day_theme");
+        if (cachedAdaptive === "false") adaptiveDayThemeEnabled = false;
         var cachedLd = localStorage.getItem("ha_lightning_disabled");
         if (cachedLd === "true") lightningDisabled = true;
         var cachedPool = localStorage.getItem("ha_pool_presets");
@@ -5140,6 +5217,33 @@
       var albumArtCache = {};
       var lastEntityColor = {};
       var lastEntityArt = {};
+      // In-flight dominant-color extraction registry. Extraction is slow on the
+      // iPad Mini 1 (image fetch + decode + canvas read), and before this
+      // registry existed every card render started a fresh duplicate Image load,
+      // then styled only the card that happened to be in the DOM when it finally
+      // completed — so colors appeared late or not at all until a page change.
+      // Now one load runs per artwork and EVERY waiter (card, home card, page
+      // tint) is re-applied the moment it finishes.
+      var albumColorExtracting = {};
+      var albumColorWaiters = {};
+
+      function prewarmAlbumColors(allStates) {
+        if (!allStates) return;
+        var haUrl = HA_URL.replace(/\/$/, "");
+        for (var i = 0; i < allStates.length; i++) {
+          var mp = allStates[i];
+          if (mp.entity_id.indexOf("media_player.") !== 0) continue;
+          var st = mp.state;
+          if (st !== "playing" && st !== "paused") continue;
+          var pic = (mp.attributes && mp.attributes.entity_picture) || "";
+          if (!pic) continue;
+          var artSrc = pic.indexOf("http") === 0 ? pic : haUrl + pic;
+          if (albumColorCache[artSrc] || albumColorExtracting[artSrc]) continue;
+          // No callback: this just warms the cache so the next render of the
+          // Media page (or home card) gets the tint instantly.
+          extractAlbumDominantColor(artSrc);
+        }
+      }
 
       function getEntityDominantRgb(entityOrEid, artSrc, albumName) {
         var eid = (typeof entityOrEid === "string") ? entityOrEid : (entityOrEid ? entityOrEid.entity_id : "");
@@ -5193,13 +5297,42 @@
       function extractAlbumDominantColor(artSrc, callback) {
         var defaultRgb = { r: 65, g: 122, b: 160 };
         if (!artSrc) {
-          callback(defaultRgb);
+          if (typeof callback === "function") callback(defaultRgb);
           return;
         }
         if (albumColorCache[artSrc]) {
-          callback(albumColorCache[artSrc]);
+          if (typeof callback === "function") callback(albumColorCache[artSrc]);
           return;
         }
+        if (typeof callback === "function") {
+          if (albumColorExtracting[artSrc]) {
+            // Extraction already in flight for this artwork: queue this caller
+            // so it still gets the color when the load finishes, instead of
+            // firing a duplicate Image request.
+            if (!albumColorWaiters[artSrc]) albumColorWaiters[artSrc] = [];
+            albumColorWaiters[artSrc].push(callback);
+            return;
+          }
+          if (!albumColorWaiters[artSrc]) albumColorWaiters[artSrc] = [];
+          albumColorWaiters[artSrc].push(callback);
+        }
+        albumColorExtracting[artSrc] = true;
+
+        // Single completion point: caches the result and notifies EVERY waiter
+        // (media card, home card, page tint) so colors always land on whatever
+        // DOM is current — even if it was rebuilt while the image loaded.
+        var finishExtraction = function (rgb) {
+          if (!albumColorExtracting[artSrc]) return;
+          albumColorExtracting[artSrc] = false;
+          albumColorCache[artSrc] = rgb;
+          var waiters = albumColorWaiters[artSrc] || [];
+          albumColorWaiters[artSrc] = [];
+          for (var w = 0; w < waiters.length; w++) {
+            try {
+              waiters[w](rgb);
+            } catch (e) {}
+          }
+        };
 
         var processImageCanvas = function (imgElement) {
           try {
@@ -5321,16 +5454,18 @@
               finalColor = { r: Math.round(bestMono.rSum / bestMono.weightSum), g: Math.round(bestMono.gSum / bestMono.weightSum), b: Math.round(bestMono.bSum / bestMono.weightSum) };
             }
 
-            albumColorCache[artSrc] = finalColor;
-            callback(finalColor);
+            finishExtraction(finalColor);
           } catch (err) {
-            albumColorCache[artSrc] = defaultRgb;
-            callback(defaultRgb);
+            finishExtraction(defaultRgb);
           }
         };
 
         var img = new Image();
-        img.crossOrigin = "Anonymous";
+        // NOTE: no img.crossOrigin here. HA's media_player_proxy sends no CORS
+        // headers, so crossOrigin="Anonymous" makes the load fail on iOS 9 and
+        // forces a duplicate fallback download of the album art (double flash
+        // + double bandwidth). The proxy URL is same-origin with HA_URL, so a
+        // plain load can be read by the canvas without tainting it.
         img.onload = function () {
           processImageCanvas(img);
         };
@@ -5340,8 +5475,7 @@
             processImageCanvas(localImg);
           };
           localImg.onerror = function () {
-            albumColorCache[artSrc] = defaultRgb;
-            callback(defaultRgb);
+            finishExtraction(defaultRgb);
           };
           localImg.src = artSrc;
         };
@@ -5603,11 +5737,17 @@
         var primary = group[0] || group;
         var attrs = primary.attributes || {};
         var state = primary.state;
-        var isPlaying = (state === "playing");
+
+        // Use the skip-filter-aware track info (same as Home / All Controls tabs):
+        // after one speaker in a group skips, EVERY member is treated as having
+        // skipped for 15 seconds, so this card never splits apart or reverts to
+        // the old song while the other speakers catch up.
+        var trackInfo = getGroupTrackInfo(group.length ? group : [primary]);
+        var isPlaying = trackInfo.isPlaying;
 
         // Media Info
-        var title = escapeHtml(attrs.media_title || attrs.friendly_name || "No Track Selected");
-        var artist = escapeHtml(attrs.media_artist || attrs.media_album_name || "Unknown Artist");
+        var title = escapeHtml(trackInfo.title);
+        var artist = escapeHtml(trackInfo.artist);
         var albumName = (attrs.media_album_name || "").trim();
         var entityPicture = attrs.entity_picture || "";
         var haUrl = HA_URL.replace(/\/$/, "");
@@ -6004,6 +6144,25 @@
         return h;
       }
 
+      // Lightweight signature of the media data that the media page displays.
+      // Used to decide whether #mediaPageHost needs repopulating. Deliberately
+      // excludes media_position / volume_level so in-place progress updates and
+      // volume adjustments never rebuild the album-art DOM.
+      function buildMediaSig(allStates) {
+        var parts = [];
+        for (var i = 0; i < allStates.length; i++) {
+          var ent = allStates[i];
+          if (ent.entity_id.indexOf("media_player.") !== 0) continue;
+          var a = ent.attributes || {};
+          parts.push(
+            ent.entity_id + "|" + ent.state + "|" + (a.media_title || "") + "|" +
+            (a.media_artist || "") + "|" + (a.media_album_name || "") + "|" +
+            (a.entity_picture || "")
+          );
+        }
+        return parts.join("~");
+      }
+
       function renderMediaPage(allStates) {
         var allMediaPlayers = [];
         var taggedMediaPlayers = [];
@@ -6037,8 +6196,12 @@
           }
           if ((st === "playing" || st === "paused") && !pausedTooLong) {
             var attrs = mp.attributes || {};
-            var key = (attrs.media_title || "") + "___" + (attrs.media_artist || "");
-            if (key !== "___") {
+            // Use the sticky-group-aware key (same as Home / All Controls tabs) so
+            // that when a group skips a track, all the grouped speakers stay in ONE
+            // card for the skip window instead of splitting apart and re-merging.
+            var key = getMediaGroupKey(mp);
+            if (!key) key = (attrs.media_title || "") + "___" + (attrs.media_artist || "");
+            if (key && key !== "___") {
               if (!songGroups[key]) {
                 songGroups[key] = [];
                 activeGroups.push(songGroups[key]);
@@ -6127,12 +6290,10 @@
         var isIdle = (state !== "playing" && state !== "paused" && title !== "Skipping...");
         if (isIdle) return "";
 
-        // If paused for > 15 minutes (900,000 ms), hide from Home tab
-        if (state === "paused" && primary.last_changed) {
-          var lastChangedTs = new Date(primary.last_changed).getTime();
-          if (!isNaN(lastChangedTs) && (Date.now() - lastChangedTs > 900000)) {
-            return "";
-          }
+        // If not actually playing and idle for > 15 minutes (900,000 ms), hide from Home tab
+        var homeIdleMs = getMediaPlayerIdleMs(primary);
+        if (homeIdleMs >= 0 && homeIdleMs > 900000) {
+          return "";
         }
 
         var bigTrackTitle = escapeHtml(title) || "Playing";
@@ -6261,6 +6422,23 @@
           }
         }
         return true;
+      }
+
+      function isAnyKitchenLightOn(states) {
+        var list = states || lastStatesCache || [];
+        for (var i = 0; i < list.length; i++) {
+          var s = list[i];
+          var eid = (s.entity_id || "").toLowerCase();
+          if (eid.indexOf("light.") !== 0) continue;
+          if (eid === KITCHEN_LIGHT_ENTITY) {
+            if (s.state === "on") return true;
+            continue;
+          }
+          if (eid.indexOf("kitchen") !== -1 || (friendlyName(s) || "").toLowerCase().indexOf("kitchen") !== -1) {
+            if (s.state === "on") return true;
+          }
+        }
+        return false;
       }
 
       var isDimDashboardActive = false;
@@ -6392,37 +6570,14 @@
         var hr = now.getHours();
         var min = now.getMinutes();
 
-        // Before 12:30 AM it's day/evening: never show the night splash (auto-unlocked while home)
+        // Before 12:30 AM it's day/evening: never auto-lock.
         var past1230 = (hr > 0) || (hr === 0 && min >= 30);
         if (!past1230) return false;
 
-        // After 12:30 AM: only stay locked when the house is genuinely in a night state.
-        // A daytime / home state ("morning", "day", "afternoon", "home", sun up, etc.) unlocks the display.
-        var dayStateFound = false;
-        var nightStateFound = false;
-        var hasModeEntity = false;
-        for (var i = 0; i < allStates.length; i++) {
-          var entId = allStates[i].entity_id;
-          if (entId.indexOf("home_state") !== -1 || entId.indexOf("house_mode") !== -1 ||
-            entId.indexOf("home_mode") !== -1 || entId.indexOf("house_state") !== -1 ||
-            entId.indexOf("time_of_day") !== -1 || entId.indexOf("day_phase") !== -1 || entId === "sun.sun") {
-            hasModeEntity = true;
-            var stVal = (allStates[i].state || "").toLowerCase().trim();
-            if (stVal === "morning" || stVal === "day" || stVal === "daytime" || stVal === "afternoon" ||
-              stVal === "above_horizon" || stVal === "awake" || stVal === "home" || stVal === "occupied" || stVal === "present") {
-              dayStateFound = true;
-            } else if (stVal === "night" || stVal === "nighttime" || stVal === "evening" || stVal === "dusk" ||
-              stVal === "sleep" || stVal === "bedtime" || stVal === "below_horizon" || stVal === "late_night") {
-              nightStateFound = true;
-            }
-          }
-        }
-        if (dayStateFound) return false;
-        if (nightStateFound) return true;
-
-        // No house-mode entity at all: fall back to an early-morning window (12:30 AM - 7:00 AM)
-        if (!hasModeEntity && hr >= 7) return false;
-        return true;
+        // After 12:30 AM the display stays locked until the kitchen overhead
+        // lights are switched on in the morning. If they never turn on, the
+        // iPad stays locked until the user taps "Tap to Unlock".
+        return isKitchenLightsOff(allStates);
       }
 
       function shouldShowSplash(allStates) {
@@ -6445,6 +6600,7 @@
         } else {
           overlay.classList.add("hidden");
         }
+        refreshSplashCam();
       }
 
       window.unlockSplash = function () {
@@ -6484,7 +6640,147 @@
         }
         var overlay = document.getElementById("splashOverlay");
         if (overlay) overlay.classList.remove("hidden");
+        refreshSplashCam();
         closeSettings();
+      };
+
+      // ======== LOCK SCREEN CAMERA FEED (iOS 9 compatible snapshot background) ========
+      // Loads a Home Assistant camera snapshot as the lock screen background WITHOUT
+      // any XHR/binary handling. HA's camera_proxy endpoint accepts the camera's
+      // rotating access_token as a query param (?token=), so a plain CSS url()
+      // background-image is enough — iOS 9 WebKit decodes the JPEG natively. The
+      // access_token rotates every 5 min and is published in the entity's state
+      // attributes (attributes.access_token), which the dashboard already has
+      // cached from /api/states. Re-fetches every CAMERA_REFRESH_MS while the
+      // lock screen is visible.
+      var splashCamTimer = null;
+      var splashCamRetryTimer = null;
+      var splashCamBusy = false;
+      var splashCamLoaded = false;
+      var splashCamLastToken = "";
+      var splashCamProbe = null;
+
+      function splashCamVisible() {
+        var overlay = document.getElementById("splashOverlay");
+        return !!(overlay && overlay.className.indexOf("hidden") === -1);
+      }
+
+      function setSplashCamStatus(msg) {
+        var el = document.getElementById("splashCamStatus");
+        if (el) {
+          el.textContent = msg || "";
+          el.style.display = msg ? "block" : "none";
+        }
+      }
+
+      function getSplashCamToken() {
+        if (lastStatesCache) {
+          for (var i = 0; i < lastStatesCache.length; i++) {
+            if (lastStatesCache[i].entity_id === CAMERA_ENTITY) {
+              var tk = lastStatesCache[i].attributes && lastStatesCache[i].attributes.access_token;
+              return tk || "";
+            }
+          }
+        }
+        return "";
+      }
+
+      function loadSplashCamera() {
+        var overlay = document.getElementById("splashOverlay");
+        if (!overlay || !CAMERA_ENTITY || splashCamBusy) return;
+        var token = getSplashCamToken();
+        if (!token) {
+          splashCamLoaded = false;
+          setSplashCamStatus("Cam unavailable (no token)");
+          scheduleSplashCamRetry();
+          return;
+        }
+        splashCamBusy = true;
+        setSplashCamStatus("Loading camera feed…");
+        if (splashCamRetryTimer) { clearTimeout(splashCamRetryTimer); splashCamRetryTimer = null; }
+        // Cache-busting timestamp: the album slideshow camera re-renders its still
+        // on every slide change, so we must not serve a stale cached JPEG. HA
+        // scales JPEG responses down by discrete factors, so 960x540 returns a
+        // light image that a 2012 iPad Mini can actually decode.
+        var url = HA_URL + "/api/camera_proxy/" + CAMERA_ENTITY + "?width=960&height=540&token=" + encodeURIComponent(token) + "&t=" + Date.now();
+        overlay.style.backgroundImage = "url('" + url + "')";
+        splashCamProbe = new Image();
+        splashCamProbe.onload = function () {
+          splashCamBusy = false;
+          splashCamLoaded = true;
+          splashCamLastToken = token;
+          setSplashCamStatus("");
+        };
+        splashCamProbe.onerror = function () {
+          splashCamBusy = false;
+          splashCamLoaded = false;
+          setSplashCamStatus("Cam unavailable");
+          scheduleSplashCamRetry();
+        };
+        splashCamProbe.src = url;
+        scheduleSplashCam();
+      }
+
+      function scheduleSplashCamRetry() {
+        if (splashCamRetryTimer) { clearTimeout(splashCamRetryTimer); splashCamRetryTimer = null; }
+        splashCamRetryTimer = setTimeout(function () {
+          splashCamRetryTimer = null;
+          if (splashCamVisible() && !splashCamLoaded) loadSplashCamera();
+        }, 10000);
+      }
+
+      function scheduleSplashCam() {
+        if (splashCamTimer) { clearTimeout(splashCamTimer); splashCamTimer = null; }
+        if (!CAMERA_ENTITY) return;
+        splashCamTimer = setTimeout(function () {
+          splashCamTimer = null;
+          if (splashCamVisible()) {
+            loadSplashCamera();
+            scheduleSplashCam();
+          }
+        }, CAMERA_REFRESH_MS);
+      }
+
+      function refreshSplashCam() {
+        var overlay = document.getElementById("splashOverlay");
+        if (!CAMERA_ENTITY) {
+          if (overlay) overlay.style.backgroundImage = "";
+          splashCamLoaded = false;
+          splashCamLastToken = "";
+          if (splashCamTimer) { clearTimeout(splashCamTimer); splashCamTimer = null; }
+          if (splashCamRetryTimer) { clearTimeout(splashCamRetryTimer); splashCamRetryTimer = null; }
+          setSplashCamStatus("");
+          return;
+        }
+        if (splashCamVisible()) {
+          // Reload if the access_token changed (it rotates every 5 min) so the
+          // background URL is never served with an expired token.
+          var tk = getSplashCamToken();
+          if (tk && tk !== splashCamLastToken) splashCamLoaded = false;
+          if (!splashCamLoaded) loadSplashCamera();
+          scheduleSplashCam();
+        }
+      }
+
+      window.saveCameraSettings = function () {
+        var entEl = document.getElementById("settingsCamEntity");
+        var minEl = document.getElementById("settingsCamRefresh");
+        var entity = entEl ? (entEl.value || "").replace(/^\s+|\s+$/g, "").toLowerCase() : "";
+        var mins = parseInt(minEl ? minEl.value : "", 10);
+        if (entity && entity.indexOf("camera.") !== 0) entity = "camera." + entity;
+        if (entity && !/^camera\.[a-z0-9_]+$/.test(entity)) {
+          showToast("Invalid camera entity ID", true);
+          return;
+        }
+        CAMERA_ENTITY = entity;
+        if (!isNaN(mins) && mins >= 1) CAMERA_REFRESH_MS = Math.max(60000, mins * 60 * 1000);
+        try {
+          if (entity) localStorage.setItem("ha_splash_camera", entity);
+          else localStorage.removeItem("ha_splash_camera");
+          localStorage.setItem("ha_splash_camera_refresh_min", String(Math.round(CAMERA_REFRESH_MS / 60000)));
+        } catch (e) { }
+        refreshSplashCam();
+        showToast(entity ? "Camera set to " + entity : "Camera background cleared");
       };
 
       function checkNightDimming(statesArray) {
@@ -6625,11 +6921,10 @@
             var volPct = Math.round(attrs.volume_level * 100);
             if (volDisplayEl) volDisplayEl.textContent = volPct + "%";
             if (volFillEl) {
-              var mRgb = getEntityDominantRgb(entity);
-              var tintRgb = ensureLightVibrantTint(mRgb);
+              // Update ONLY the width here. The fill color is set at render time
+              // from the group's uniform album tint, so re-coloring it per-entity
+              // would make the sliders inside one media card mismatch.
               volFillEl.style.width = volPct + "%";
-              volFillEl.style.background = 'rgba(' + tintRgb.r + ',' + tintRgb.g + ',' + tintRgb.b + ', 0.45)';
-              volFillEl.style.borderRight = '2.5px solid rgba(' + tintRgb.r + ',' + tintRgb.g + ',' + tintRgb.b + ', 0.9)';
             }
           }
         }
@@ -7098,6 +7393,12 @@
         renderCurrentTab();
       };
 
+      window.setAdaptiveDayTheme = function (el) {
+        adaptiveDayThemeEnabled = !!el.checked;
+        try { localStorage.setItem("ha_adaptive_day_theme", adaptiveDayThemeEnabled ? "true" : "false"); } catch (e) { }
+        renderCurrentTab();
+      };
+
       window.setSoundSetting = function (el) {
         soundFeedbackEnabled = !!el.checked;
         try { localStorage.setItem("ha_sound_feedback", soundFeedbackEnabled ? "true" : "false"); } catch (e) { }
@@ -7173,6 +7474,8 @@
         if (tintChk) tintChk.checked = tintEnabled;
         var dirChk = document.getElementById("settingsVerticalChk");
         if (dirChk) dirChk.checked = (gradientDirection === "vertical");
+        var adaptiveChk = document.getElementById("settingsAdaptiveChk");
+        if (adaptiveChk) adaptiveChk.checked = adaptiveDayThemeEnabled;
         var soundChk = document.getElementById("settingsSoundChk");
         if (soundChk) soundChk.checked = soundFeedbackEnabled;
         var lightChk = document.getElementById("settingsLightningChk");
@@ -7185,6 +7488,9 @@
         var pwChk = document.getElementById("settingsPoolWinter"); if (pwChk) pwChk.checked = poolWinterMode;
         var twChk = document.getElementById("settingsTubWinter"); if (twChk) twChk.checked = hottubWinterMode;
         var lockChk = document.getElementById("settingsLockChk"); if (lockChk) lockChk.checked = splashEnabled;
+        var camEnt = document.getElementById("settingsCamEntity"); if (camEnt) camEnt.value = CAMERA_ENTITY;
+        var camMin = document.getElementById("settingsCamRefresh");
+        if (camMin) camMin.value = String(Math.round(CAMERA_REFRESH_MS / 60000));
         window.updateSettingsDimChk();
         window.updateSettingsThemeBtn();
         window.updateSettingsLightningBtn();
@@ -7224,10 +7530,20 @@
 
       // ======== REFRESH ========
       var consecutiveErrors = 0;
+      // Monotonic sequence for /api/states fetches. refreshAll (15s) and
+      // pollMediaPlayersHA (3s) run concurrently; without this, a slow older
+      // response could land AFTER a newer one and revert the dashboard to stale
+      // data (media page getting "stuck" on an old song). A response is only
+      // applied if it was sent after the last one that was applied.
+      var stateReqSeq = 0;
+      var stateReqApplied = 0;
+
       window.refreshAll = function () {
         if (refreshTimer) clearTimeout(refreshTimer);
+        var mySeq = ++stateReqSeq;
 
         haRequest("GET", "/api/states", null, function (err, data) {
+          refreshTimer = setTimeout(refreshAll, REFRESH_INTERVAL);
           if (err) {
             setStatus("error");
             consecutiveErrors++;
@@ -7235,10 +7551,11 @@
             if (consecutiveErrors >= 2) {
               showSetup();
             }
-            refreshTimer = setTimeout(refreshAll, REFRESH_INTERVAL);
             return;
           }
+          if (mySeq < stateReqApplied) return;
 
+          stateReqApplied = mySeq;
           consecutiveErrors = 0;
           setStatus("connected");
           entities = {};
@@ -7248,7 +7565,6 @@
           }
           lastStatesCache = data;
           renderDashboard(data);
-          refreshTimer = setTimeout(refreshAll, REFRESH_INTERVAL);
         });
       };
 
@@ -7280,9 +7596,30 @@
         }
       };
 
+      window.showMediaDebug = function () {
+        if (!lastStatesCache || lastStatesCache.length === 0) {
+          alert("No state data loaded yet.");
+          return;
+        }
+        var out = [];
+        for (var d = 0; d < lastStatesCache.length; d++) {
+          var s = lastStatesCache[d];
+          if (s.entity_id && s.entity_id.indexOf("media_player.") === 0) {
+            var a = s.attributes || {};
+            var idleMs = getMediaPlayerIdleMs(s);
+            out.push(s.entity_id + "\n  state=" + s.state + "\n  last_changed=" + (s.last_changed || "n/a") + "\n  media_position_updated_at=" + (a.media_position_updated_at || "n/a") + "\n  idle_ms=" + (idleMs < 0 ? "n/a" : idleMs));
+          }
+        }
+        alert(out.length ? out.join("\n\n") : "No media players found.");
+      };
+
       // ======== RENDER ========
       function renderDashboard(allStates) {
         checkLightningSafety(allStates);
+        // Start dominant-color extraction for any currently-playing album art
+        // immediately, so the Media page / home cards get their tint as soon as
+        // it's ready instead of waiting for the next card render.
+        prewarmAlbumColors(allStates);
         var welcomeMessage = "Welcome Home";
         for (var i = 0; i < allStates.length; i++) {
           if (allStates[i].entity_id === "input_text.dashboard_welcome_message") {
@@ -7298,6 +7635,12 @@
         var welcomeIsGreeting = ((welcomeMessage || "").toLowerCase().indexOf("welcome") !== -1);
 
         var isNight = computeIsNight(allStates);
+
+        // Adaptive Day Theme: during the day, follow the kitchen overheads.
+        // Lights ON => light theme; lights OFF => dark theme. Manual override wins while active.
+        if (adaptiveDayThemeEnabled && themeOverride === null && !isNight) {
+          isNight = !isAnyKitchenLightOn(allStates);
+        }
 
         if (themeOverride === "dark" || isNight) {
           document.documentElement.className = "dark-theme";
@@ -7525,10 +7868,10 @@
             if (hasHomeTagDefined && !isHomeScreenEntity(mp)) continue;
 
             if (mp.state === "playing" || mp.state === "paused") {
-              if (mp.state === "paused" && mp.last_changed) {
-                var mpPausedTs = new Date(mp.last_changed).getTime();
-                if (!isNaN(mpPausedTs) && (Date.now() - mpPausedTs > 900000)) continue;
-              }
+              // Hide players that are not actually playing and have been idle
+              // (paused or stuck-reporting-playing) for more than 15 minutes.
+              var mpIdleMs = getMediaPlayerIdleMs(mp);
+              if (mpIdleMs >= 0 && mpIdleMs > 900000) continue;
               var key = getMediaGroupKey(mp);
               if (key) {
                 if (!songGroups[key]) {
@@ -7586,7 +7929,10 @@
             html += '</div>';
           }
         } else if (activeTab === "media") {
-          html += renderMediaPage(allStates);
+          // The media page is rendered into the persistent #mediaPageHost
+          // container below (see the innerHTML assignment) so it isn't rebuilt
+          // every refresh. entityContainer gets only an invisible placeholder.
+          html = '<div style="display:none;"></div>';
         } else if (activeTab === "controls") {
           document.body.className = (themeOverride === "dark" || isNight ? "dark-theme" : "");
           // 1. Group controls by floor first
@@ -7901,6 +8247,25 @@
         updateChemLogButtons(allStates);
         updateAlbumPageTint(allStates);
         checkSparseHomeLayout();
+
+        // ======== MEDIA PAGE PERSISTENT HOST ========
+        // Keep the media page's album-art DOM alive across unrelated re-renders.
+        var mediaHostEl = document.getElementById("mediaPageHost");
+        if (activeTab === "media") {
+          if (mediaHostEl) {
+            var mediaSigNow = buildMediaSig(allStates);
+            if (mediaHostLastSig !== mediaSigNow || !mediaHostEl.getAttribute("data-populated")) {
+              mediaHostLastSig = mediaSigNow;
+              mediaHostEl.innerHTML = renderMediaPage(allStates);
+              mediaHostEl.setAttribute("data-populated", "1");
+            }
+            document.getElementById("entityContainer").style.display = "none";
+            mediaHostEl.style.display = "block";
+          }
+        } else if (mediaHostEl) {
+          mediaHostEl.style.display = "none";
+          document.getElementById("entityContainer").style.display = "block";
+        }
 
         // Auto-scroll the page down past the scrollable black bar once, so the bar
         // hides above the viewport and the iOS status text blends into the page.
@@ -9831,6 +10196,7 @@
       };
 
       window.mediaNextTrack = function (entityId) {
+        optimisticSkipUpdate(entityId);
         haRequest("POST", "/api/services/media_player/media_next_track", {
           entity_id: entityId
         }, function (err) {
@@ -9841,6 +10207,7 @@
       };
 
       window.mediaPrevTrack = function (entityId) {
+        optimisticSkipUpdate(entityId);
         haRequest("POST", "/api/services/media_player/media_previous_track", {
           entity_id: entityId
         }, function (err) {
@@ -9939,11 +10306,28 @@
         };
       }
 
+      function getMediaPlayerIdleMs(mp) {
+        if (!mp || !mp.entity_id) return -1;
+        var attrs = mp.attributes || {};
+        var ts = null;
+        if (attrs.media_position_updated_at) {
+          var posTs = new Date(attrs.media_position_updated_at).getTime();
+          if (!isNaN(posTs)) ts = posTs;
+        }
+        if (ts === null && mp.state !== "playing" && mp.last_changed) {
+          var lcTs = new Date(mp.last_changed).getTime();
+          if (!isNaN(lcTs)) ts = lcTs;
+        }
+        if (ts === null) return -1;
+        var idle = Date.now() - ts;
+        return (idle < 0) ? 0 : idle;
+      }
+
       function getMediaGroupKey(mp) {
         // Clean up expired sticky groups (older than 10 seconds)
         var now = Date.now();
         activeStickyGroups = activeStickyGroups.filter(function (g) {
-          return (now - g.timestamp) < 10000;
+          return (now - g.timestamp) < 15000;
         });
 
         // Find if this entity is in any active sticky group
@@ -10011,7 +10395,7 @@
           }
         }
 
-        // Save this group as a sticky group for 10 seconds to cover Home Assistant update time
+        // Save this group as a sticky group for 15 seconds to cover Home Assistant update time
         if (groupedIds.length > 1) {
           activeStickyGroups.push({
             timestamp: Date.now(),
@@ -10996,9 +11380,12 @@
 
       function pollMediaPlayersHA() {
         if (!HA_URL || !HA_TOKEN) return;
+        var mySeq = ++stateReqSeq;
         haRequest("GET", "/api/states", null, function (err, states) {
           if (err || !states || !states.length) return;
+          if (mySeq < stateReqApplied) return;
 
+          stateReqApplied = mySeq;
           var mediaChanged = false;
           for (var i = 0; i < states.length; i++) {
             var s = states[i];
@@ -11103,6 +11490,12 @@
 
       function renderVolumeControls(group, isCompact) {
         var h = "";
+        // Use ONE uniform tint derived from the group's primary player so every
+        // volume slider in the same media card matches (previously each slider
+        // used its own per-entity dominant color, so bars looked different even
+        // though the speakers were all playing the same song).
+        var primaryForTint = group[0] || group;
+        var groupTint = ensureLightVibrantTint(getEntityDominantRgb(primaryForTint));
         for (var g = 0; g < group.length; g++) {
           var m = group[g];
           var mEid = escapeHtml(m.entity_id);
@@ -11111,10 +11504,8 @@
           var mVolume = typeof mAttrs.volume_level !== "undefined" ? mAttrs.volume_level : 0.5;
           var mName = friendlyName(m);
 
-          var mRgb = getEntityDominantRgb(m);
-          var tintRgb = ensureLightVibrantTint(mRgb);
           var volPct = Math.round(mVolume * 100);
-          var fillStyle = 'width:' + volPct + '%; background: rgba(' + tintRgb.r + ',' + tintRgb.g + ',' + tintRgb.b + ', 0.45); border-right: 2.5px solid rgba(' + tintRgb.r + ',' + tintRgb.g + ',' + tintRgb.b + ', 0.9);';
+          var fillStyle = 'width:' + volPct + '%; background: rgba(' + groupTint.r + ',' + groupTint.g + ',' + groupTint.b + ', 0.45); border-right: 2.5px solid rgba(' + groupTint.r + ',' + groupTint.g + ',' + groupTint.b + ', 0.9);';
 
           var mt = isCompact ? '0' : '10px';
           var borderStyle = (!isCompact && g === 0) ? ' border-top:1px solid rgba(0,0,0,0.05); padding-top:10px;' : '';

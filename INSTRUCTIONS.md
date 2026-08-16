@@ -14,7 +14,14 @@ var HA_URL = "http://YOUR_HA_IP:8123";  // Your Home Assistant Server IP & Port 
 var HA_TOKEN = "YOUR_LONG_LIVED_ACCESS_TOKEN_HERE"; // Long-Lived Access Token from Home Assistant
 var STORAGE_KEY = "ha_controls_config";  // LocalStorage key for caching options
 var REFRESH_INTERVAL = 15000;            // Data refresh polling interval in ms (15 seconds)
+var CAMERA_ENTITY = "camera.album_slideshow_kitchen_icloud_album"; // Lock screen camera entity ("" = disabled)
+var CAMERA_REFRESH_MS = 5 * 60 * 1000;   // How often the lock screen camera refreshes (default 5 minutes)
 ```
+
+### Lock Screen Camera Feed
+When `CAMERA_ENTITY` is set to a camera entity ID (e.g. `camera.album_slideshow_kitchen_icloud_album`), the night / away lock screen shows a camera snapshot as its background instead of a plain black screen. The snapshot is loaded via a plain `url()` background-image from Home Assistant's `camera_proxy` endpoint (`/api/camera_proxy/<entity>?token=<access_token>`). The camera's rotating access token (published in the entity's state attributes) is used instead of the Bearer token, so iOS 9 Safari decodes the JPEG natively — no XHR or base64 conversion needed. The image refreshes automatically every `CAMERA_REFRESH_MS` (5 minutes by default) while the lock screen is visible — it does not update while unlocked to save bandwidth and iPad Mini battery. Each fetch includes a cache-busting timestamp so slideshow cameras (like Album Slideshow) always serve the latest rendered frame.
+
+You can also configure this from the dashboard without editing the file: open **Settings → Display → Lock Screen Camera**, enter the entity ID and refresh interval in minutes, then tap **Save Camera**.
 
 ### How to generate a Long-Lived Access Token in Home Assistant:
 1. Log into your Home Assistant web interface.
