@@ -4278,6 +4278,12 @@
       var lightningAlertDismissed = false;
       var lastLightningState = false;
       var forceLightningTest = false;
+      var lastLightningAlarmTime = 0;
+      var LIGHTNING_ALARM_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+      try {
+        var cachedLat = localStorage.getItem("ha_last_lightning_alarm");
+        if (cachedLat) lastLightningAlarmTime = parseInt(cachedLat, 10) || 0;
+      } catch (e) { }
       var soundFeedbackEnabled = true;
       var audioCtx = null;
 
@@ -4495,8 +4501,10 @@
         if (overlay) {
           var isCurrentlyHidden = overlay.className.indexOf("hidden") !== -1;
           if (shouldShowAlert) {
-            if (isCurrentlyHidden) {
+            if (isCurrentlyHidden && Date.now() - lastLightningAlarmTime >= LIGHTNING_ALARM_WEEK_MS) {
               playLightningEmergencyAlarm();
+              lastLightningAlarmTime = Date.now();
+              try { localStorage.setItem("ha_last_lightning_alarm", String(lastLightningAlarmTime)); } catch (e) { }
             }
             overlay.className = "lightning-overlay";
           } else {
