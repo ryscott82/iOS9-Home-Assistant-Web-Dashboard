@@ -42,14 +42,16 @@
       -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     }
 
-    /* Black page background at night / dark mode. html flips to white so the
-       overscroll/bounce area matches the white scrollable top bar in dark mode. */
+    /* Dark page background at night / dark mode. html matches the body so the
+       overscroll/bounce area above the page stays black with no white bar.
+       No !important: the ambient album tint sets an inline background that
+       must win while music plays; clearing the inline style falls back here. */
     html.dark-theme {
-      background: #ffffff !important;
+      background: #000000;
     }
 
     body.dark-theme {
-      background: #000000 !important;
+      background: #000000;
       color: #ffffff;
     }
 
@@ -99,20 +101,14 @@
 
     /* ======== SCROLLABLE TOP BAR ========
        Sits at the very top of the page content. While the page is at the top
-       (scrollY 0) it covers the iOS status bar area. In light mode it is black
-       (white status text readable on it); in dark mode it is white so the white
-       status text blends into it. The app auto-scrolls the page down past it so
-       it hides above the viewport; the iOS status text then blends into the
-       page background. Height matches the iOS status bar (20px). */
+       (scrollY 0) it covers the iOS status bar area. It is black in BOTH themes
+       so the white status text stays readable at scroll-top and blends into the
+       page background once the app auto-scrolls past the bar — no white bar in
+       dark mode. Height matches the iOS status bar (20px). */
     #scrollBlackBar {
       width: 100%;
       height: 20px;
       background: #000000;
-    }
-
-    html.dark-theme #scrollBlackBar,
-    body.dark-theme #scrollBlackBar {
-      background: #ffffff;
     }
 
     /* ======== NIGHT / AWAY SPLASH LOCK SCREEN ======== */
@@ -235,14 +231,14 @@
     }
 
     .setup-card h1 {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 700;
       margin-bottom: 4px;
       color: #1c1c1e;
     }
 
     .setup-card p {
-      font-size: 14px;
+      font-size: 16px;
       color: #8e8e93;
       margin-bottom: 24px;
       line-height: 1.5;
@@ -250,12 +246,12 @@
 
     .setup-card label {
       display: block;
-      font-size: 12px;
+      font-size: 14px;
       font-weight: 600;
       color: #8e8e93;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
     }
 
     .setup-card input[type="text"],
@@ -266,16 +262,65 @@
       border: 1px solid #e5e5ea;
       border-radius: 12px;
       color: #1c1c1e;
-      font-size: 16px;
-      padding: 14px 16px;
+      font-size: 18px;
+      padding: 15px 16px;
       margin-bottom: 18px;
       outline: none;
       -webkit-appearance: none;
       appearance: none;
+      box-sizing: border-box;
     }
 
     .setup-card input:focus {
       border-color: #007aff;
+    }
+
+    .overlay-close-btn {
+      color: #8e8e93;
+    }
+
+    .setup-quick-btn {
+      padding: 12px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      -webkit-flex: 1;
+      flex: 1;
+      border-radius: 12px;
+      margin: 0;
+      min-width: 0;
+    }
+
+    /* Shared classes for the Settings panel so every element respects
+       light/dark theme without inline color overrides. */
+    .settings-heading {
+      font-size: 15px;
+      font-weight: 700;
+      color: #6d6d72;
+      margin: 18px 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .settings-row-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .settings-desc {
+      font-size: 14px;
+      color: #8e8e93;
+      line-height: 1.35;
+    }
+
+    .settings-input {
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 10px;
+      padding: 11px;
+      font-size: 17px;
+      background: #ffffff;
+      color: #1c1c1e;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .setup-card .setup-btn {
@@ -285,8 +330,8 @@
       color: #ffffff;
       border: none;
       border-radius: 12px;
-      padding: 16px;
-      font-size: 17px;
+      padding: 17px;
+      font-size: 19px;
       font-weight: 600;
       cursor: pointer;
       -webkit-appearance: none;
@@ -304,7 +349,9 @@
       border: 1px solid rgba(255, 59, 48, 0.3);
       border-radius: 12px;
       color: #ff3b30;
-      font-size: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.4;
       padding: 12px 16px;
       margin-bottom: 16px;
       display: none;
@@ -3725,6 +3772,10 @@
       box-shadow: 0 4px 12px rgba(255, 69, 58, 0.15);
     }
 
+    body.dark-theme .setup-overlay {
+      background: #000000;
+    }
+
     body.dark-theme .setup-card {
       background: #1c1c1e;
       color: #e6edf3;
@@ -3732,6 +3783,39 @@
     }
 
     body.dark-theme .setup-card h1 {
+      color: #ffffff;
+    }
+
+    body.dark-theme .setup-card p {
+      color: #98989d;
+    }
+
+    body.dark-theme .setup-card label {
+      color: #98989d;
+    }
+
+    body.dark-theme .setup-card input[type="text"],
+    body.dark-theme .setup-card input[type="password"] {
+      background: #2c2c2e;
+      border-color: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+    }
+
+    body.dark-theme .overlay-close-btn {
+      color: #98989d;
+    }
+
+    body.dark-theme .settings-heading {
+      color: #98989d;
+    }
+
+    body.dark-theme .settings-desc {
+      color: #98989d;
+    }
+
+    body.dark-theme .settings-input {
+      background: #1c1c1e;
+      border-color: rgba(255, 255, 255, 0.25);
       color: #ffffff;
     }
 
@@ -3796,33 +3880,28 @@
   <div id="setupOverlay" class="setup-overlay hidden">
     <div class="setup-card">
       <div
-        style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; margin-bottom:12px;">
+        style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; margin-bottom:14px;">
         <h1 style="margin:0;">Connection Settings</h1>
-        <button onclick="hideSetup()"
-          style="background:none; border:none; font-size:22px; color:#8e8e93; cursor:pointer; padding:4px 8px;">✕</button>
+        <button class="overlay-close-btn" onclick="hideSetup()"
+          style="background:none; border:none; font-size:26px; cursor:pointer; padding:4px 10px;">✕</button>
       </div>
-      <p>Configure your Home Assistant server URL and Long-Lived Access Token. (Useful if server IP changed after power
-        surge/reboot)</p>
+      <p>Update the server address if your Home Assistant IP changed after a power surge or reboot. The access token is
+        managed in the dashboard source file.</p>
 
-      <div id="setupError" class="setup-error"
-        style="color:#ff3b30; font-size:13.5px; font-weight:600; margin-bottom:12px; display:none;"></div>
+      <div id="setupError" class="setup-error" style="display:none;"></div>
 
       <label for="haUrl">Home Assistant URL / IP</label>
-      <input type="text" id="haUrl" placeholder="http://192.168.40.89:8123" />
+      <input type="text" id="haUrl" placeholder="http://192.168.40.89:8123"
+        autocapitalize="off" autocorrect="off" />
 
-      <label for="haToken">Long-Lived Access Token</label>
-      <input type="password" id="haToken" placeholder="Paste your token here..." />
-
-      <div style="display:-webkit-flex; display:flex; gap:10px; margin-bottom:18px;">
-        <button type="button" class="media-control-btn"
-          style="padding:8px 12px; font-size:12px; -webkit-flex:1; flex:1; border-radius:10px; margin:0;"
+      <div style="display:-webkit-flex; display:flex; gap:10px; margin-bottom:20px;">
+        <button type="button" class="media-control-btn setup-quick-btn"
           onclick="document.getElementById('haUrl').value='http://192.168.40.89:8123'">Default IP</button>
-        <button type="button" class="media-control-btn"
-          style="padding:8px 12px; font-size:12px; -webkit-flex:1; flex:1; border-radius:10px; margin:0;"
+        <button type="button" class="media-control-btn setup-quick-btn"
           onclick="document.getElementById('haUrl').value='http://homeassistant.local:8123'">mDNS (.local)</button>
       </div>
 
-      <button id="setupBtn" class="setup-btn" onclick="saveSetup()">Connect & Save</button>
+      <button id="setupBtn" class="setup-btn" onclick="saveSetup()">Connect &amp; Save</button>
     </div>
   </div>
 
@@ -3833,192 +3912,192 @@
       <div
         style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; margin-bottom:14px;">
         <h1 style="margin:0;">Settings</h1>
-        <button onclick="closeSettings()"
-          style="background:none; border:none; font-size:22px; color:#8e8e93; cursor:pointer; padding:4px 8px;">✕</button>
+        <button class="overlay-close-btn" onclick="closeSettings()"
+          style="background:none; border:none; font-size:26px; cursor:pointer; padding:4px 10px;">✕</button>
       </div>
 
       <!-- APPEARANCE -->
       <div
-        style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
+        class="settings-heading">
         Appearance</div>
       <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <span style="font-weight:600;">Theme</span>
           <button id="settingsThemeBtn" onclick="toggleTheme(); updateSettingsThemeBtn();"
-            style="background:#007aff; color:#ffffff; border:none; padding:8px 14px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer;">🌙 Dark</button>
+            style="background:#007aff; color:#ffffff; border:none; padding:10px 16px; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer;">🌙 Dark</button>
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Album Background Tint</div>
-            <div style="font-size:12px; color:#8e8e93;">Pastel tint from playing album</div>
+            <div class="settings-row-title">Album Background Tint</div>
+            <div class="settings-desc">Ambient tint from playing album (light &amp; dark)</div>
           </div>
           <input type="checkbox" id="settingsTintChk" onchange="setTintEnabled(this)"
-            style="width:22px; height:22px;" />
+            style="width:26px; height:26px;" />
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Gradient Direction</div>
-            <div style="font-size:12px; color:#8e8e93;">Check = vertical, uncheck = horizontal</div>
+            <div class="settings-row-title">Gradient Direction</div>
+            <div class="settings-desc">Check = vertical, uncheck = horizontal</div>
           </div>
           <input type="checkbox" id="settingsVerticalChk" onchange="setGradientDirection(this)"
-            style="width:22px; height:22px;" />
+            style="width:26px; height:26px;" />
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Adaptive Day Theme</div>
-            <div style="font-size:12px; color:#8e8e93;">Dark when kitchen overheads are off</div>
+            <div class="settings-row-title">Adaptive Day Theme</div>
+            <div class="settings-desc">Dark when kitchen overheads are off</div>
           </div>
           <input type="checkbox" id="settingsAdaptiveChk" onchange="setAdaptiveDayTheme(this)"
-            style="width:22px; height:22px;" />
+            style="width:26px; height:26px;" />
         </div>
       </div>
 
       <!-- DISPLAY -->
       <div
-        style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
+        class="settings-heading">
         Display</div>
       <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Lock Screen</div>
-            <div style="font-size:12px; color:#8e8e93;">Locks after 12:30 AM until the kitchen lights turn on</div>
+            <div class="settings-row-title">Lock Screen</div>
+            <div class="settings-desc">Locks after 12:30 AM until the kitchen lights turn on</div>
           </div>
           <input type="checkbox" id="settingsLockChk" onchange="setSplashEnabled(this)"
-            style="width:22px; height:22px;" />
+            style="width:26px; height:26px;" />
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Dim Screen</div>
-            <div style="font-size:12px; color:#8e8e93;">Controls input_boolean.dim_dashboard</div>
+            <div class="settings-row-title">Dim Screen</div>
+            <div class="settings-desc">Controls input_boolean.dim_dashboard</div>
           </div>
           <input type="checkbox" id="settingsDimChk" onchange="setDimDashboardSetting(this)"
-            style="width:22px; height:22px;" />
+            style="width:26px; height:26px;" />
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; padding:6px 0 0;">
           <button id="settingsLockNowBtn" onclick="lockScreenNow()"
-            style="background:#007aff; color:#ffffff; border:none; padding:10px 24px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; width:100%;">🔒 Lock Now</button>
+            style="background:#007aff; color:#ffffff; border:none; padding:12px 24px; border-radius:10px; font-size:16px; font-weight:700; cursor:pointer; width:100%;">🔒 Lock Now</button>
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Lock Screen Camera</div>
-            <div style="font-size:12px; color:#8e8e93;">Shows a camera snapshot behind the lock screen</div>
+            <div class="settings-row-title">Lock Screen Camera</div>
+            <div class="settings-desc">Shows a camera snapshot behind the lock screen</div>
           </div>
         </div>
         <div style="display:-webkit-flex; display:flex; gap:8px; -webkit-flex-wrap:wrap; flex-wrap:wrap;">
           <input type="text" id="settingsCamEntity" placeholder="camera.driveway" autocapitalize="off" autocorrect="off"
-            style="-webkit-flex:2; flex:2; min-width:140px; border:1px solid rgba(0,0,0,0.15); border-radius:10px; padding:10px; font-size:14px;" />
+            class="settings-input" style="-webkit-flex:2; flex:2; min-width:140px;" />
           <input type="number" id="settingsCamRefresh" placeholder="5" min="1" step="1"
-            style="-webkit-flex:1; flex:1; width:70px; border:1px solid rgba(0,0,0,0.15); border-radius:10px; padding:10px; font-size:14px;" />
+            class="settings-input" style="-webkit-flex:1; flex:1; width:70px;" />
         </div>
         <div style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; padding:6px 0 0;">
           <button id="settingsCamSaveBtn" onclick="saveCameraSettings()"
-            style="background:#007aff; color:#ffffff; border:none; padding:10px 24px; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer; width:100%;">Save Camera</button>
+            style="background:#007aff; color:#ffffff; border:none; padding:12px 24px; border-radius:10px; font-size:16px; font-weight:700; cursor:pointer; width:100%;">Save Camera</button>
         </div>
       </div>
 
       <!-- AUDIO -->
       <div
-        style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
+        class="settings-heading">
         Audio</div>
       <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Sound Feedback</div>
-            <div style="font-size:12px; color:#8e8e93;">Click sounds on button presses</div>
+            <div class="settings-row-title">Sound Feedback</div>
+            <div class="settings-desc">Click sounds on button presses</div>
           </div>
           <input type="checkbox" id="settingsSoundChk" onchange="setSoundSetting(this)"
-            style="width:22px; height:22px;" />
+            style="width:26px; height:26px;" />
         </div>
       </div>
 
       <!-- LIGHTNING -->
       <div
-        style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
+        class="settings-heading">
         Lightning</div>
       <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Lightning Safety Alerts</div>
-            <div style="font-size:12px; color:#8e8e93;">Uncheck to permanently disable</div>
+            <div class="settings-row-title">Lightning Safety Alerts</div>
+            <div class="settings-desc">Uncheck to permanently disable</div>
           </div>
           <input type="checkbox" id="settingsLightningChk" onchange="setLightningDisabled(this)"
-            style="width:22px; height:22px;" />
+            style="width:26px; height:26px;" />
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-justify-content:center; justify-content:center; padding:6px 0 0;">
           <button id="settingsLightningTestBtn" onclick="toggleLightningTest(); updateSettingsLightningBtn();"
-            style="background:#ff9f0a; color:#ffffff; border:none; padding:8px 14px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer;">⚡ Test Lightning</button>
+            style="background:#ff9f0a; color:#ffffff; border:none; padding:10px 16px; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer;">⚡ Test Lightning</button>
         </div>
       </div>
 
       <!-- POOL & HOT TUB -->
       <div
-        style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
+        class="settings-heading">
         Pool &amp; Hot Tub</div>
       <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
-        <div style="font-weight:700; margin-bottom:6px;">Pool Presets (°F)</div>
+        <div style="font-weight:700; font-size:16px; margin-bottom:8px;">Pool Presets (°F)</div>
         <div style="display:-webkit-flex; display:flex; gap:8px; margin-bottom:10px;">
           <input type="number" id="settingsPoolP1"
-            style="-webkit-flex:1; flex:1; border:1px solid rgba(0,0,0,0.15); border-radius:10px; padding:8px; font-size:15px;" />
+            class="settings-input" style="-webkit-flex:1; flex:1;" />
           <input type="number" id="settingsPoolP2"
-            style="-webkit-flex:1; flex:1; border:1px solid rgba(0,0,0,0.15); border-radius:10px; padding:8px; font-size:15px;" />
+            class="settings-input" style="-webkit-flex:1; flex:1;" />
         </div>
-        <div style="font-weight:700; margin-bottom:6px;">Hot Tub Presets (°F)</div>
+        <div style="font-weight:700; font-size:16px; margin-bottom:8px;">Hot Tub Presets (°F)</div>
         <div style="display:-webkit-flex; display:flex; gap:8px; margin-bottom:10px;">
           <input type="number" id="settingsTubP1"
-            style="-webkit-flex:1; flex:1; border:1px solid rgba(0,0,0,0.15); border-radius:10px; padding:8px; font-size:15px;" />
+            class="settings-input" style="-webkit-flex:1; flex:1;" />
           <input type="number" id="settingsTubP2"
-            style="-webkit-flex:1; flex:1; border:1px solid rgba(0,0,0,0.15); border-radius:10px; padding:8px; font-size:15px;" />
+            class="settings-input" style="-webkit-flex:1; flex:1;" />
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Pool Winter Mode</div>
-            <div style="font-size:12px; color:#8e8e93;">Keeps water from freezing</div>
+            <div class="settings-row-title">Pool Winter Mode</div>
+            <div class="settings-desc">Keeps water from freezing</div>
           </div>
           <input type="checkbox" id="settingsPoolWinter" onchange="setPoolWinter(this)"
-            style="width:22px; height:22px;" />
+            style="width:26px; height:26px;" />
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
           <div>
-            <div style="font-weight:600;">Hot Tub Winter Mode</div>
-            <div style="font-size:12px; color:#8e8e93;">Keeps water from freezing</div>
+            <div class="settings-row-title">Hot Tub Winter Mode</div>
+            <div class="settings-desc">Keeps water from freezing</div>
           </div>
           <input type="checkbox" id="settingsTubWinter" onchange="setTubWinter(this)"
-            style="width:22px; height:22px;" />
+            style="width:26px; height:26px;" />
         </div>
         <div
           style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; padding:6px 0;">
-          <div style="font-weight:600;">Winter Temp (°F)</div>
+          <div class="settings-row-title">Winter Temp (°F)</div>
           <input type="number" id="settingsWinterTemp"
-            style="width:70px; border:1px solid rgba(0,0,0,0.15); border-radius:10px; padding:8px; font-size:15px;" />
+            class="settings-input" style="width:80px;" />
         </div>
         <button onclick="savePresetSettings()" class="confirm-btn"
-          style="width:100%; margin:10px 0 0; padding:12px; border-radius:12px; font-size:14px;">Save Presets</button>
+          style="width:100%; margin:10px 0 0; padding:13px; border-radius:12px; font-size:16px;">Save Presets</button>
       </div>
 
       <!-- CONNECTION -->
       <div
-        style="font-size:13px; font-weight:700; color:#8e8e93; margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px;">
+        class="settings-heading">
         Connection</div>
       <div class="settings-section" style="background:#f2f2f7; border-radius:14px; padding:14px;">
         <div style="display:-webkit-flex; display:flex; gap:10px; -webkit-flex-wrap:wrap; flex-wrap:wrap;">
           <button class="media-control-btn"
-            style="padding:10px 12px; font-size:13px; -webkit-flex:1; flex:1; border-radius:10px; margin:0; min-width:0;"
+            style="padding:12px 12px; font-size:15px; -webkit-flex:1; flex:1; border-radius:10px; margin:0; min-width:0;"
             onclick="closeSettings(); showSetup();">⚙️ Connection Settings</button>
           <button class="media-control-btn"
-            style="padding:10px 12px; font-size:13px; -webkit-flex:1; flex:1; border-radius:10px; margin:0; min-width:0;"
+            style="padding:12px 12px; font-size:15px; -webkit-flex:1; flex:1; border-radius:10px; margin:0; min-width:0;"
             onclick="closeSettings(); location.reload();">&#8635; Refresh</button>
         </div>
       </div>
@@ -4200,7 +4279,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.6.7";
+      var DASHBOARD_VERSION = "v4.7.1";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -4628,14 +4707,6 @@
         }
         window.scrollTo(0, 24);
       }
-
-      window.switchTab = function (tabName) {
-        activeTab = tabName;
-        applyTabClass(tabName);
-        if (lastStatesCache && lastStatesCache.length > 0) {
-          renderDashboard(lastStatesCache);
-        }
-      };
 
       window.toggleMainNavigation = function (e) {
         if (e && e.stopPropagation) e.stopPropagation();
@@ -5235,6 +5306,35 @@
       var albumColorExtracting = {};
       var albumColorWaiters = {};
 
+      // Strip the dynamic "_v=" cache-buster some art URLs carry so two URLs
+      // pointing at the same picture compare as equal during continuity checks.
+      function normalizeArtUrl(u) {
+        if (!u) return "";
+        return u.replace(/([?&])_v=[^&]*/g, "").replace(/[?&]$/, "");
+      }
+
+      // Called by the hidden preloader <img> once NEW artwork has fully
+      // downloaded. Only then is the blurred card backdrop swapped, so the
+      // previous album picture stays on screen until the replacement is ready.
+      window.__mediaArtLoaded = function (imgEl, eid, newSrcEsc) {
+        var cleanEid = String(eid).replace(/\./g, "_");
+        var bg = document.getElementById("card_bg_art_" + cleanEid);
+        if (bg) bg.style.backgroundImage = 'url("' + newSrcEsc + '")';
+        if (imgEl && imgEl.parentNode) imgEl.parentNode.removeChild(imgEl);
+      };
+
+      // New artwork failed to download: keep the previous cover committed so
+      // the next render doesn't degrade to a blank card.
+      window.__mediaArtError = function (imgEl, eid, prevArtEsc) {
+        var key = String(eid);
+        if (prevArtEsc) {
+          lastEntityArt[key] = prevArtEsc;
+        } else {
+          delete lastEntityArt[key];
+        }
+        if (imgEl && imgEl.parentNode) imgEl.parentNode.removeChild(imgEl);
+      };
+
       function prewarmAlbumColors(allStates) {
         if (!allStates) return;
         var haUrl = HA_URL.replace(/\/$/, "");
@@ -5646,13 +5746,24 @@
         return 'rgb(' + pr + ',' + pg + ',' + pb + ')';
       }
 
+      // Dark-mode counterpart: same hue, pulled down near-black so the ambient
+      // tint stays subtle on the dark theme instead of glaring.
+      function albumDarkWash(rgb) {
+        var pr = Math.round(rgb[0] + (16 - rgb[0]) * 0.82);
+        var pg = Math.round(rgb[1] + (16 - rgb[1]) * 0.82);
+        var pb = Math.round(rgb[2] + (20 - rgb[2]) * 0.82);
+        return 'rgb(' + pr + ',' + pg + ',' + pb + ')';
+      }
+
       // Perceptual color interpolation computed in JS so the page only ever emits
       // plain rgb()/linear-gradient (the native oklch() CSS functions aren't
       // available in the iOS 9 browser this dashboard targets).
-      function buildAlbumTintGradient(colors) {
+      function buildAlbumTintGradient(colors, forDark) {
+        var wash = forDark ? albumDarkWash : albumPastelWash;
+        var endColor = forDark ? '#000000' : '#ffffff';
         var dirDeg = (gradientDirection === "vertical") ? "180deg" : "90deg";
         if (colors.length === 1) {
-          return 'linear-gradient(' + dirDeg + ', ' + albumPastelWash(colors[0]) + ' 0%, #ffffff 70%, #ffffff 100%)';
+          return 'linear-gradient(' + dirDeg + ', ' + wash(colors[0]) + ' 0%, ' + endColor + ' 70%, ' + endColor + ' 100%)';
         }
         var lchColors = [];
         for (var i = 0; i < colors.length; i++) {
@@ -5667,17 +5778,16 @@
             var pct = ((s + t) / segs) * 100;
             var blended = blendPerceptual(lchColors[s], lchColors[s + 1], t);
             var rgb = perceptualToSrgb(blended[0], blended[1], blended[2]);
-            stops.push(albumPastelWash(rgb) + ' ' + pct.toFixed(1) + '%');
+            stops.push(wash(rgb) + ' ' + pct.toFixed(1) + '%');
           }
         }
         var last = perceptualToSrgb(lchColors[lchColors.length - 1][0], lchColors[lchColors.length - 1][1], lchColors[lchColors.length - 1][2]);
-        stops.push(albumPastelWash(last) + ' 100%');
+        stops.push(wash(last) + ' 100%');
         return 'linear-gradient(' + dirDeg + ', ' + stops.join(', ') + ')';
       }
 
       function applyAlbumPageTint(bgOrNull) {
-        var isDark = document.body.classList.contains("dark-theme");
-        if (!bgOrNull || isDark) {
+        if (!bgOrNull) {
           document.body.style.background = "";
           document.documentElement.style.background = "";
           return;
@@ -5738,13 +5848,18 @@
           }
           return;
         }
-        applyAlbumPageTint(buildAlbumTintGradient(colors));
+        var isDarkTheme = document.body.classList.contains("dark-theme");
+        applyAlbumPageTint(buildAlbumTintGradient(colors, isDarkTheme));
       }
 
       function renderMediaCardLayout(group, cardCount, cardIndex) {
         var primary = group[0] || group;
         var attrs = primary.attributes || {};
         var state = primary.state;
+
+        // Snapshot the PREVIOUSLY displayed artwork before getGroupTrackInfo()
+        // below overwrites the per-entity art memory with this render's URL.
+        var prevArtRaw = lastEntityArt[primary.entity_id] || "";
 
         // Use the skip-filter-aware track info (same as Home / All Controls tabs):
         // after one speaker in a group skips, EVERY member is treated as having
@@ -5782,8 +5897,11 @@
           }
         }
 
-        // Get actual album image color from cache or default to slate blue rgb(65, 122, 160)
-        var rawRgb = (artSrc && albumColorCache[artSrc]) ? albumColorCache[artSrc] : { r: 65, g: 122, b: 160 };
+        // Get actual album image color: cached extraction for this art first,
+        // then the album-key cache, then THIS player's previous color, and only
+        // then default slate blue — so the card tint never flashes to a generic
+        // color while a new artwork's dominant color is still being extracted.
+        var rawRgb = getEntityDominantRgb(primary, artSrc, albumName);
         var tintRgb = ensureLightVibrantTint(rawRgb);
         var tr = tintRgb.r, tg = tintRgb.g, tb = tintRgb.b;
 
@@ -5793,6 +5911,7 @@
 
         if (artSrc && !albumColorCache[artSrc]) {
           extractAlbumDominantColor(artSrc, function (extractedRgb) {
+            lastEntityColor[primaryEid] = extractedRgb;
             var lightRgb = ensureLightVibrantTint(extractedRgb);
             updateAlbumPageTint(lastAllStates);
             var cardEl = document.getElementById("media_card_" + primaryCleanEid);
@@ -5982,8 +6101,25 @@
         var h = '<div id="media_card_' + primaryCleanEid + '" class="' + cardClass + '" style="' + cardGlowStyle + '">';
 
         // 1. ALBUM ART FULL CARD BACKGROUND + DYNAMIC DOMINANT COLOR GRADIENT OVERLAY
+        // Artwork continuity: the PREVIOUS cover (per player) stays painted on
+        // both the blurred backdrop and the crisp single-card art until the new
+        // image has fully downloaded — a hidden preloader <img> swaps it the
+        // moment it arrives, so track changes never flash a blank card.
+        var prevArtNorm = normalizeArtUrl(prevArtRaw);
+        var newArtNorm = normalizeArtUrl(artSrc);
+        var artContinuity = !!artSrc && !!prevArtNorm && prevArtNorm !== newArtNorm;
         if (artSrc) {
-          h += '<div class="' + bgClass + '" style="background-image: url(\'' + escapeHtml(artSrc) + '\');"></div>';
+          lastEntityArt[primaryEid] = artSrc;
+        } else if (prevArtRaw) {
+          lastEntityArt[primaryEid] = prevArtRaw;
+        }
+        var bgArtShown = artContinuity ? prevArtNorm : artSrc;
+
+        if (artSrc) {
+          h += '<div id="card_bg_art_' + primaryCleanEid + '" class="' + bgClass + '" style="background-image: url(\'' + escapeHtml(bgArtShown) + '\');"></div>';
+          if (artContinuity) {
+            h += '<img src="' + escapeHtml(artSrc) + '" alt="" style="display:none;" onload="__mediaArtLoaded(this, \'' + primaryEid + '\', \'' + escapeHtml(artSrc) + '\')" onerror="__mediaArtError(this, \'' + primaryEid + '\', \'' + escapeHtml(prevArtRaw) + '\')">';
+          }
         } else {
           h += '<div class="media-card-bg-fallback"></div>';
         }
@@ -6039,8 +6175,13 @@
           h += '<div class="single-card-body">';
           // Unblurred Crisp Album Cover Art Inside Card
           if (artSrc) {
-            h += '<div class="single-album-art-wrap">';
-            h += '<img src="' + escapeHtml(artSrc) + '" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentNode.style.display=\'none\';">';
+            h += '<div class="single-album-art-wrap"' + (artContinuity ? ' style="position:relative;"' : '') + '>';
+            if (artContinuity) {
+              h += '<img src="' + escapeHtml(prevArtNorm) + '" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover;">';
+              h += '<img src="' + escapeHtml(artSrc) + '" style="position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; opacity:0; -webkit-transition:opacity 0.45s ease; transition:opacity 0.45s ease;" onload="this.style.opacity=\'1\'; __mediaArtLoaded(null, \'' + primaryEid + '\', \'' + escapeHtml(artSrc) + '\')">';
+            } else {
+              h += '<img src="' + escapeHtml(artSrc) + '" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentNode.style.display=\'none\';">';
+            }
             h += '</div>';
           }
           h += '<div class="single-controls-wrap">';
@@ -6329,6 +6470,7 @@
 
           if (artUrl && !albumColorCache[artUrl]) {
             extractAlbumDominantColor(artUrl, function (extractedRgb) {
+              lastEntityColor[primary.entity_id] = extractedRgb;
               updateAlbumPageTint(lastAllStates);
               var homeCardEl = document.getElementById("home_media_card_" + primaryCleanEid);
               if (homeCardEl) {
@@ -6844,13 +6986,22 @@
       window.resetIdleTimer = resetInactivityTimer;
 
       // ======== INIT ========
+      // The 3s REST poller starts only after the first successful data arrives
+      // (WS initial states or refreshAll), so boot doesn't fire 2-3 redundant
+      // full /api/states pulls and renders.
+      var pollerStarted = false;
+      function ensureStatePoller() {
+        if (pollerStarted) return;
+        pollerStarted = true;
+        setInterval(function () { pollStatesHA(false); }, 3000);
+      }
+
       function init() {
         hideSetup();
         loadEntityRegistry();
         startMediaTickers();
         updateClock();
         setInterval(updateClock, 10000);
-        setInterval(pollMediaPlayersHA, 3000); // 3-second REST polling backup for Media & Track updates
         resetInactivityTimer();
         document.addEventListener("click", wakeFromNightDim);
         document.addEventListener("touchstart", wakeFromNightDim);
@@ -6919,8 +7070,16 @@
           }
           var artEl = document.getElementById("home_media_art_" + cleanEid);
           if (artEl && trackInfo.artUrl) {
-            if (artEl.src !== trackInfo.artUrl) {
-              artEl.src = trackInfo.artUrl;
+            if (artEl.getAttribute("src") !== trackInfo.artUrl) {
+              // Continuity: keep the current cover visible until the new one
+              // has fully downloaded, then swap in a single paint.
+              var artPreloader = new Image();
+              artPreloader.onload = function () {
+                if (artEl.parentNode && artEl.getAttribute("src") !== trackInfo.artUrl) {
+                  artEl.src = trackInfo.artUrl;
+                }
+              };
+              artPreloader.src = trackInfo.artUrl;
             }
           }
           var volDisplayEl = document.getElementById("vol_display_" + cleanEid);
@@ -7004,23 +7163,12 @@
       function updateRealtimeEntityState(newState) {
         if (!newState || !newState.entity_id) return;
         var eid = newState.entity_id;
-        var oldState = entities[eid] ? entities[eid].state : null;
-        entities[eid] = newState;
-
-        var foundInCache = false;
-        if (lastStatesCache && lastStatesCache.length > 0) {
-          for (var i = 0; i < lastStatesCache.length; i++) {
-            if (lastStatesCache[i].entity_id === eid) {
-              lastStatesCache[i] = newState;
-              foundInCache = true;
-              break;
-            }
-          }
-        }
-        if (!foundInCache) {
-          if (!lastStatesCache) lastStatesCache = [];
-          lastStatesCache.push(newState);
-        }
+        var prevEntity = entities[eid] || null;
+        var oldState = prevEntity ? prevEntity.state : null;
+        var isMedia = (eid.indexOf("media_player.") === 0);
+        // Diff BEFORE the caches are overwritten below.
+        var mediaChanged = isMedia ? mediaDisplayDiff(prevEntity, newState) : false;
+        syncEntityCaches(newState);
 
         // Auto-page rotation triggers (Media playback & Hot Tub chemical red alert)
         checkAutoPageRotation(newState, oldState);
@@ -7029,9 +7177,21 @@
           checkNightDimming();
         }
 
+        if (isMedia) {
+          if (mediaChanged) {
+            updateTargetedEntityDOM(newState);
+            // Attribute-only track changes (title/artist/album/artwork while
+            // still "playing") used to be applied silently here and only
+            // reached the Media page on the next 15s full refresh — which is
+            // why track titles often looked stuck. They now render instantly.
+            renderTabsForMediaChange(oldState !== newState.state);
+          }
+          return;
+        }
+
         // If media player or Home State / House Mode / Sun entity state changed, re-render tab theme/layout
         var isThemeEntity = (eid.indexOf("home_state") !== -1 || eid.indexOf("house_mode") !== -1 || eid.indexOf("home_mode") !== -1 || eid.indexOf("house_state") !== -1 || eid.indexOf("time_of_day") !== -1 || eid.indexOf("day_phase") !== -1 || eid === "sun.sun" || eid === "input_text.dashboard_welcome_message");
-        if ((eid.indexOf("media_player") !== -1 || isThemeEntity) && oldState !== newState.state) {
+        if (isThemeEntity && oldState !== newState.state) {
           window.renderCurrentTab();
           return;
         }
@@ -7040,11 +7200,17 @@
         updateTargetedEntityDOM(newState);
       }
 
+      // Exponential backoff for WebSocket reconnects: 3s -> 6s -> 12s ... capped
+      // at 60s so an extended HA outage doesn't hammer the server. Reset on a
+      // successful open.
+      var wsRetryDelay = 3000;
       function scheduleWsReconnect() {
         if (wsReconnectTimer) clearTimeout(wsReconnectTimer);
+        var delay = wsRetryDelay;
+        wsRetryDelay = Math.min(wsRetryDelay * 2, 60000);
         wsReconnectTimer = setTimeout(function () {
           loadEntityRegistry();
-        }, 3000);
+        }, delay);
       }
 
       function loadEntityRegistry() {
@@ -7079,6 +7245,7 @@
 
         ws.onopen = function () {
           console.log("WebSocket connected.");
+          wsRetryDelay = 3000;
         };
 
         ws.onmessage = function (event) {
@@ -7182,9 +7349,10 @@
                 registryLoaded = true;
                 entities = {};
                 for (var s = 0; s < res.length; s++) {
-                  entities[res[s].entity_id] = res[s];
+                  entities[res[s].entity_id] = es5ShallowClone(res[s]);
                 }
                 lastStatesCache = res;
+                ensureStatePoller();
                 renderDashboard(res);
               }
 
@@ -7214,19 +7382,13 @@
       // ======== SETUP ========
       window.saveSetup = window.connectHA = function () {
         var urlInput = document.getElementById("haUrl");
-        var tokenInput = document.getElementById("haToken");
         var errEl = document.getElementById("setupError");
         var setupBtn = document.getElementById("setupBtn");
 
         var url = urlInput ? urlInput.value.replace(/\/+$/, "").trim() : "";
-        var token = tokenInput ? tokenInput.value.replace(/^\s+|\s+$/g, "").trim() : "";
 
         if (!url) {
           if (errEl) { errEl.textContent = "Please enter a Home Assistant URL."; errEl.style.display = "block"; }
-          return;
-        }
-        if (!token) {
-          if (errEl) { errEl.textContent = "Please enter a long-lived access token."; errEl.style.display = "block"; }
           return;
         }
 
@@ -7234,7 +7396,8 @@
         if (setupBtn) setupBtn.textContent = "Connecting...";
 
         HA_URL = url;
-        HA_TOKEN = token;
+        // Token is intentionally not editable here; keep whatever is already
+        // configured (hardcoded constant or previously saved value).
 
         haRequest("GET", "/api/", null, function (err, data) {
           if (setupBtn) setupBtn.textContent = "Connect & Save";
@@ -7243,7 +7406,11 @@
             return;
           }
           try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ url: HA_URL, token: HA_TOKEN }));
+            var stored = {};
+            var existing = localStorage.getItem(STORAGE_KEY);
+            if (existing) { try { stored = JSON.parse(existing) || {}; } catch (e2) { stored = {}; } }
+            stored.url = HA_URL;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
           } catch (e) { }
           hideSetup();
           showToast("Connected to Home Assistant!");
@@ -7330,10 +7497,19 @@
         document.getElementById("appContent").style.display = "";
       }
 
-      window.showSetup = function () {
+      window.showSetup = function (message) {
         document.getElementById("setupOverlay").className = "setup-overlay";
         document.getElementById("haUrl").value = HA_URL;
-        document.getElementById("haToken").value = HA_TOKEN;
+        var errEl = document.getElementById("setupError");
+        if (errEl) {
+          if (message) {
+            errEl.textContent = message;
+            errEl.style.display = "block";
+          } else {
+            errEl.textContent = "";
+            errEl.style.display = "none";
+          }
+        }
       };
 
       // ======== SETTINGS ========
@@ -7538,13 +7714,101 @@
 
       // ======== REFRESH ========
       var consecutiveErrors = 0;
-      // Monotonic sequence for /api/states fetches. refreshAll (15s) and
-      // pollMediaPlayersHA (3s) run concurrently; without this, a slow older
-      // response could land AFTER a newer one and revert the dashboard to stale
-      // data (media page getting "stuck" on an old song). A response is only
-      // applied if it was sent after the last one that was applied.
+      // Monotonic sequence for /api/states fetches. refreshAll (15s reconcile)
+      // and pollStatesHA (3s unified poll) run concurrently; without this, a
+      // slow older response could land AFTER a newer one and revert the
+      // dashboard to stale data (media page getting "stuck" on an old song). A
+      // response is only applied if it was sent after the last one applied.
       var stateReqSeq = 0;
       var stateReqApplied = 0;
+
+      // Meaningful media-display comparison shared by the WebSocket realtime
+      // handler and the REST poller, so a track change is detected no matter
+      // which path delivers it. Deliberately excludes media_position (the 1s
+      // ticker advances progress in place) so playback never triggers rebuilds.
+      function mediaDisplayDiff(prev, next) {
+        if (!prev) return true;
+        var pa = prev.attributes || {};
+        var na = next.attributes || {};
+        return prev.state !== next.state ||
+          pa.media_title !== na.media_title ||
+          pa.media_artist !== na.media_artist ||
+          pa.media_album_name !== na.media_album_name ||
+          pa.entity_picture !== na.entity_picture ||
+          pa.volume_level !== na.volume_level;
+      }
+
+      // ES5 shallow clone (iOS 9 has no Object.assign). Used so entities[] holds
+      // a clean diff baseline while lastStatesCache keeps receiving optimistic
+      // UI mutations (Skipping..., volume nudges) without poisoning comparisons.
+      function es5ShallowClone(s) {
+        var c = {};
+        for (var k in s) {
+          if (Object.prototype.hasOwnProperty.call(s, k)) c[k] = s[k];
+        }
+        if (c.attributes && typeof c.attributes === "object") {
+          var a = {};
+          for (var k2 in c.attributes) {
+            if (Object.prototype.hasOwnProperty.call(c.attributes, k2)) a[k2] = c.attributes[k2];
+          }
+          c.attributes = a;
+        }
+        return c;
+      }
+
+      // Single write-point for keeping entities + lastStatesCache in sync.
+      function syncEntityCaches(s) {
+        if (!s || !s.entity_id) return;
+        entities[s.entity_id] = es5ShallowClone(s);
+        var found = false;
+        if (lastStatesCache) {
+          for (var c = 0; c < lastStatesCache.length; c++) {
+            if (lastStatesCache[c].entity_id === s.entity_id) {
+              lastStatesCache[c] = s;
+              found = true;
+              break;
+            }
+          }
+        }
+        if (!found) {
+          if (!lastStatesCache) lastStatesCache = [];
+          lastStatesCache.push(s);
+        }
+      }
+
+      // Targeted re-render policy after a media change was applied in place:
+      // - Media page bakes titles/art into HTML -> rebuild on ANY display change.
+      // - Home / All Controls play-pause overlays & grouping depend on the state
+      //   string -> rebuild only on state flips (title/art/volume already updated
+      //   in place by updateTargetedEntityDOM with zero flicker).
+      function renderTabsForMediaChange(stateChanged) {
+        if (activeTab === "media") {
+          renderDashboard(lastStatesCache);
+        } else if (stateChanged && (activeTab === "home" || activeTab === "controls")) {
+          renderDashboard(lastStatesCache);
+        }
+      }
+
+      // Cheap whole-dashboard fingerprint. media_player entries include their
+      // display attributes because attribute-only changes do NOT bump
+      // last_changed; everything else is covered by state + last_changed.
+      function buildGlobalStateSig(states) {
+        var parts = [];
+        for (var i = 0; i < states.length; i++) {
+          var s = states[i];
+          var a = s.attributes || {};
+          var extra = "";
+          if (s.entity_id.indexOf("media_player.") === 0) {
+            extra = "~" + (a.media_title || "") + "~" + (a.media_artist || "") + "~" +
+              (a.media_album_name || "") + "~" + (a.entity_picture || "") + "~" +
+              (typeof a.volume_level !== "undefined" ? a.volume_level : "");
+          }
+          parts.push(s.entity_id + "~" + s.state + "~" + (s.last_changed || "") + extra);
+        }
+        return parts.join("`");
+      }
+      var lastRenderedStateSig = "";
+      var fullRenderCycle = 0;
 
       window.refreshAll = function () {
         if (refreshTimer) clearTimeout(refreshTimer);
@@ -7554,10 +7818,18 @@
           refreshTimer = setTimeout(refreshAll, REFRESH_INTERVAL);
           if (err) {
             setStatus("error");
+            var isAuthError = (String(err).indexOf("401") !== -1 || String(err).indexOf("403") !== -1);
+            if (isAuthError) {
+              // Token rejected: surface the connection card with an explanation.
+              consecutiveErrors = 0;
+              showSetup("The Home Assistant token was rejected (" + err + "). Update HA_TOKEN in index.html, then reload.");
+              return;
+            }
+            // Transient network issue: never kick the dashboard out of kiosk
+            // mode. Toast only on the first failure of a streak to avoid spam.
             consecutiveErrors++;
-            showToast("Connection error: " + err + " (Tap Settings to update IP)", true);
-            if (consecutiveErrors >= 2) {
-              showSetup();
+            if (consecutiveErrors === 1 || (consecutiveErrors % 8) === 0) {
+              showToast("Connection error: " + err, true);
             }
             return;
           }
@@ -7569,10 +7841,21 @@
           entities = {};
           var i;
           for (i = 0; i < data.length; i++) {
-            entities[data[i].entity_id] = data[i];
+            entities[data[i].entity_id] = es5ShallowClone(data[i]);
           }
           lastStatesCache = data;
-          renderDashboard(data);
+          ensureStatePoller();
+
+          // Reconcile pass: only rebuild the DOM when something actually changed
+          // since the last full render — or every 4th cycle (~1 min) so purely
+          // time-based layout rules (splash lock window, long-paused idle
+          // hiding) stay fresh. Unchanged data now costs zero repaints.
+          var sig = buildGlobalStateSig(data);
+          fullRenderCycle++;
+          if (sig !== lastRenderedStateSig || (fullRenderCycle % 4) === 0) {
+            lastRenderedStateSig = sig;
+            renderDashboard(data);
+          }
         });
       };
 
@@ -7827,12 +8110,13 @@
         if (themeMetaEl) {
           themeMetaEl.setAttribute("content", "#000000");
         }
-        // Status bar text: white (black-translucent) in light mode so it blends
-        // into the white page; black (default) in dark mode so it shows on the
-        // white scrollable top bar and blends into the black page when scrolled.
+        // Status bar text: always white (black-translucent) in both themes —
+        // readable on the black scrollable top bar at scroll-top, and blended
+        // into the page background (white in light / black in dark) when
+        // scrolled past it.
         var statusBarMetaEl = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
         if (statusBarMetaEl) {
-          statusBarMetaEl.setAttribute("content", isDarkTheme ? "default" : "black-translucent");
+          statusBarMetaEl.setAttribute("content", "black-translucent");
         }
 
         var appFooterEl = document.querySelector("footer.app-footer");
@@ -10156,6 +10440,17 @@
             break;
           }
         }
+        // Restore helper for failed service calls so the UI doesn't lie about
+        // playback state until the next poll.
+        function revertOptimisticState() {
+          for (var r = 0; r < lastStatesCache.length; r++) {
+            if (lastStatesCache[r].entity_id === entityId && curState !== "") {
+              lastStatesCache[r].state = curState;
+              break;
+            }
+          }
+          renderCurrentTab();
+        }
         if (lastStatesCache.length > 0) {
           renderDashboard(lastStatesCache);
         }
@@ -10169,6 +10464,7 @@
               entity_id: entityId
             }, function (err) {
               if (err) {
+                revertOptimisticState();
                 showToast("Error: " + err, true);
               } else {
                 // Wait 800ms for hardware connection, then start playing
@@ -10187,7 +10483,10 @@
             haRequest("POST", "/api/services/media_player/media_play", {
               entity_id: entityId
             }, function (err) {
-              if (err) showToast("Error starting playback: " + err, true);
+              if (err) {
+                revertOptimisticState();
+                showToast("Error starting playback: " + err, true);
+              }
               setTimeout(refreshAll, 1000);
             });
           }
@@ -10196,7 +10495,10 @@
           haRequest("POST", "/api/services/media_player/media_play_pause", {
             entity_id: entityId
           }, function (err) {
-            if (err) showToast("Error: " + err, true);
+            if (err) {
+              revertOptimisticState();
+              showToast("Error: " + err, true);
+            }
             setTimeout(refreshAll, 1000);
             setTimeout(refreshAll, 3000);
           });
@@ -10438,30 +10740,6 @@
         });
       };
 
-      window.mediaSetVolume = function (entityId, value) {
-        var floatVal = parseFloat(value);
-        // Optimistic volume state update
-        for (var i = 0; i < lastStatesCache.length; i++) {
-          if (lastStatesCache[i].entity_id === entityId) {
-            if (!lastStatesCache[i].attributes) lastStatesCache[i].attributes = {};
-            lastStatesCache[i].attributes.volume_level = floatVal;
-            break;
-          }
-        }
-        if (lastStatesCache.length > 0) {
-          renderDashboard(lastStatesCache);
-        }
-
-        haRequest("POST", "/api/services/media_player/volume_set", {
-          entity_id: entityId,
-          volume_level: floatVal
-        }, function (err) {
-          if (err) showToast("Error: " + err, true);
-          setTimeout(refreshAll, 1000);
-          setTimeout(refreshAll, 3000);
-        });
-      };
-
       window.adjustVolume = function (entityId, step) {
         var currentVol = 0;
         var targetEntity = null;
@@ -10492,7 +10770,14 @@
           entity_id: entityId,
           volume_level: nextVol
         }, function (err) {
-          if (err) showToast("Error: " + err, true);
+          if (err) {
+            // Revert the optimistic nudge so the bar matches reality.
+            if (targetEntity && targetEntity.attributes) {
+              targetEntity.attributes.volume_level = currentVol;
+            }
+            if (fillCtrl) fillCtrl.style.width = (currentVol * 100) + "%";
+            showToast("Error: " + err, true);
+          }
           setTimeout(refreshAll, 1000);
           setTimeout(refreshAll, 3000);
         });
@@ -10500,9 +10785,11 @@
 
       window.setVolumeZero = function (entityId) {
         var targetEntity = null;
+        var prevVol = 0;
         for (var i = 0; i < lastStatesCache.length; i++) {
           if (lastStatesCache[i].entity_id === entityId) {
             targetEntity = lastStatesCache[i];
+            prevVol = (targetEntity.attributes && typeof targetEntity.attributes.volume_level !== "undefined") ? targetEntity.attributes.volume_level : 0;
             break;
           }
         }
@@ -10524,7 +10811,13 @@
           entity_id: entityId,
           volume_level: 0
         }, function (err) {
-          if (err) showToast("Error: " + err, true);
+          if (err) {
+            if (targetEntity && targetEntity.attributes) {
+              targetEntity.attributes.volume_level = prevVol;
+            }
+            if (fillCtrl) fillCtrl.style.width = (prevVol * 100) + "%";
+            showToast("Error: " + err, true);
+          }
           setTimeout(refreshAll, 1000);
           setTimeout(refreshAll, 3000);
         });
@@ -11386,59 +11679,65 @@
         return (mins < 10 ? "0" : "") + mins + ":" + (secs < 10 ? "0" : "") + secs;
       }
 
-      function pollMediaPlayersHA() {
+      // ======== UNIFIED REST POLLER ========
+      // The ONLY polling fetcher for /api/states (3s). The WebSocket is the
+      // primary data path; this loop is its backup AND keeps non-media entity
+      // caches fresh. Media players are diff-applied so UI work happens only
+      // when something visible actually changed; everything else is absorbed
+      // silently into the caches.
+      var lastStatesPollAt = 0;
+
+      function pollStatesHA(force) {
         if (!HA_URL || !HA_TOKEN) return;
+        var nowMs = Date.now();
+        if (!force && (nowMs - lastStatesPollAt) < 2500) return;
+        lastStatesPollAt = nowMs;
         var mySeq = ++stateReqSeq;
         haRequest("GET", "/api/states", null, function (err, states) {
           if (err || !states || !states.length) return;
           if (mySeq < stateReqApplied) return;
 
           stateReqApplied = mySeq;
-          var mediaChanged = false;
+          var mediaDisplayChanged = false;
+          var mediaStateChanged = false;
           for (var i = 0; i < states.length; i++) {
             var s = states[i];
-            if (s.entity_id && s.entity_id.indexOf("media_player.") === 0) {
-              var eid = s.entity_id;
-              var existing = entities[eid];
-              var attrs = s.attributes || {};
-              var exAttrs = existing ? (existing.attributes || {}) : {};
-
-              var hasChanged = !existing ||
-                existing.state !== s.state ||
-                exAttrs.media_title !== attrs.media_title ||
-                exAttrs.media_artist !== attrs.media_artist ||
-                exAttrs.entity_picture !== attrs.entity_picture ||
-                exAttrs.volume_level !== attrs.volume_level;
-
-              if (hasChanged) {
-                entities[eid] = s;
-                var found = false;
-                if (lastStatesCache) {
-                  for (var c = 0; c < lastStatesCache.length; c++) {
-                    if (lastStatesCache[c].entity_id === eid) {
-                      lastStatesCache[c] = s;
-                      found = true;
-                      break;
-                    }
-                  }
-                }
-                if (!found) {
-                  if (!lastStatesCache) lastStatesCache = [];
-                  lastStatesCache.push(s);
-                }
-
+            if (!s.entity_id) continue;
+            if (s.entity_id.indexOf("media_player.") === 0) {
+              var existing = entities[s.entity_id];
+              if (mediaDisplayDiff(existing, s)) {
+                syncEntityCaches(s);
+                var stChanged = !existing || existing.state !== s.state;
+                if (stChanged) mediaStateChanged = true;
+                mediaDisplayChanged = true;
                 updateTargetedEntityDOM(s);
                 checkAutoPageRotation(s, existing ? existing.state : null);
-                mediaChanged = true;
               }
+            } else {
+              // Non-media entity: absorb into caches. If something actually
+              // changed (last_updated bumps on attribute-only changes), also
+              // refresh its DOM in place — covers WS-outage windows so
+              // automation-driven brightness/volume changes don't sit stale.
+              var prevNonMedia = entities[s.entity_id];
+              var nonMediaChanged = !prevNonMedia ||
+                prevNonMedia.state !== s.state ||
+                (prevNonMedia.last_updated || "") !== (s.last_updated || "");
+              syncEntityCaches(s);
+              if (nonMediaChanged) updateTargetedEntityDOM(s);
             }
           }
 
-          if (mediaChanged && (activeTab === "media" || activeTab === "home")) {
-            window.renderCurrentTab();
+          if (mediaDisplayChanged || mediaStateChanged) {
+            renderTabsForMediaChange(mediaStateChanged);
           }
         });
       }
+
+      // Per-player last computed position/duration (for track-boundary
+      // detection) and a throttle for the immediate polls fired on rollover.
+      var lastTickPos = {};
+      var lastTickDur = {};
+      var lastBoundaryPollAt = 0;
 
       function startMediaTickers() {
         setInterval(function () {
@@ -11450,9 +11749,6 @@
               var cleanEid = eid.replace(/\./g, "_");
               var state = entity.state;
               var attrs = entity.attributes || {};
-
-              // Real-time DOM poll update for track info & album art
-              updateTargetedEntityDOM(entity);
 
               var fillCtrl = document.getElementById("prog_fill_ctrl_" + cleanEid);
               var timeCurCtrl = document.getElementById("prog_cur_ctrl_" + cleanEid);
@@ -11474,6 +11770,31 @@
 
                 if (fillPage) fillPage.style.width = pct + "%";
                 if (timeCurPage) timeCurPage.textContent = formatTime(curPos);
+
+                // Track-boundary detection: when playback reaches 0:00 (new
+                // track started / position rolled over) or touches the end of
+                // the duration, fire an IMMEDIATE poll so the new title,
+                // artist, album and artwork land right away instead of waiting
+                // for the next scheduled poll cycle. The 0:00 trigger only
+                // fires when ENTERING the zero zone (or the duration changed =
+                // genuinely new track), so a player parked at 0:00 cannot loop
+                // polls forever.
+                var prevPos = lastTickPos[eid];
+                var prevDur = lastTickDur[eid];
+                lastTickPos[eid] = curPos;
+                lastTickDur[eid] = attrs.media_duration;
+                if (state === "playing") {
+                  var rolledToNewTrack = (typeof prevPos === "number" && prevPos > 3 && curPos < (prevPos - 1.5));
+                  var reachedEnd = (curPos >= attrs.media_duration - 0.75);
+                  var enteredZero = (curPos <= 1.25 && (typeof prevPos !== "number" || prevPos > 1.25 || prevDur !== attrs.media_duration));
+                  if (rolledToNewTrack || reachedEnd || enteredZero) {
+                    var nowTick = Date.now();
+                    if (nowTick - lastBoundaryPollAt > 2000) {
+                      lastBoundaryPollAt = nowTick;
+                      pollStatesHA(true);
+                    }
+                  }
+                }
               }
             }
           }

@@ -13,10 +13,17 @@ Open `index.html` in an editor and adjust the global **CONFIG** variables locate
 var HA_URL = "http://YOUR_HA_IP:8123";  // Your Home Assistant Server IP & Port (e.g. http://192.168.1.100:8123)
 var HA_TOKEN = "YOUR_LONG_LIVED_ACCESS_TOKEN_HERE"; // Long-Lived Access Token from Home Assistant
 var STORAGE_KEY = "ha_controls_config";  // LocalStorage key for caching options
-var REFRESH_INTERVAL = 15000;            // Data refresh polling interval in ms (15 seconds)
+var REFRESH_INTERVAL = 15000;            // Full-state reconcile interval in ms (15 seconds; skipped entirely when nothing changed)
 var CAMERA_ENTITY = "camera.album_slideshow_kitchen_icloud_album"; // Lock screen camera entity ("" = disabled)
 var CAMERA_REFRESH_MS = 5 * 60 * 1000;   // How often the lock screen camera refreshes (default 5 minutes)
 ```
+
+### Media Refresh Behavior
+Media data updates through three cooperating layers, so track changes appear as fast as Home Assistant reports them without redundant UI rebuilds:
+- **WebSocket (primary)**: `state_changed` events are diffed per media player (`mediaDisplayDiff`: state, title, artist, album, artwork, volume). Any display change re-renders the Media page instantly; Home / All Controls tabs update in place and only fully re-render on play/pause flips.
+- **Unified REST poll (backup, 3s)**: `pollStatesHA` fetches `/api/states`, diff-applies media players and silently refreshes all other entity caches.
+- **Track-boundary fast poll**: when the progress ticker sees a playing player reach 0:00, touch the end of its duration, or report a new duration, it fires an immediate one-shot poll (throttled to once per 2s) so new track metadata lands right as the progress bar resets.
+- **Continuity**: the previous album cover and its dominant color stay on screen until the new artwork has fully downloaded, so track changes never flash blank cards or generic tint colors.
 
 ### Lock Screen Camera Feed
 When `CAMERA_ENTITY` is set to a camera entity ID (e.g. `camera.album_slideshow_kitchen_icloud_album`), the night / away lock screen shows a camera snapshot as its background instead of a plain black screen. The snapshot is loaded via a plain `url()` background-image from Home Assistant's `camera_proxy` endpoint (`/api/camera_proxy/<entity>?token=<access_token>`). The camera's rotating access token (published in the entity's state attributes) is used instead of the Bearer token, so iOS 9 Safari decodes the JPEG natively — no XHR or base64 conversion needed. The image refreshes automatically every `CAMERA_REFRESH_MS` (5 minutes by default) while the lock screen is visible — it does not update while unlocked to save bandwidth and iPad Mini battery. Each fetch includes a cache-busting timestamp so slideshow cameras (like Album Slideshow) always serve the latest rendered frame.
@@ -28,6 +35,8 @@ You can also configure this from the dashboard without editing the file: open **
 2. Click your **Profile** icon at the bottom of the left sidebar.
 3. Scroll down to the **Long-Lived Access Tokens** section.
 4. Click **Create Token**, name it `iPad Dashboard`, and copy the token string into `HA_TOKEN`.
+
+The token lives only in the source file (or a previously saved `localStorage` value) — the on-screen **Connection Settings** card is intentionally IP-only, so a server address change after a reboot can be fixed from the iPad without exposing or re-entering the token.
 
 ---
 
