@@ -16,7 +16,7 @@ A ultra-minimal, high-readability Home Assistant web dashboard designed specific
 
 > [!NOTE]
 > **AI GENERATED & HUMAN REVIEWED**  
-> This codebase was built with the assistance of Google Gemini (Antigravity AI) and has been human-reviewed, iterated, and verified for real-world hardware deployment.
+> This codebase was built with the assistance of Google Gemini and opencode (Big Pickle) and has been human-reviewed, iterated, and verified for real-world hardware deployment.
 
 ---
 
