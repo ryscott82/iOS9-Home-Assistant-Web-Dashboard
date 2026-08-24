@@ -16,13 +16,31 @@ var STORAGE_KEY = "ha_controls_config";  // LocalStorage key for caching options
 var REFRESH_INTERVAL = 15000;            // Full-state reconcile interval in ms (15 seconds; skipped entirely when nothing changed)
 var CAMERA_ENTITY = "camera.album_slideshow_kitchen_icloud_album"; // Lock screen camera entity ("" = disabled)
 var CAMERA_REFRESH_MS = 5 * 60 * 1000;   // How often the lock screen camera refreshes (default 5 minutes)
+
+// ======== PARTY PAGE ========
+var PARTY_MODE_ENTITY = "input_select.house_mode";                 // Entity that activates the Party page when set to "Party"
+var PARTY_QR_URL = "http://192.168.40.89:8095/#/guest";            // URL encoded in the Party page QR code (guest music queue)
+var PARTY_MEDIA_ENTITY = "media_player.family_room_apple_tv";      // Media player whose group is shown on the Party page
+var PARTY_HIDDEN_ENTITIES = ["theater", "game_room", "kitchen"];   // Substring patterns: matching entities never appear on the Party page (still on Home)
+var PARTY_POOL_LIGHTS_ENTITY = "light.scott_pool_lights";          // Pool-lights shortcut card on the Party page (half-column, pool + bulb icon)
+var PARTY_SPA_LIGHT_ENTITY = "light.spa_light";                    // Spa-light shortcut card on the Party page (half-column, hot-tub + bulb icon)
+var PARTY_EXIT_MODE = "Day";                                       // house_mode option the 🎉 header toggle switches to when ending a party
 ```
+
+### Party Page
+When the `PARTY_MODE_ENTITY` (default `input_select.house_mode`) is set to `Party`, the dashboard automatically switches to a dedicated **Party page**: home-screen controls stacked in one column on the left, and the QR code plus a compact media card for the `PARTY_MEDIA_ENTITY` media group on the right. The card uses the same renderer as the Media tab's multi-player layout (no album-cover square, transport + volume controls only). Entities whose id contains any `PARTY_HIDDEN_ENTITIES` substring (e.g. every kitchen light) are excluded from the left column (they remain on the Home tab). The top of the left column is a pair of half-width shortcut cards for `PARTY_POOL_LIGHTS_ENTITY` and `PARTY_SPA_LIGHT_ENTITY` — big high-contrast pool-and-bulb / hot-tub-and-bulb icons that toggle their light on tap and highlight yellow while on; anything named "outdoor" (plus these two entities) is dropped from the generic stack below so nothing renders twice. The layout is tuned so the right column — QR panel plus media card — fits a 1024x768 landscape screen with no scrolling. Parties follow the **normal theme rules** again (night or a manual dark override makes the Party page dark — every party-page surface has a dark variant), but **self-dimming stays suppressed** (the dim overlay and night dimming never engage mid-party), and the automatic return-home timers are pinned so the page stays put; a floating Home button in the top-right corner remains as a manual escape hatch, and a one-line strip showing the welcome message (`input_text.dashboard_welcome_message`) sits at the top of the left column in standard bold body text at 56px — it never wraps, overly long messages just clip with an ellipsis.
+
+You can also start or end a party by hand: the All Controls header has a 🎉 button next to Settings that toggles `PARTY_MODE_ENTITY` between `Party` and `PARTY_EXIT_MODE`. And if you navigate to Home mid-party, a floating "🎉 Back to Party" pill appears at the bottom of the Home screen (the footer nav bar is hidden there).
+
+**Nothing auto-switches pages during a party**: tagged media players starting playback, hot tub chemical red alerts and all return-home timers are suppressed until the party ends (a still-red chemical alert fires as soon as it's over). The Settings/Reload/Home buttons in the All Controls and Chemical Status headers stay visible too — their icon color follows `isDashboardDarkTheme()` like every other theme decision. Note: actual hardware brightness is controlled from iPad Settings or Guided Access — a web page cannot change it. The dashboard's own night/away **lock screen (the camera-feed splash overlay) never shows during a party** — not for alarm/away state, not at night, and not via the manual "Lock Now" button (which shows a "disabled during a Party" toast instead). Normal lock behavior resumes automatically when house mode leaves `Party`. Leaving `Party` returns the dashboard to Home automatically. The QR code points guests to whatever URL you place in `PARTY_QR_URL` (e.g. your local queue service), and the media card stays visible for the whole party even when nothing is playing — its built-in Play pill starts the music.
 
 ### Media Refresh Behavior
 Media data updates through three cooperating layers, so track changes appear as fast as Home Assistant reports them without redundant UI rebuilds:
 - **WebSocket (primary)**: `state_changed` events are diffed per media player (`mediaDisplayDiff`: state, title, artist, album, artwork, volume). Any display change re-renders the Media page instantly; Home / All Controls tabs update in place and only fully re-render on play/pause flips.
 - **Unified REST poll (backup, 3s)**: `pollStatesHA` fetches `/api/states`, diff-applies media players and silently refreshes all other entity caches.
 - **Track-boundary fast poll**: when the progress ticker sees a playing player reach 0:00, touch the end of its duration, or report a new duration, it fires an immediate one-shot poll (throttled to once per 2s) so new track metadata lands right as the progress bar resets.
+- **Freshness guards**: every REST snapshot is checked against the state already applied by the WebSocket (`isNewerState`, comparing `last_updated`) before it may overwrite caches — so a slow poll captured before a track change can't repaint the previous song afterwards. The same newer-wins rule protects the 15s full refresh.
+- **Artwork loading**: the Media page, Party page and dominant-color prewarming all request artwork via the raw `entity_picture` URL Home Assistant reports (signed CDN/proxy URLs break if extra query parameters are added). Only the Home tab's small thumbnails append a `_v=<title_artist>` cache-buster to keep covers fresh when the proxy URL itself doesn't change.
 - **Continuity**: the previous album cover and its dominant color stay on screen until the new artwork has fully downloaded, so track changes never flash blank cards or generic tint colors.
 
 ### Lock Screen Camera Feed
@@ -49,6 +67,7 @@ The dashboard relies on specific Home Assistant **Helpers** (`input_boolean` and
 | **Text** (`input_text`) | `input_text.dashboard_welcome_message` | `Dashboard Welcome Message` | Sets the custom welcome text shown at the top-left of the header bar (e.g., "Welcome Home, Family!"). Defaults to "Welcome Home" if unavailable. |
 | **Toggle** (`input_boolean`) | `input_boolean.chemicals_checked_today` | `Chemicals Checked Today` | Tracks whether chemical levels have been logged today. Displays a yellow warning banner when turned `off`. |
 | **Toggle** (`input_boolean`) | `input_boolean.chlorine_logged_since_changing` | `Chlorine Logged Since Changing` | Safety gate used by pool/spa chemical dosage recommendations to prevent accidental chlorine overdosing. |
+| **Dropdown** (`input_select`) | `input_select.house_mode` | `House Mode` | House mode selector used for theming and the **Party page**. Include a `Party` option — selecting it switches the dashboard to the Party page until the mode changes. |
 
 ---
 

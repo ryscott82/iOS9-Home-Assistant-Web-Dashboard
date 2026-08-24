@@ -3412,6 +3412,364 @@
       background: rgba(10, 132, 255, 0.15);
     }
 
+    /* ======== PARTY PAGE ======== */
+    /* Two independently-scrolling columns. Header and footer are hidden on
+       this tab (see renderDashboard), so the layout owns the full viewport.
+       The page is scrolled 24px past the black status bar like every other
+       tab, so the layout is 100vh tall with the bar hidden above it.
+       Column split and card sizing are tuned for a 1024x768 landscape iPad:
+       the right column (QR panel + media hero card) fits 768px with no
+       scrolling; the left column scrolls only if many controls remain. */
+    .party-layout {
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: stretch;
+      align-items: stretch;
+      width: 100%;
+      height: 100vh;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .party-col {
+      -webkit-overflow-scrolling: touch;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 4px 8px 16px 12px;
+      box-sizing: border-box;
+    }
+
+    .party-col-left {
+      -webkit-flex: 0 0 56%;
+      flex: 0 0 56%;
+      max-width: 56%;
+    }
+
+    .party-col-right {
+      -webkit-flex: 1 1 auto;
+      flex: 1 1 auto;
+      min-width: 0;
+      padding-left: 6px;
+    }
+
+    /* Left column: stacked control cards, one per row. Plain block wrappers,
+       so the tiles' flex-basis rules are inert and cards fill the column. */
+    .party-left-item {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* Pool & spa light shortcut pair: two half-column cards side by side with
+       big high-contrast icons (pool / hot tub, each with a bulb badge) that
+       toggle their light on tap. Plain divs (not <button>) so the global
+       button reset can't stretch them; the realtime targeted updater flips
+       the "active" class via each card's card_<entity_id> id. */
+    .party-light-row {
+      display: -webkit-flex;
+      display: flex;
+      margin-bottom: 8px;
+    }
+
+    .party-light-card {
+      -webkit-flex: 1 1 50%;
+      flex: 1 1 50%;
+      min-height: 148px;
+      border-radius: 22px;
+      border: 1.5px solid rgba(0, 0, 0, 0.08);
+      background: #ffffff;
+      color: #1c1c1e;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      display: -webkit-flex;
+      display: flex;
+      -webkit-flex-direction: column;
+      flex-direction: column;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      padding: 14px 8px;
+      box-sizing: border-box;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 850;
+      letter-spacing: -0.5px;
+      cursor: pointer;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .party-light-card + .party-light-card {
+      margin-left: 10px;
+    }
+
+    .party-light-card svg {
+      width: 84px;
+      height: 76px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* ON state: same yellow highlight the generic light tiles use */
+    .party-light-card.active {
+      background: #ffcc00;
+      border-color: rgba(0, 0, 0, 0.12);
+      box-shadow: 0 6px 18px rgba(255, 204, 0, 0.45);
+      color: #1c1c1e;
+    }
+
+    /* Parties follow the normal theme now (no forced light mode), so every
+       party-page surface needs a dark-theme variant too. */
+    .dark-theme .party-left-message {
+      color: #f2f2f7;
+    }
+
+    .dark-theme .party-light-card {
+      background: #1c1c1e;
+      border-color: rgba(255, 255, 255, 0.14);
+      color: #f2f2f7;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+
+    .dark-theme .party-light-card.active {
+      background: #ffcc00;
+      border-color: rgba(0, 0, 0, 0.12);
+      color: #1c1c1e;
+    }
+
+    /* One-line welcome strip above the controls. Standard bold body text —
+       same treatment as the pool card's Waterfall button label (inherited
+       system font, weight 800) at 4x its size (14px -> 56px). Never wraps:
+       long messages are clipped with an ellipsis so the control stack below
+       can't be pushed down and break the fit-to-768px layout. */
+    .party-left-message {
+      font-family: inherit;
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: normal;
+      color: #1c1c1e;
+      margin: 0 0 10px 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-line-clamp: 1;
+    }
+
+    .party-col-left .tile {
+      width: calc(100% - 12px);
+      -webkit-flex: none;
+      flex: none;
+    }
+
+    /* Pool & Hot Tub cards hardcode a half-grid width with !important on the
+       Home tab; in the single-column party layout they span the full (56%)
+       column and get extra height headroom so the big temp readout, feature
+       buttons and name row never clip */
+    .party-col-left .tile.overview-big-tile.is-heater-tile {
+      width: calc(100% - 12px) !important;
+      -webkit-flex: 0 0 calc(100% - 12px) !important;
+      flex: 0 0 calc(100% - 12px) !important;
+      min-height: 224px !important;
+    }
+
+    /* QR panel sits at the top of the right column. Chrome is kept minimal:
+       the PNG carries its own 2-module quiet zone, so extra padding around it
+       is wasted space on a 768px-tall screen */
+    .party-qr-panel {
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 10px 12px;
+      margin: 2px 2px 12px 2px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10);
+      border: 1.5px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .party-qr-img {
+      display: block;
+      width: 264px; /* exact canvas size (33 modules x 8px) for crisp pixels */
+      height: 264px;
+      max-width: 100%;
+      margin: 0 auto;
+    }
+
+    .party-qr-error {
+      width: 264px;
+      height: 264px;
+      max-width: 100%;
+      margin: 0 auto;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      background: #f2f2f7;
+      border-radius: 12px;
+      color: #8e8e93;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    .party-qr-caption {
+      margin-top: 8px;
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #1c1c1e;
+    }
+
+    .party-media-wrap {
+      display: block;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    /* ---- Fit 1024x768 landscape ----
+       The media card is the compact multi-player variant (no crisp album
+       square) sized to fill the space left under the QR panel so QR + card
+       fill exactly one 768px-tall screen. */
+    .party-media-wrap .media-page-card {
+      height: calc(100vh - 368px);
+      min-height: 0;
+    }
+
+    /* NOTE: no flex `gap` here — iOS 9 doesn't support it; margins are used
+       between the stacked sections instead */
+    /* The party page renders the COMPACT multi-player card variant (no crisp
+       album-cover square). These overrides mirror the Media tab's grid-4
+       compaction so the card suits the narrower right column. */
+    .party-media-wrap .media-page-card .media-card-content {
+      padding: 14px 18px 12px 18px;
+    }
+
+    .party-media-wrap .media-page-card .media-card-top-bar {
+      margin-bottom: 10px;
+    }
+
+    .party-media-wrap .media-page-card .media-card-speaker-badge {
+      font-size: 14px;
+      padding: 5px 12px;
+    }
+
+    .party-media-wrap .media-page-card .media-card-info-box {
+      margin-top: auto;
+      margin-bottom: 4px;
+    }
+
+    .party-media-wrap .media-page-card .media-card-artist-name {
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+
+    .party-media-wrap .media-page-card .media-card-track-title {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .party-media-wrap .media-page-card .media-glass-btn {
+      width: 46px;
+      height: 46px;
+    }
+
+    .party-media-wrap .media-page-card .media-glass-play-pill {
+      height: 46px;
+      padding: 0 24px;
+      font-size: 17px;
+    }
+
+    .party-media-wrap .media-page-card .media-large-vol-bar {
+      height: 38px;
+      border-radius: 12px;
+    }
+
+    .party-media-wrap .media-page-card .media-vol-btn {
+      width: 44px;
+      height: 38px;
+    }
+
+    .party-media-wrap .media-page-card .media-vol-display {
+      font-size: 14px;
+    }
+
+    /* Floating exit button pinned to the TOP RIGHT corner — header AND footer
+       are hidden on this page, so the corner is free and the button is easy
+       to reach without covering the media card's controls.
+       min-height must be set explicitly: the global reset gives every <button>
+       min-height:100%, and on a fixed-position element that resolves against
+       the viewport, stretching the button edge-to-edge. */
+    #partyHomeBtn {
+      position: fixed;
+      right: 16px;
+      top: 16px;
+      z-index: 60;
+      width: 54px;
+      height: 54px;
+      min-height: 54px;
+      border-radius: 50%;
+      background: rgba(120, 120, 128, 0.32);
+      color: #1c1c1e;
+      border: 1.5px solid rgba(0, 0, 0, 0.15);
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    body.dark-theme .party-qr-panel {
+      background: #161b22;
+      border-color: rgba(255, 255, 255, 0.08);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+    }
+
+    body.dark-theme .party-qr-caption {
+      color: #e6edf3;
+    }
+
+    body.dark-theme .party-qr-error {
+      background: #21262d;
+      color: #8e8e93;
+    }
+
+    body.dark-theme #partyHomeBtn {
+      background: rgba(120, 120, 128, 0.42);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Floating pill shown on the HOME page while a party is running: the
+       bottom navigation bar is hidden on Home, so this is the only way back
+       to the Party page after manually navigating away. Hidden by default;
+       renderDashboard shows it imperatively (party active + home tab). */
+    #backToPartyBtn {
+      position: fixed;
+      left: 50%;
+      bottom: 16px;
+      -webkit-transform: translateX(-50%);
+      transform: translateX(-50%);
+      z-index: 60;
+      height: 48px;
+      min-height: 48px; /* defeat the global button min-height reset */
+      padding: 0 24px;
+      border-radius: 24px;
+      background: rgba(255, 45, 85, 0.92);
+      color: #ffffff;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      display: none;
+      -webkit-align-items: center;
+      align-items: center;
+      cursor: pointer;
+      padding: 0 24px;
+      box-shadow: 0 4px 14px rgba(255, 45, 85, 0.35);
+    }
+
     /* ======== DARK THEME OVERRIDES ======== */
     body.dark-theme {
       background: #0d1117;
@@ -4272,6 +4630,10 @@
     </footer>
   </main>
 
+  <!-- Shown only while a party is running and the user is on the Home page
+       (the footer nav bar is hidden there, so this pill is the way back) -->
+  <button id="backToPartyBtn" onclick="switchTab('party')" title="Return to Party Page">🎉 Back to Party</button>
+
   <div id="toast" class="toast"></div>
 
   <script>
@@ -4279,7 +4641,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.7.1";
+      var DASHBOARD_VERSION = "v4.8.0";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -4312,6 +4674,235 @@
         }
       }
 
+      // ======== MINIMAL QR ENCODER (for the Party page) ========
+      // Fixed parameters: Version 3 (29x29), ECC level M, byte mode, single
+      // block (44 data + 26 ECC codewords), mask pattern 2. Byte-mode payload
+      // capacity: 42 bytes. Algorithm adapted from Project Nayuki's
+      // "QR Code generator library" (MIT License) and ISO/IEC 18004.
+      function partyQrEncodeBytes(bytes) {
+        var SIZE = 29;          // 4 * version(3) + 17
+        var DATA_CW = 44;       // version 3-M data codewords
+        var ECC_CW = 26;        // version 3-M error-correction codewords per block
+        var MASK_ID = 2;
+        var MAX_PAYLOAD_BYTES = 42; // (DATA_CW * 8 - 4 mode - 8 count) / 8
+
+        if (bytes.length > MAX_PAYLOAD_BYTES) {
+          throw new Error("QR payload too long: " + bytes.length + " bytes (max " + MAX_PAYLOAD_BYTES + ")");
+        }
+
+        // ---- GF(256) tables (field poly 0x11D) ----
+        var GF_EXP = [];
+        var GF_LOG = [];
+        (function () {
+          var x = 1;
+          for (var gi = 0; gi < 255; gi++) {
+            GF_EXP[gi] = x;
+            GF_LOG[x] = gi;
+            x <<= 1;
+            if (x & 0x100) x ^= 0x11d;
+          }
+        })();
+        function gfMul(a, b) {
+          if (a === 0 || b === 0) return 0;
+          return GF_EXP[(GF_LOG[a] + GF_LOG[b]) % 255];
+        }
+
+        // ---- Bit buffer: mode + length + data + terminator + padding ----
+        var bits = [];
+        function appendBits(val, len) {
+          var gb;
+          for (gb = len - 1; gb >= 0; gb--) bits.push((val >>> gb) & 1);
+        }
+        appendBits(4, 4); // byte mode indicator 0100
+        appendBits(bytes.length, 8); // char count (8 bits for versions 1-9)
+        var bi;
+        for (bi = 0; bi < bytes.length; bi++) appendBits(bytes[bi], 8);
+
+        var capacityBits = DATA_CW * 8;
+        var termLen = capacityBits - bits.length;
+        if (termLen > 4) termLen = 4;
+        appendBits(0, termLen);
+        while (bits.length % 8 !== 0) bits.push(0);
+
+        var codewords = [];
+        for (bi = 0; bi < bits.length; bi += 8) {
+          var byteVal = 0;
+          for (var bb = 0; bb < 8; bb++) byteVal = (byteVal << 1) | bits[bi + bb];
+          codewords.push(byteVal);
+        }
+        while (codewords.length < DATA_CW) {
+          // Pad sequence always begins with 0xEC regardless of landing parity
+          codewords.push(codewords.length % 2 === 1 ? 0xEC : 0x11);
+        }
+
+        // ---- Reed-Solomon ECC over GF(256) ----
+        // Generator polynomial (descending coefficients, monic): prod (x - a^i)
+        var gen = [1];
+        var r, k;
+        for (r = 0; r < ECC_CW; r++) {
+          var root = GF_EXP[r];
+          var ng = [];
+          for (k = 0; k <= gen.length; k++) ng[k] = 0;
+          for (k = 0; k <= gen.length; k++) {
+            if (k < gen.length) ng[k] ^= gfMul(gen[k], 1);
+            if (k > 0) ng[k] ^= gfMul(gen[k - 1], root);
+          }
+          gen = ng;
+        }
+        // Synthetic division remainder
+        var res = codewords.slice();
+        for (r = 0; r < ECC_CW; r++) res.push(0);
+        for (r = 0; r < DATA_CW; r++) {
+          var factor = res[r];
+          if (factor !== 0) {
+            for (k = 1; k < gen.length; k++) {
+              res[r + k] ^= gfMul(gen[k], factor);
+            }
+          }
+        }
+        var ecc = res.slice(DATA_CW);
+        var finalSeq = codewords.concat(ecc);
+
+        // ---- Matrix: modules[][] (dark), isFunction[][] ----
+        var modules = [], isFunction = [];
+        var row, col;
+        for (row = 0; row < SIZE; row++) {
+          modules.push([]);
+          isFunction.push([]);
+          for (col = 0; col < SIZE; col++) {
+            modules[row].push(false);
+            isFunction[row].push(false);
+          }
+        }
+        function setFn(x, y, dark) {
+          modules[y][x] = dark;
+          isFunction[y][x] = true;
+        }
+
+        // Timing patterns (painted first so finder boxes overwrite their ends)
+        for (row = 0; row < SIZE; row++) {
+          setFn(6, row, row % 2 === 0);
+          setFn(row, 6, row % 2 === 0);
+        }
+
+        // Finder patterns (+ separators) at three corners
+        function drawFinder(cx, cy) {
+          var dx, dy, dist;
+          for (dy = -4; dy <= 4; dy++) {
+            for (dx = -4; dx <= 4; dx++) {
+              if (cx + dx < 0 || cx + dx >= SIZE || cy + dy < 0 || cy + dy >= SIZE) continue;
+              dist = Math.max(Math.abs(dx), Math.abs(dy));
+              setFn(cx + dx, cy + dy, dist !== 2 && dist !== 4);
+            }
+          }
+        }
+        drawFinder(3, 3);
+        drawFinder(SIZE - 4, 3);
+        drawFinder(3, SIZE - 4);
+
+        // Alignment pattern: version 3 centers {6,22}; only (22,22) stands alone.
+        (function () {
+          var cx = 22, cy = 22, adx, ady, adist;
+          for (ady = -2; ady <= 2; ady++) {
+            for (adx = -2; adx <= 2; adx++) {
+              adist = Math.max(Math.abs(adx), Math.abs(ady));
+              setFn(cx + adx, cy + ady, adist !== 1);
+            }
+          }
+        })();
+
+        // Format info: ECL M (00), mask 2 -> BCH(15,5)
+        var fmtData = (0 << 3) | MASK_ID; // ECL bits for M are 00
+        var remF = fmtData << 10;
+        var fi;
+        for (fi = 14; fi >= 10; fi--) {
+          if (((remF >> fi) & 1) !== 0) remF ^= 0x537 << (fi - 10);
+        }
+        var fmtBits = ((fmtData << 10) | remF) ^ 0x5412;
+        function getBit(val, i) { return ((val >>> i) & 1) !== 0; }
+        // Copy A (around top-left finder)
+        for (fi = 0; fi < 6; fi++) setFn(8, fi, getBit(fmtBits, fi));
+        setFn(8, 7, getBit(fmtBits, 6));
+        setFn(8, 8, getBit(fmtBits, 7));
+        setFn(7, 8, getBit(fmtBits, 8));
+        for (fi = 9; fi < 15; fi++) setFn(14 - fi, 8, getBit(fmtBits, fi));
+        // Copy B (split bottom-left column / top-right row)
+        for (fi = 0; fi < 8; fi++) setFn(SIZE - 1 - fi, 8, getBit(fmtBits, fi));
+        for (fi = 8; fi < 15; fi++) setFn(8, SIZE - 15 + fi, getBit(fmtBits, fi));
+        setFn(SIZE - 8, 8, true); // dark module
+
+        // ---- Zigzag placement with mask 2 (col % 3 === 0 inverts) ----
+        var totalDataBits = finalSeq.length * 8;
+        var bitIdx = 0;
+        var right, vert, j;
+        for (right = SIZE - 1; right >= 1; right -= 2) {
+          if (right === 6) right = 5;
+          for (vert = 0; vert < SIZE; vert++) {
+            for (j = 0; j < 2; j++) {
+              var x = right - j;
+              var upward = ((right + 1) & 2) === 0;
+              var y = upward ? SIZE - 1 - vert : vert;
+              if (!isFunction[y][x] && bitIdx < totalDataBits) {
+                var dark = getBit(finalSeq[bitIdx >> 3], 7 - (bitIdx & 7));
+                if (x % 3 === 0) dark = !dark;
+                modules[y][x] = dark;
+                bitIdx++;
+              }
+            }
+          }
+        }
+        return modules;
+      }
+
+      function partyQrEncodeText(text) {
+        var bytes = [];
+        for (var i = 0; i < text.length; i++) {
+          var c = text.charCodeAt(i);
+          if (c < 0x80) {
+            bytes.push(c);
+          } else if (c < 0x800) {
+            bytes.push(0xc0 | (c >> 6), 0x80 | (c & 0x3f));
+          } else {
+            bytes.push(0xe0 | (c >> 12), 0x80 | ((c >> 6) & 0x3f), 0x80 | (c & 0x3f));
+          }
+        }
+        return partyQrEncodeBytes(bytes);
+      }
+
+      // Render the QR matrix once to a canvas and cache the PNG data URL —
+      // regenerating a static image every render would be wasted work.
+      var partyQrDataUrlCache = null;
+      function getPartyQrDataUrl(pxPerModule) {
+        if (partyQrDataUrlCache) return partyQrDataUrlCache;
+        try {
+          var matrix = partyQrEncodeText(PARTY_QR_URL);
+          // 2-module quiet zone (half the spec's 4): still scans reliably but
+          // wastes far less of the panel; the code renders at 8px/module
+          var quiet = 2;
+          var scale = pxPerModule || 8;
+          var dim = (matrix.length + quiet * 2) * scale;
+          var canvas = document.createElement("canvas");
+          canvas.width = dim;
+          canvas.height = dim;
+          var ctx = canvas.getContext("2d");
+          ctx.fillStyle = "#ffffff";
+          ctx.fillRect(0, 0, dim, dim);
+          ctx.fillStyle = "#000000";
+          for (var mr = 0; mr < matrix.length; mr++) {
+            for (var mc = 0; mc < matrix.length; mc++) {
+              if (matrix[mr][mc]) {
+                ctx.fillRect((mc + quiet) * scale, (mr + quiet) * scale, scale, scale);
+              }
+            }
+          }
+          partyQrDataUrlCache = canvas.toDataURL("image/png");
+        } catch (e) {
+          try { console.log("QR generation failed: " + e); } catch (e2) { }
+          partyQrDataUrlCache = null;
+        }
+        return partyQrDataUrlCache;
+      }
+
       // ======== CONFIG ========
       var HA_URL = "http://192.168.40.89:8123";
       var HA_TOKEN = "INSERT_LONG_API_CODE_HERE";
@@ -4325,6 +4916,25 @@
         }
       } catch (e) { }
       var REFRESH_INTERVAL = 15000;
+      // ======== PARTY PAGE ========
+      // Party mode activates when input_select.house_mode is "Party" (case-insensitive).
+      // PARTY_QR_URL: what guests' phones get when scanning the QR code on the Party page.
+      // PARTY_MEDIA_ENTITY: the media player whose group is shown on the Party page.
+      var PARTY_MODE_ENTITY = "input_select.house_mode";
+      var PARTY_QR_URL = "http://192.168.40.89:8095/#/guest";
+      var PARTY_MEDIA_ENTITY = "media_player.family_room_apple_tv";
+      // Substring patterns matched against entity_id: nothing on the Party
+      // page's left column may contain any of these (they remain on Home).
+      // "kitchen" hides every kitchen light entity, not just one.
+      var PARTY_HIDDEN_ENTITIES = ["theater", "game_room", "kitchen"];
+      // Pool & spa light shortcut cards on the Party page's left column: two
+      // half-column cards with high-contrast pool/spa + bulb icons. These two
+      // entities (and anything named "outdoor") are removed from the generic
+      // card stack so they don't render twice.
+      var PARTY_POOL_LIGHTS_ENTITY = "light.scott_pool_lights";
+      var PARTY_SPA_LIGHT_ENTITY = "light.spa_light";
+      // Where the 🎉 header toggle sends house_mode when switching a party OFF
+      var PARTY_EXIT_MODE = "Day";
       var refreshTimer = null;
       var globalMsgId = 100;
       function getNextMsgId() { return globalMsgId++; }
@@ -4695,6 +5305,87 @@
         el.style.display = "flex";
       }
 
+      // ======== PARTY MODE ========
+      var wasPartyMode = false;
+      function isPartyMode(allStates) {
+        if (!allStates || !allStates.length) return false;
+        var fallbackState = null;
+        for (var i = 0; i < allStates.length; i++) {
+          var s = allStates[i];
+          if (!s || !s.entity_id) continue;
+          if (s.entity_id === PARTY_MODE_ENTITY) return ("" + (s.state || "")).toLowerCase() === "party";
+          if (fallbackState === null && s.entity_id.indexOf("house_mode") !== -1) fallbackState = s.state;
+        }
+        return ("" + (fallbackState || "")).toLowerCase() === "party";
+      }
+      function isPartyModeActive() {
+        return wasPartyMode;
+      }
+      // Theme decision used by renderDashboard: parties ALWAYS display light
+      // mode (maximum perceived brightness on the wall panel), overriding
+      // night mode and any manual dark override until house_mode leaves Party.
+      function isDashboardDarkTheme(isNight) {
+        // Party mode no longer forces light theme: parties follow the normal
+        // night/manual-override rules like every other page. Only dimming and
+        // the lock screen are suppressed mid-party.
+        return themeOverride === "dark" || isNight;
+      }
+      // Called at the top of renderDashboard. Flips activeTab on party-mode
+      // transitions (auto-switch both ways), and recovers from a stale cached
+      // "party" tab after a page reload while HA is no longer in party mode.
+      function syncPartyModeState(allStates) {
+        var partyNow = isPartyMode(allStates);
+        if (partyNow !== wasPartyMode) {
+          wasPartyMode = partyNow;
+          if (partyNow && activeTab !== "party") {
+            activeTab = "party";
+            applyTabClass("party");
+            showToast("🎉 Party mode activated");
+            return;
+          }
+          if (!partyNow && activeTab === "party") {
+            activeTab = "home";
+            applyTabClass("home");
+            showToast("Party mode ended");
+            return;
+          }
+        } else if (!partyNow && activeTab === "party") {
+          activeTab = "home";
+          applyTabClass("home");
+        }
+      }
+
+      // 🎉 Manual party toggle for the All Controls header button: turns the
+      // house_mode input_select to Party (or back to PARTY_EXIT_MODE). The
+      // resulting state change flows through the normal poll -> render ->
+      // syncPartyModeState path, so all party behavior activates itself.
+      window.togglePartyMode = function () {
+        var goingParty = !isPartyModeActive();
+        var option = goingParty ? "Party" : PARTY_EXIT_MODE;
+        haRequest("POST", "/api/services/input_select/select_option", {
+          entity_id: PARTY_MODE_ENTITY,
+          option: option
+        }, function (err) {
+          if (err) {
+            showToast("Error: " + err, true);
+          } else {
+            showToast(goingParty ? "🎉 Party mode activated" : "Party mode ended — back to " + PARTY_EXIT_MODE);
+          }
+          setTimeout(refreshAll, 500);
+        });
+      };
+
+      // The page hides the iOS status bar by scrolling itself 24px past the
+      // black-translucent band. iOS Safari occasionally resets that scroll
+      // back to 0 (rubber-band bounce, keyboard, tab restore), which exposes
+      // a black strip across the top of the screen in light mode. Tab changes
+      // and the first render force it down; init() re-checks every minute so
+      // drift can't leave the bar visible.
+      function ensureBlackBarHidden(force) {
+        var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+        if (force || y < 24) window.scrollTo(0, 24);
+      }
+
       function applyTabClass(tabName) {
         document.body.className = document.body.className.replace(/\btab-[a-z]+\b/g, "").replace(/\bsparse-home-layout\b/g, "").trim();
         document.body.classList.add("tab-" + tabName);
@@ -4705,7 +5396,7 @@
         if (tabName === "home") {
           setTimeout(checkSparseHomeLayout, 50);
         }
-        window.scrollTo(0, 24);
+        ensureBlackBarHidden(true);
       }
 
       window.toggleMainNavigation = function (e) {
@@ -6405,7 +7096,7 @@
         return h;
       }
 
-      function renderHomeMediaPlayerCard(group, isExtended) {
+      function renderHomeMediaPlayerCard(group, isExtended, forceShow) {
         var primary = group[0] || group;
         var names = [];
         if (group.length) {
@@ -6437,15 +7128,16 @@
         var isPlaying = trackInfo.isPlaying;
 
         var isIdle = (state !== "playing" && state !== "paused" && title !== "Skipping...");
-        if (isIdle) return "";
+        // forceShow (Party page): the card stays visible even when idle/paused
+        if (isIdle && !forceShow) return "";
 
         // If not actually playing and idle for > 15 minutes (900,000 ms), hide from Home tab
         var homeIdleMs = getMediaPlayerIdleMs(primary);
-        if (homeIdleMs >= 0 && homeIdleMs > 900000) {
+        if (!forceShow && homeIdleMs >= 0 && homeIdleMs > 900000) {
           return "";
         }
 
-        var bigTrackTitle = escapeHtml(title) || "Playing";
+        var bigTrackTitle = escapeHtml(title) || ((forceShow && !isPlaying) ? "Queue a track" : "Playing");
         var smallSpeakerSubtext = speakerName + (artist ? ' • ' + escapeHtml(artist) : '');
 
         var playOverlaySvg = isPlaying
@@ -6595,6 +7287,9 @@
       var dimWakeTimer = null;
 
       function applyDimDashboardStyle() {
+        // Party mode forces full brightness: neither the manual dim boolean
+        // nor automatic night dimming may apply the overlay while active
+        if (isPartyModeActive()) isDimDashboardActive = false;
         if (isDimDashboardActive) {
           if (!document.body.classList.contains("dashboard-dimmed-65pct")) {
             document.body.classList.add("dashboard-dimmed-65pct");
@@ -6640,6 +7335,7 @@
       }
 
       function handleDimmedInteraction() {
+        if (isPartyModeActive()) return; // never dim during a party
         if (isDimDashboardActive) {
           document.body.classList.add("dashboard-dimmed-active-80pct");
           document.documentElement.classList.add("dashboard-dimmed-active-80pct");
@@ -6731,6 +7427,11 @@
       }
 
       function shouldShowSplash(allStates) {
+        // Party mode never locks the dashboard (no camera-feed overlay over
+        // the Party page), regardless of night/away state, the 30-minute
+        // unlock window or a previously forced lock. Normal behavior resumes
+        // automatically once house_mode leaves Party.
+        if (isPartyModeActive()) return false;
         if (!splashEnabled) return false;
         if (splashForced) return true;
         if (Date.now() < splashUnlockedUntil) return false;
@@ -6770,6 +7471,13 @@
       };
 
       window.lockScreenNow = function () {
+        // Manual "Lock Now" is also disabled mid-party: the camera-feed lock
+        // screen must never appear over the Party page
+        if (isPartyModeActive()) {
+          showToast("Lock screen is disabled during a Party", true);
+          closeSettings();
+          return;
+        }
         splashEnabled = true;
         splashForced = true;
         try {
@@ -6955,6 +7663,8 @@
       var idleTimer = null;
       var returnHomeTimer = null;
       function scheduleReturnHome(delayMs) {
+        // Party mode pins the dashboard to the Party page
+        if (isPartyModeActive()) return;
         if (returnHomeTimer) clearTimeout(returnHomeTimer);
         returnHomeTimer = setTimeout(function () {
           returnHomeTimer = null;
@@ -6965,6 +7675,8 @@
         }, delayMs);
       }
       function resetInactivityTimer(customTimeoutMs) {
+        // Party mode pins the dashboard to the Party page
+        if (isPartyModeActive()) return;
         if (idleTimer) {
           clearTimeout(idleTimer);
         }
@@ -7002,6 +7714,11 @@
         startMediaTickers();
         updateClock();
         setInterval(updateClock, 10000);
+        // Minute-cadence guard so the black status-bar band never reappears
+        // after iOS Safari silently resets the scroll offset (see
+        // ensureBlackBarHidden). Only nudges when the bar is actually exposed,
+        // so a user's deeper scroll on a long page is never yanked back.
+        setInterval(function () { ensureBlackBarHidden(false); }, 60000);
         resetInactivityTimer();
         document.addEventListener("click", wakeFromNightDim);
         document.addEventListener("touchstart", wakeFromNightDim);
@@ -7105,38 +7822,48 @@
         var eid = newState.entity_id;
 
         // 1. Tagged Media Player ('ipadhomescreen' / 'ipaddashboard') Playback Trigger
+        // Playback-state tracking ALWAYS updates so that when a party ends the
+        // baseline is current and no phantom play-edge fires a late switch.
+        // The auto-switch itself is suppressed during Party mode: the Party
+        // page IS the now-playing view, and music will be playing constantly,
+        // so auto-rotating away would fight it.
         if (eid.indexOf("media_player") !== -1) {
           var oldSt = oldState || previousMediaStates[eid] || "off";
           var newSt = newState.state;
           previousMediaStates[eid] = newSt;
 
-          if (oldSt !== "playing" && newSt === "playing") {
-            if (isIpadDashboardMedia(newState) || isIpadHomeScreenEntity(newState)) {
-              if (activeTab !== "media") {
-                switchTab("media");
-                showToast("🎵 " + (friendlyName(newState) || "Media player") + " started playing — Auto-switched to Media page");
+          if (!isPartyModeActive()) {
+            if (oldSt !== "playing" && newSt === "playing") {
+              if (isIpadDashboardMedia(newState) || isIpadHomeScreenEntity(newState)) {
+                if (activeTab !== "media") {
+                  switchTab("media");
+                  showToast("🎵 " + (friendlyName(newState) || "Media player") + " started playing — Auto-switched to Media page");
+                }
+                resetInactivityTimer(5 * 60 * 1000); // 5 minutes countdown to return to Home
               }
-              resetInactivityTimer(5 * 60 * 1000); // 5 minutes countdown to return to Home
-            }
-          } else if (oldSt === "playing" && newSt !== "playing") {
-            // Playback paused or stopped — return to Home in 30s if no other player is still playing
-            var stillPlaying = false;
-            if (lastStatesCache) {
-              for (var pm = 0; pm < lastStatesCache.length; pm++) {
-                var pmState = lastStatesCache[pm];
-                if (pmState.entity_id.indexOf("media_player.") === 0 && pmState.state === "playing") {
-                  stillPlaying = true;
-                  break;
+            } else if (oldSt === "playing" && newSt !== "playing") {
+              // Playback paused or stopped — return to Home in 30s if no other player is still playing
+              var stillPlaying = false;
+              if (lastStatesCache) {
+                for (var pm = 0; pm < lastStatesCache.length; pm++) {
+                  var pmState = lastStatesCache[pm];
+                  if (pmState.entity_id.indexOf("media_player.") === 0 && pmState.state === "playing") {
+                    stillPlaying = true;
+                    break;
+                  }
                 }
               }
-            }
-            if (!stillPlaying) {
-              scheduleReturnHome(30 * 1000);
+              if (!stillPlaying) {
+                scheduleReturnHome(30 * 1000);
+              }
             }
           }
         }
 
         // 2. Hot Tub Chemicals Status Trigger (Green/Yellow -> RED)
+        // Also suppressed during parties (no page may auto-switch mid-party).
+        // The status latch is held at false while partying so that if the
+        // water is still red when the party ends, the alert fires then.
         if (typeof getRecommendationsData === "function" && lastStatesCache && lastStatesCache.length > 0) {
           var hotTubRecs = getRecommendationsData(lastStatesCache, "hottub");
           var currentHotTubRed = false;
@@ -7147,16 +7874,20 @@
             }
           }
 
-          if (!previousHotTubRedStatus && currentHotTubRed) {
-            if (typeof openChemicalsTab === "function") {
-              openChemicalsTab("hottub");
-            } else if (activeTab !== "chemicals") {
-              switchTab("chemicals");
+          if (!isPartyModeActive()) {
+            if (!previousHotTubRedStatus && currentHotTubRed) {
+              if (typeof openChemicalsTab === "function") {
+                openChemicalsTab("hottub");
+              } else if (activeTab !== "chemicals") {
+                switchTab("chemicals");
+              }
+              showToast("🚨 Hot Tub Chemical Red Alert — Auto-switched to Chemicals page for 15m", true);
+              resetInactivityTimer(15 * 60 * 1000); // 15 minutes countdown to return to Home
             }
-            showToast("🚨 Hot Tub Chemical Red Alert — Auto-switched to Chemicals page for 15m", true);
-            resetInactivityTimer(15 * 60 * 1000); // 15 minutes countdown to return to Home
+            previousHotTubRedStatus = currentHotTubRed;
+          } else {
+            previousHotTubRedStatus = false;
           }
-          previousHotTubRedStatus = currentHotTubRed;
         }
       }
 
@@ -7756,6 +8487,19 @@
         return c;
       }
 
+      // Freshness guard for /api/states snapshots racing WebSocket events. The
+      // request-sequence counter only orders REST responses against each other;
+      // without this check a poll captured BEFORE a WS state_changed but landing
+      // AFTER it would revert entities[]/lastStatesCache to the older snapshot
+      // and repaint the previous song for up to one poll interval. ISO-8601
+      // timestamps from the same HA instance compare correctly as strings;
+      // equal timestamps apply (same content); missing values fall back to
+      // "apply" so nothing regresses if last_updated is absent.
+      function isNewerState(prev, next) {
+        if (!prev || !prev.last_updated || !next.last_updated) return true;
+        return next.last_updated >= prev.last_updated;
+      }
+
       // Single write-point for keeping entities + lastStatesCache in sync.
       function syncEntityCaches(s) {
         if (!s || !s.entity_id) return;
@@ -7784,7 +8528,7 @@
       function renderTabsForMediaChange(stateChanged) {
         if (activeTab === "media") {
           renderDashboard(lastStatesCache);
-        } else if (stateChanged && (activeTab === "home" || activeTab === "controls")) {
+        } else if (stateChanged && (activeTab === "home" || activeTab === "controls" || activeTab === "party")) {
           renderDashboard(lastStatesCache);
         }
       }
@@ -7838,9 +8582,15 @@
           stateReqApplied = mySeq;
           consecutiveErrors = 0;
           setStatus("connected");
+          // Newer-wins merge: a REST snapshot captured before a WebSocket
+          // event landed must not overwrite fresher state already applied by
+          // updateRealtimeEntityState (REST-vs-WS race -> stale song info).
+          var prevEntities = entities;
           entities = {};
           var i;
           for (i = 0; i < data.length; i++) {
+            var prev = prevEntities[data[i].entity_id] || null;
+            if (prev && !isNewerState(prev, data[i])) data[i] = prev;
             entities[data[i].entity_id] = es5ShallowClone(data[i]);
           }
           lastStatesCache = data;
@@ -7904,9 +8654,202 @@
         alert(out.length ? out.join("\n\n") : "No media players found.");
       };
 
+      // ======== PARTY PAGE HELPERS ========
+      // Pick the media group that contains PARTY_MEDIA_ENTITY (family room
+      // Apple TV). Unlike the Home tab there is NO idle filter here: during a
+      // party the card always stays visible so transport controls remain
+      // available even when nothing is playing yet.
+      function findPartyMediaGroup(mediaPlayers, hasHomeTagDefined) {
+        var eligible = [];
+        var i, mp;
+        for (i = 0; i < mediaPlayers.length; i++) {
+          mp = mediaPlayers[i];
+          if (hasHomeTagDefined && !isHomeScreenEntity(mp)) continue;
+          if (mp.state === "playing" || mp.state === "paused") eligible.push(mp);
+        }
+        var groups = [];
+        var byKey = {};
+        for (i = 0; i < eligible.length; i++) {
+          var key = getMediaGroupKey(eligible[i]);
+          if (key) {
+            if (!byKey[key]) {
+              byKey[key] = [];
+              groups.push(byKey[key]);
+            }
+            byKey[key].push(eligible[i]);
+          } else {
+            groups.push([eligible[i]]);
+          }
+        }
+        for (i = 0; i < groups.length; i++) {
+          var g = groups[i];
+          for (var j = 0; j < g.length; j++) {
+            if (g[j].entity_id === PARTY_MEDIA_ENTITY) return g;
+          }
+        }
+        // Fall back to the family room player alone so its card is always shown
+        for (i = 0; i < mediaPlayers.length; i++) {
+          if (mediaPlayers[i].entity_id === PARTY_MEDIA_ENTITY) return [mediaPlayers[i]];
+        }
+        return null;
+      }
+
+      function buildPartyQrPanelHtml() {
+        var h = '<div class="party-qr-panel">';
+        // 8px/module with the 2-module quiet zone baked in: a much bigger,
+        // easier-to-scan code while trimming panel chrome so the whole right
+        // column still fits a 768px-tall landscape screen without scrolling
+        var dataUrl = getPartyQrDataUrl(8);
+        if (dataUrl) {
+          h += '<img class="party-qr-img" src="' + dataUrl + '" alt="Scan to queue music">';
+        } else {
+          h += '<div class="party-qr-error">QR unavailable</div>';
+        }
+        h += '<div class="party-qr-caption">Scan to queue music</div>';
+        h += '</div>';
+        return h;
+      }
+
+      // Shared bulb badge appended to both party light icons: a filled yellow
+      // disc with a dark bulb glyph, high-contrast on light AND dark cards.
+      function buildPartyBulbBadge() {
+        return '<circle cx="56" cy="11" r="10.5" fill="#ffcc00" stroke="#1c1c1e" stroke-width="2.5"/>' +
+          '<circle cx="56" cy="9" r="4.6" fill="none" stroke="#1c1c1e" stroke-width="2.4"/>' +
+          '<path d="M53.6 16 h4.8 M54.4 18.5 h3.2" stroke="#1c1c1e" stroke-width="2.2" stroke-linecap="round" fill="none"/>';
+      }
+
+      function buildPartyPoolLightSvg() {
+        return '<svg viewBox="0 0 68 62" fill="none">' +
+          // Ladder
+          '<path d="M31 8 v20 M43 8 v20 M31 14 h12 M31 21 h12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
+          // Water waves
+          '<path d="M6 36 q5 -5 10 0 t10 0 t10 0 t10 0 t10 0" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
+          '<path d="M6 48 q5 -5 10 0 t10 0 t10 0 t10 0 t10 0" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
+          buildPartyBulbBadge() +
+          '</svg>';
+      }
+
+      function buildPartySpaLightSvg() {
+        return '<svg viewBox="0 0 68 62" fill="none">' +
+          // Steam squiggles
+          '<path d="M22 24 q-3.5 -5 0 -10 M33 24 q-3.5 -5 0 -10 M44 24 q-3.5 -5 0 -10" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/>' +
+          // Tub rim + body
+          '<path d="M8 31 h48" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
+          '<path d="M11 31 v7 a13 13 0 0 0 13 13 h16 a13 13 0 0 0 13 -13 v-7" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>' +
+          // Water line inside the tub
+          '<path d="M15 38 q4 -3 8 0 t8 0 t8 0 t8 0" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>' +
+          buildPartyBulbBadge() +
+          '</svg>';
+      }
+
+      function getPartyPairLightState(eid, rawHomeList) {
+        var i;
+        if (rawHomeList) {
+          for (i = 0; i < rawHomeList.length; i++) {
+            if (rawHomeList[i].entity_id === eid) return rawHomeList[i].state || "off";
+          }
+        }
+        if (lastStatesCache) {
+          for (i = 0; i < lastStatesCache.length; i++) {
+            if (lastStatesCache[i].entity_id === eid) return lastStatesCache[i].state || "off";
+          }
+        }
+        return "off";
+      }
+
+      function buildPartyLightPairHtml(rawHomeList) {
+        var pair = [
+          { eid: PARTY_POOL_LIGHTS_ENTITY, label: "Pool Lights", svg: buildPartyPoolLightSvg() },
+          { eid: PARTY_SPA_LIGHT_ENTITY, label: "Spa Light", svg: buildPartySpaLightSvg() }
+        ];
+        var h = '<div class="party-light-row">';
+        for (var i = 0; i < pair.length; i++) {
+          var isOn = getPartyPairLightState(pair[i].eid, rawHomeList) === "on" ||
+            getPartyPairLightState(pair[i].eid, rawHomeList) === "On";
+          h += '<div class="party-light-card' + (isOn ? " active" : "") + '" id="card_' + pair[i].eid.replace(/[^a-zA-Z0-9_-]/g, "_") + '"' +
+            ' onclick="toggleEntity(\'' + pair[i].eid + '\', \'light\')" title="' + pair[i].label + '">' +
+            pair[i].svg +
+            '<div class="party-light-label">' + escapeHtml(pair[i].label) + '</div>' +
+            '</div>';
+        }
+        h += '</div>';
+        return h;
+      }
+
+      function buildPartyPageHtml(mediaPlayers, lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects, welcomeMessage) {
+        var hasHomeTagDefined = (Object.keys(homeEntityIds).length > 0);
+
+        // LEFT COLUMN: same entity set as the Home tab ('ipadhomescreen', no
+        // media players), stacked one control per row instead of a grid.
+        // PARTY_HIDDEN_ENTITIES are substring patterns matched against
+        // entity_id; matching entities stay on the Home tab only.
+        var rawHomeList = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
+        var leftHtml = "";
+        // Small one-line welcome strip above the controls. Never wraps:
+        // overflow is clipped with an ellipsis so long messages can't push
+        // the control stack down and break the fit-to-768px layout.
+        if (typeof welcomeMessage === "string" && welcomeMessage.replace(/^\s+|\s+$/g, "")) {
+          leftHtml += '<div class="party-left-message">' + escapeHtml(welcomeMessage) + '</div>';
+        }
+        // Pool & spa light shortcut pair replaces the generic outdoor-light
+        // rows: rendered first, and those entities are skipped below so they
+        // don't appear twice.
+        leftHtml += buildPartyLightPairHtml(rawHomeList);
+        for (var li = 0; li < rawHomeList.length; li++) {
+          var ent = rawHomeList[li];
+          if (hasHomeTagDefined && !isHomeScreenEntity(ent)) continue;
+          var entIdLower = (ent.entity_id || "").toLowerCase();
+          var entNameLower = (friendlyName(ent) || "").toLowerCase();
+          var entHidden = false;
+          for (var hi = 0; hi < PARTY_HIDDEN_ENTITIES.length; hi++) {
+            if (entIdLower.indexOf(PARTY_HIDDEN_ENTITIES[hi]) !== -1) {
+              entHidden = true;
+              break;
+            }
+          }
+          // Outdoor lights + the two pair entities render as the custom cards
+          if (!entHidden &&
+            (entIdLower.indexOf("outdoor") !== -1 ||
+             entNameLower.indexOf("outdoor") !== -1 ||
+             ent.entity_id === PARTY_POOL_LIGHTS_ENTITY ||
+             ent.entity_id === PARTY_SPA_LIGHT_ENTITY)) {
+            entHidden = true;
+          }
+          if (entHidden) continue;
+          leftHtml += '<div class="party-left-item">' + renderHomeCard(ent) + '</div>';
+        }
+
+        // RIGHT COLUMN: QR panel on top, family room media group below.
+        var rightHtml = buildPartyQrPanelHtml();
+        var group = findPartyMediaGroup(mediaPlayers, hasHomeTagDefined);
+        if (group && group.length) {
+          // Use the REAL media renderer, but force the MULTI-card variant
+          // (cardCount 2): no crisp album cover square, more compact info +
+          // controls stack — better proportions for the narrow right column.
+          // All controls are inline onclick handlers and progress tickers
+          // target IDs globally, so it works outside #mediaPageHost unchanged.
+          // When idle the card's built-in Play pill is the way to start music.
+          rightHtml += '<div class="party-media-wrap">' + renderMediaCardLayout(group, 2, 0) + '</div>';
+        }
+
+        var h = '<div class="party-layout">';
+        h += '<div class="party-col party-col-left">' + leftHtml + '</div>';
+        h += '<div class="party-col party-col-right">' + rightHtml + '</div>';
+        h += '</div>';
+        // Escape hatch: header AND footer are hidden on this page, so provide a
+        // small floating Home button (same icon as the in-page home buttons).
+        h += '<button id="partyHomeBtn" onclick="switchTab(\'home\')" title="Exit Party View">';
+        h += '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>';
+        h += '</button>';
+        return h;
+      }
+
       // ======== RENDER ========
       function renderDashboard(allStates) {
         checkLightningSafety(allStates);
+        // Party-mode transitions flip activeTab BEFORE anything renders, so the
+        // correct tab branch below executes within this same render pass.
+        syncPartyModeState(allStates);
         // Start dominant-color extraction for any currently-playing album art
         // immediately, so the Media page / home cards get their tint as soon as
         // it's ready instead of waiting for the next card render.
@@ -7933,7 +8876,7 @@
           isNight = !isAnyKitchenLightOn(allStates);
         }
 
-        if (themeOverride === "dark" || isNight) {
+        if (isDashboardDarkTheme(isNight)) {
           document.documentElement.className = "dark-theme";
           document.body.className = "dark-theme";
         } else {
@@ -8070,12 +9013,30 @@
         if (activeTab === "controls" || activeTab === "chemicals") {
           // On Controls & Chemicals views: render clean header row with 54px Home button
           var pageTitleText = (activeTab === "controls") ? "All Controls" : "Chemical Status";
-          var isDarkTheme = (themeOverride === "dark" || isNight);
+          // Must go through isDashboardDarkTheme: during a party the page is
+          // forced light even at night, so picking the white-icon style from
+          // raw night/dark state would render white buttons on the white page
+          var isDarkTheme = isDashboardDarkTheme(isNight);
           var subViewHomeBtnStyle = isDarkTheme ? 'style="background:rgba(255,255,255,0.18); color:#ffffff; border:1.5px solid rgba(255,255,255,0.3); border-radius:16px; height:54px; width:54px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer;"' : 'style="background:rgba(0,0,0,0.08); color:#1c1c1e; border:1.5px solid rgba(0,0,0,0.15); border-radius:16px; height:54px; width:54px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer;"';
+
+          // 🎉 Party toggle lives next to Settings on All Controls: one tap
+          // flips input_select.house_mode without hunting through HA. Accent
+          // styling while the party is running makes the state obvious.
+          var partyHatHtml = "";
+          if (activeTab === "controls") {
+            var partyHatBtnStyle = subViewHomeBtnStyle;
+            if (isPartyModeActive()) {
+              partyHatBtnStyle = 'style="background:rgba(255,45,85,0.14); color:#ff2d55; border:1.5px solid rgba(255,45,85,0.45); border-radius:16px; height:54px; width:54px; display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; cursor:pointer;"';
+            }
+            partyHatHtml = '<button class="card-home-btn" onclick="togglePartyMode()" title="Toggle Party Mode" ' + partyHatBtnStyle + '>' +
+              '<span style="font-size:24px; line-height:1;">🎉</span>' +
+              '</button>';
+          }
 
           html += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:space-between; justify-content:space-between; width:100%; margin-bottom:18px;">';
           html += '<div style="font-size:28px; font-weight:850; letter-spacing:-0.5px;">' + pageTitleText + '</div>';
           html += '<div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; gap:10px;">';
+          html += partyHatHtml;
           html += '<button class="card-home-btn" onclick="openSettings()" title="Open Settings" ' + subViewHomeBtnStyle + '>';
           html += '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>';
           html += '</button>';
@@ -8090,7 +9051,8 @@
         }
 
         // RENDER BASED ON ACTIVE TAB & DYNAMIC THEME COLOR
-        var isDarkTheme = (themeOverride === "dark" || isNight);
+        // Gated through isDashboardDarkTheme so parties always stay light
+        var isDarkTheme = isDashboardDarkTheme(isNight);
         document.body.className = (isDarkTheme ? "dark-theme " : "") + "tab-" + activeTab;
 
         // Dynamic backgrounds matching theme: body is black at night / white by day.
@@ -8131,9 +9093,24 @@
           topClockEl.style.display = (activeTab === "home") ? "block" : "none";
         }
 
-        // Footer is on all pages EXCEPT home and sleep mode
+        // The entire header is hidden on the Party page (no welcome, no clock).
+        // Restoring must re-declare display explicitly: setting "" would strip
+        // the flex declaration from the markup's inline style attribute.
+        var appHeaderEl = document.getElementById("appHeader");
+        if (appHeaderEl) {
+          appHeaderEl.style.display = (activeTab === "party") ? "none" : "flex";
+        }
+
+        // Footer is on all pages EXCEPT home, sleep mode, and party
         if (appFooterEl) {
-          appFooterEl.style.display = (activeTab === "home") ? "none" : "";
+          appFooterEl.style.display = (activeTab === "home" || activeTab === "party") ? "none" : "";
+        }
+
+        // Back-to-Party pill: only on the Home page during an active party
+        var backToPartyEl = document.getElementById("backToPartyBtn");
+        if (backToPartyEl) {
+          backToPartyEl.style.display = (isPartyModeActive() && activeTab === "home") ? "-webkit-flex" : "none";
+          backToPartyEl.style.display = (isPartyModeActive() && activeTab === "home") ? "flex" : "none";
         }
 
         if (activeTab === "home") {
@@ -8220,13 +9197,16 @@
             }
             html += '</div>';
           }
+        } else if (activeTab === "party") {
+          if (chemBanner) chemBanner.style.display = "none";
+          html += buildPartyPageHtml(mediaPlayers, lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects, welcomeMessage);
         } else if (activeTab === "media") {
           // The media page is rendered into the persistent #mediaPageHost
           // container below (see the innerHTML assignment) so it isn't rebuilt
           // every refresh. entityContainer gets only an invisible placeholder.
           html = '<div style="display:none;"></div>';
         } else if (activeTab === "controls") {
-          document.body.className = (themeOverride === "dark" || isNight ? "dark-theme" : "");
+          document.body.className = (isDashboardDarkTheme(isNight) ? "dark-theme" : "");
           // 1. Group controls by floor first
           var floorGroups = {};
           var allControls = [].concat(lights, switches, fans, climates, waterHeaters, covers, locks, inputSelects);
@@ -8563,7 +9543,7 @@
         // hides above the viewport and the iOS status text blends into the page.
         if (!didInitialBlackBarScroll) {
           didInitialBlackBarScroll = true;
-          window.scrollTo(0, 24);
+          ensureBlackBarHidden(true);
         }
       }
 
@@ -11705,6 +12685,9 @@
             if (!s.entity_id) continue;
             if (s.entity_id.indexOf("media_player.") === 0) {
               var existing = entities[s.entity_id];
+              // Stale-poll guard: a snapshot captured before a WebSocket event
+              // must not revert the fresher state already applied.
+              if (existing && !isNewerState(existing, s)) continue;
               if (mediaDisplayDiff(existing, s)) {
                 syncEntityCaches(s);
                 var stChanged = !existing || existing.state !== s.state;
@@ -11722,6 +12705,7 @@
               var nonMediaChanged = !prevNonMedia ||
                 prevNonMedia.state !== s.state ||
                 (prevNonMedia.last_updated || "") !== (s.last_updated || "");
+              if (prevNonMedia && !isNewerState(prevNonMedia, s)) continue;
               syncEntityCaches(s);
               if (nonMediaChanged) updateTargetedEntityDOM(s);
             }
