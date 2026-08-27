@@ -2083,9 +2083,9 @@
       -webkit-justify-content: center;
       justify-content: center;
       width: 100%;
-      margin-top: 4px;
-      margin-bottom: 8px;
-      padding: 6px 0;
+      margin-top: 2px;
+      margin-bottom: 4px;
+      padding: 2px 0;
       border: none;
       background: transparent;
       text-align: center;
@@ -2110,10 +2110,10 @@
       -webkit-justify-content: center;
       justify-content: center;
       margin-top: 14px;
-      padding: 14px 28px;
-      height: 52px;
+      padding: 16px 32px;
+      height: 62px;
       border-radius: 18px;
-      font-size: 18px;
+      font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.3px;
       cursor: pointer;
@@ -2130,6 +2130,50 @@
       color: #ffffff;
       border: 1.5px solid rgba(255, 255, 255, 0.25);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .home-party-btn {
+      display: -webkit-inline-flex;
+      display: inline-flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: center;
+      justify-content: center;
+      margin-top: 14px;
+      padding: 16px 32px;
+      height: 62px;
+      border-radius: 18px;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      cursor: pointer;
+      background: rgba(0, 0, 0, 0.08);
+      color: #1c1c1e;
+      border: 1.5px solid rgba(0, 0, 0, 0.14);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      -webkit-transition: none !important;
+      transition: none !important;
+    }
+
+    .home-party-btn.party-active {
+      background: rgba(255, 45, 85, 0.14);
+      color: #ff2d55;
+      border: 1.5px solid rgba(255, 45, 85, 0.45);
+      box-shadow: 0 4px 14px rgba(255, 45, 85, 0.2);
+    }
+
+    body.dark-theme .home-party-btn {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    body.dark-theme .home-party-btn.party-active {
+      background: rgba(255, 45, 85, 0.2);
+      color: #ff2d55;
+      border: 1.5px solid rgba(255, 45, 85, 0.55);
+      box-shadow: 0 4px 16px rgba(255, 45, 85, 0.3);
     }
 
     .sparse-clock-time {
@@ -3798,11 +3842,39 @@
     }
 
     body.tab-home .tile.overview-tile {
+      background: rgba(255, 255, 255, 0.10);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.10), 0 0 22px rgba(255, 255, 255, 0.30);
     }
 
     body.tab-home .tile.overview-big-tile {
+      background: rgba(255, 255, 255, 0.10);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12), 0 0 28px rgba(255, 255, 255, 0.32);
+    }
+
+    body.tab-home.dark-theme .tile.overview-tile {
+      background: rgba(22, 27, 34, 0.35);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45), 0 0 22px rgba(0, 0, 0, 0.30);
+    }
+
+    body.tab-home.dark-theme .tile.overview-big-tile {
+      background: rgba(22, 27, 34, 0.35);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 28px rgba(0, 0, 0, 0.30);
+    }
+
+    body.tab-home .tile.overview-big-tile.is-heater-tile.active-red {
+      background: rgba(255, 159, 10, 0.30) !important;
+    }
+
+    body.tab-home .tile.overview-big-tile.is-heater-tile.active-red-outline {
+      background: rgba(255, 255, 255, 0.10) !important;
+    }
+
+    body.tab-home.dark-theme .tile.overview-big-tile.is-heater-tile.active-red {
+      background: rgba(255, 159, 10, 0.32) !important;
+    }
+
+    body.tab-home.dark-theme .tile.overview-big-tile.is-heater-tile.active-red-outline {
+      background: rgba(22, 27, 34, 0.35) !important;
     }
 
     body.dark-theme .tile.media-tile {
@@ -4128,6 +4200,72 @@
     body.dark-theme .alert-banner {
       background: #ff453a;
       box-shadow: 0 4px 12px rgba(255, 69, 58, 0.15);
+    }
+
+    /* ======== FRIDGE FOOD SAFETY ALERT (drops down from the top) ======== */
+    .fridge-alert {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 10000;
+      background: #ff3b30;
+      color: #ffffff;
+      padding: 16px 18px;
+      display: -webkit-flex;
+      display: flex;
+      -webkit-align-items: center;
+      align-items: center;
+      -webkit-justify-content: space-between;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+      -webkit-transform: translateY(-110%);
+      transform: translateY(-110%);
+      -webkit-transition: -webkit-transform 0.35s ease;
+      transition: transform 0.35s ease;
+    }
+
+    .fridge-alert.visible {
+      -webkit-transform: translateY(0);
+      transform: translateY(0);
+    }
+
+    .fridge-alert-text {
+      -webkit-flex: 1;
+      flex: 1;
+      min-width: 0;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .fridge-alert-btn {
+      -webkit-flex-shrink: 0;
+      flex-shrink: 0;
+      margin-left: 14px;
+      background: rgba(255, 255, 255, 0.94);
+      color: #ff3b30;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      -webkit-appearance: none;
+    }
+
+    .fridge-alert-btn:active {
+      background: #ffffff;
+    }
+
+    body.dark-theme .fridge-alert {
+      background: #ff453a;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.55);
+    }
+
+    body.dark-theme .fridge-alert-btn {
+      color: #ff453a;
     }
 
     body.dark-theme .setup-overlay {
@@ -4605,7 +4743,7 @@
     <div id="sparseBottomClock" class="sparse-bottom-clock">
       <div id="sparseClockTime" class="sparse-clock-time"></div>
       <div id="sparseClockDate" class="sparse-clock-date"></div>
-      <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:10px; width:100%; margin-top:14px; padding:0 12px; box-sizing:border-box;">
+      <div style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; gap:10px; width:100%; margin-top:6px; padding:0 12px; box-sizing:border-box;">
         <div id="chemLogBtn" style="display:none; -webkit-flex:1; flex:1; max-width:260px; min-width:0;"></div>
         <button id="homeAllControlsBtn" class="home-all-controls-btn" onclick="switchTab('controls')"
           title="Open All Controls" style="margin-top:0; -webkit-flex-shrink:0; flex-shrink:0;">
@@ -4614,6 +4752,11 @@
               d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z" />
           </svg>
           <span>All Controls</span>
+        </button>
+        <button id="homePartyModeBtn" class="home-party-btn" onclick="togglePartyMode()"
+          title="Toggle Party Mode" style="margin-top:0; -webkit-flex-shrink:0; flex-shrink:0;">
+          <span style="font-size:24px; line-height:1; margin-right:8px;">🎉</span>
+          <span>Party Mode</span>
         </button>
       </div>
     </div>
@@ -4625,7 +4768,7 @@
         <span style="font-weight:500;">Connection Status</span>
         <span
           style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;"
-          id="versionLabel">v4.0.3</span>
+          id="versionLabel">v4.9.1</span>
       </div>
     </footer>
   </main>
@@ -4636,12 +4779,19 @@
 
   <div id="toast" class="toast"></div>
 
+  <!-- FRIDGE FOOD SAFETY ALERT: drops down from the top when the outside fridge
+       has been above 40°F for too long (driven by input_boolean.outdoor_fridge_food_unsafe) -->
+  <div id="fridgeFoodAlert" class="fridge-alert">
+    <div class="fridge-alert-text">⚠️ Outside fridge has been above 40 degrees for more than 4 hours. Food is potentially unsafe to eat.</div>
+    <button class="fridge-alert-btn" onclick="dismissFridgeAlert()">I Understand</button>
+  </div>
+
   <script>
     (function () {
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.8.0";
+      var DASHBOARD_VERSION = "v4.9.1";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -4934,7 +5084,7 @@
       var PARTY_POOL_LIGHTS_ENTITY = "light.scott_pool_lights";
       var PARTY_SPA_LIGHT_ENTITY = "light.spa_light";
       // Where the 🎉 header toggle sends house_mode when switching a party OFF
-      var PARTY_EXIT_MODE = "Day";
+      var PARTY_EXIT_MODE = "Home";
       var refreshTimer = null;
       var globalMsgId = 100;
       function getNextMsgId() { return globalMsgId++; }
@@ -5215,6 +5365,44 @@
         showToast("Lightning safety alert acknowledged");
       };
 
+      // ======== OUTSIDE FRIDGE FOOD SAFETY ALERT ========
+      // Driven by input_boolean.outdoor_fridge_food_unsafe (set in HA when the
+      // outside fridge has been above 40°F for more than 4 hours). Shows a
+      // notification that drops down from the top; "I Understand" turns the
+      // boolean back off.
+      var FRIDGE_ALERT_ENTITY = "input_boolean.outdoor_fridge_food_unsafe";
+
+      function updateFridgeAlertState(allStates) {
+        var unsafe = false;
+        for (var i = 0; i < allStates.length; i++) {
+          if (allStates[i].entity_id === FRIDGE_ALERT_ENTITY) {
+            unsafe = (allStates[i].state === "on" || allStates[i].state === "On" || allStates[i].state === true);
+            break;
+          }
+        }
+        var alertEl = document.getElementById("fridgeFoodAlert");
+        if (!alertEl) return;
+        if (unsafe) {
+          if (alertEl.className.indexOf("visible") === -1) alertEl.className = "fridge-alert visible";
+        } else if (alertEl.className.indexOf("visible") !== -1) {
+          alertEl.className = "fridge-alert";
+        }
+      }
+
+      window.dismissFridgeAlert = function () {
+        var alertEl = document.getElementById("fridgeFoodAlert");
+        if (alertEl) alertEl.className = "fridge-alert";
+        haRequest("POST", "/api/services/input_boolean/turn_off", {
+          entity_id: FRIDGE_ALERT_ENTITY
+        }, function (err) {
+          if (err) {
+            showToast("Error clearing fridge alert: " + err, true);
+            return;
+          }
+          showToast("Understood — outside fridge alert cleared");
+        });
+      };
+
       window.toggleLightningTest = function () {
         if (lightningDisabled) {
           showToast("Lightning alerts are disabled in Settings");
@@ -5300,7 +5488,7 @@
           var days = Math.max(1, Math.floor((now - last) / 86400000));
           daysTxt = " &middot; " + days + "d";
         }
-        el.innerHTML = '<button style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:52px; border-radius:18px; font-size:17px; font-weight:800; line-height:1.15; padding:0 8px; box-sizing:border-box; cursor:pointer; background:#8e8e93; color:#ffffff; border:none; box-shadow:0 4px 14px rgba(0,0,0,0.2);" onclick="openChemicalsTab(\'' + staleVols[0] + '\'); return false;">Click to Log Chemicals' + daysTxt + '</button>';
+        el.innerHTML = '<button style="display:-webkit-flex; display:flex; -webkit-align-items:center; align-items:center; -webkit-justify-content:center; justify-content:center; width:100%; height:62px; border-radius:18px; font-size:22px; font-weight:800; line-height:1.15; padding:0 8px; box-sizing:border-box; cursor:pointer; background:#8e8e93; color:#ffffff; border:none; box-shadow:0 4px 14px rgba(0,0,0,0.2);" onclick="openChemicalsTab(\'' + staleVols[0] + '\'); return false;">Click to Log Chemicals' + daysTxt + '</button>';
         el.style.display = "-webkit-flex";
         el.style.display = "flex";
       }
@@ -5664,10 +5852,10 @@
         var activeClass = "";
         if (isOn) {
           if (domain === "climate" || domain === "water_heater") {
-            if (isActivelyHeating) {
-              activeClass = " active-red"; // Inside background highlight fill + outline when set temp > current temp
+            if (isActivelyHeating || isTargetEqualsCurrent) {
+              activeClass = " active-red"; // Inside background highlight fill + outline when set temp >= current temp
             } else {
-              activeClass = " active-red-outline"; // Card outline ONLY when heater is ON but set temp <= current temp
+              activeClass = " active-red-outline"; // Card outline ONLY when heater is ON but set temp < current temp
             }
           } else if (domain === "light") {
             activeClass = " active"; // Yellow highlight for lights
@@ -5765,7 +5953,7 @@
           var curNum = parseFloat(currentTemp);
           var tarNum = parseFloat(targetTemp);
           if (!isNaN(curNum) && !isNaN(tarNum)) {
-            if (curNum < tarNum) isActivelyHeating = true;
+            if (curNum <= tarNum) isActivelyHeating = true;
           }
         }
 
@@ -5773,9 +5961,9 @@
         var activeClass = "";
         if (isOn) {
           if (isActivelyHeating) {
-            activeClass = " active-red"; // Inside background highlight fill + outline when set temp > current temp
+            activeClass = " active-red"; // Inside background highlight fill + outline when set temp >= current temp
           } else {
-            activeClass = " active-red-outline"; // Card outline ONLY when heater is ON but set temp <= current temp
+            activeClass = " active-red-outline"; // Card outline ONLY when heater is ON but set temp < current temp
           }
         }
 
@@ -6609,7 +6797,7 @@
             if (cardEl) {
               var isDark = document.body.classList.contains("dark-theme");
               if (isDark) {
-                cardEl.style.boxShadow = '0 10px 32px rgba(0, 0, 0, 0.42), 0 0 28px rgba(' + lightRgb.r + ',' + lightRgb.g + ',' + lightRgb.b + ', 0.32)';
+                cardEl.style.boxShadow = '0 10px 32px rgba(0, 0, 0, 0.35), 0 0 28px rgba(' + darkR + ',' + darkG + ',' + darkB + ', 0.38)';
               } else {
                 var gRgb = getLightModeGlowRgb(extractedRgb);
                 cardEl.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.06), 0 0 38px rgba(' + gRgb.r + ',' + gRgb.g + ',' + gRgb.b + ', 0.58), 0 2px 14px rgba(' + gRgb.r + ',' + gRgb.g + ',' + gRgb.b + ', 0.42)';
@@ -7152,7 +7340,8 @@
           var tr = lightRgb.r, tg = lightRgb.g, tb = lightRgb.b;
           var isDarkTheme = document.body.classList.contains("dark-theme");
           if (isDarkTheme) {
-            homeCardStyle += ' background: rgba(' + tr + ',' + tg + ',' + tb + ', 0.22); border: 1.5px solid rgba(' + tr + ',' + tg + ',' + tb + ', 0.55); box-shadow: 0 4px 18px rgba(' + tr + ',' + tg + ',' + tb + ', 0.35), 0 0 32px rgba(' + tr + ',' + tg + ',' + tb + ', 0.25);';
+            var dsR = Math.round(tr * 0.28), dsG = Math.round(tg * 0.28), dsB = Math.round(tb * 0.28);
+            homeCardStyle += ' background: rgba(' + tr + ',' + tg + ',' + tb + ', 0.22); border: 1.5px solid rgba(' + tr + ',' + tg + ',' + tb + ', 0.55); box-shadow: 0 4px 18px rgba(' + dsR + ',' + dsG + ',' + dsB + ', 0.45), 0 0 32px rgba(' + dsR + ',' + dsG + ',' + dsB + ', 0.35);';
           } else {
             var lR = Math.round(tr + (255 - tr) * 0.35);
             var lG = Math.round(tg + (255 - tg) * 0.35);
@@ -7170,9 +7359,10 @@
                 var eR = lRgb.r, eG = lRgb.g, eB = lRgb.b;
                 var isDark = document.body.classList.contains("dark-theme");
                 if (isDark) {
+                  var dsR = Math.round(eR * 0.28), dsG = Math.round(eG * 0.28), dsB = Math.round(eB * 0.28);
                   homeCardEl.style.background = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.22)';
                   homeCardEl.style.borderColor = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.55)';
-                  homeCardEl.style.boxShadow = '0 4px 18px rgba(' + eR + ',' + eG + ',' + eB + ', 0.35), 0 0 32px rgba(' + eR + ',' + eG + ',' + eB + ', 0.25)';
+                  homeCardEl.style.boxShadow = '0 4px 18px rgba(' + dsR + ',' + dsG + ',' + dsB + ', 0.45), 0 0 32px rgba(' + dsR + ',' + dsG + ',' + dsB + ', 0.35)';
                 } else {
                   var hlR = Math.round(eR + (255 - eR) * 0.35);
                   var hlG = Math.round(eG + (255 - eG) * 0.35);
@@ -7180,6 +7370,11 @@
                   homeCardEl.style.background = 'rgba(' + hlR + ',' + hlG + ',' + hlB + ', 0.28)';
                   homeCardEl.style.borderColor = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.45)';
                   homeCardEl.style.boxShadow = '0 4px 18px rgba(' + eR + ',' + eG + ',' + eB + ', 0.22), 0 0 32px rgba(' + eR + ',' + eG + ',' + eB + ', 0.16)';
+                }
+                var hVolFills = homeCardEl.querySelectorAll(".media-large-vol-fill");
+                for (var hvf = 0; hvf < hVolFills.length; hvf++) {
+                  hVolFills[hvf].style.background = 'rgba(' + eR + ',' + eG + ',' + eB + ', 0.45)';
+                  hVolFills[hvf].style.borderRight = '2.5px solid rgba(' + eR + ',' + eG + ',' + eB + ', 0.9)';
                 }
               }
             });
@@ -7821,7 +8016,7 @@
         if (!newState || !newState.entity_id) return;
         var eid = newState.entity_id;
 
-        // 1. Tagged Media Player ('ipadhomescreen' / 'ipaddashboard') Playback Trigger
+        // 1. Tagged Media Player ('ipadhomescreen') Playback Trigger
         // Playback-state tracking ALWAYS updates so that when a party ends the
         // baseline is current and no phantom play-edge fires a late switch.
         // The auto-switch itself is suppressed during Party mode: the Party
@@ -7834,7 +8029,7 @@
 
           if (!isPartyModeActive()) {
             if (oldSt !== "playing" && newSt === "playing") {
-              if (isIpadDashboardMedia(newState) || isIpadHomeScreenEntity(newState)) {
+              if (isIpadHomeScreenTagged(newState)) {
                 if (activeTab !== "media") {
                   switchTab("media");
                   showToast("🎵 " + (friendlyName(newState) || "Media player") + " started playing — Auto-switched to Media page");
@@ -7899,13 +8094,25 @@
         var isMedia = (eid.indexOf("media_player.") === 0);
         // Diff BEFORE the caches are overwritten below.
         var mediaChanged = isMedia ? mediaDisplayDiff(prevEntity, newState) : false;
+        var prevMediaAttrs = prevEntity ? (prevEntity.attributes || null) : null;
         syncEntityCaches(newState);
+
+        // Buffer grouped players through a natural track switch. WS delivers
+        // the new track one player at a time; glue the group before the next
+        // render so nobody separates mid-transition.
+        if (isMedia && mediaChanged && prevMediaAttrs && mediaTrackDiff(prevEntity, newState)) {
+          bufferTrackSwitchGroup(eid, prevMediaAttrs);
+        }
 
         // Auto-page rotation triggers (Media playback & Hot Tub chemical red alert)
         checkAutoPageRotation(newState, oldState);
 
         if (eid === "input_boolean.dim_dashboard" || eid.indexOf("light.") === 0) {
           checkNightDimming();
+        }
+
+        if (eid === "input_boolean.outdoor_fridge_food_unsafe") {
+          updateFridgeAlertState([newState]);
         }
 
         if (isMedia) {
@@ -8174,6 +8381,19 @@
         if (fname.indexOf("ipadhomescreen") !== -1 || eid.indexOf("ipadhomescreen") !== -1 ||
           fname.indexOf("ipaddashboard") !== -1 || eid.indexOf("ipaddashboard") !== -1) return true;
 
+        return false;
+      }
+
+      function isIpadHomeScreenTagged(entity) {
+        if (!entity || !entity.entity_id) return false;
+        if (homeEntityIds[entity.entity_id]) return true;
+        var attrs = entity.attributes || {};
+        var labels = attrs.labels || attrs.tags || attrs.label || [];
+        if (typeof labels === "string") labels = [labels];
+        for (var l = 0; l < labels.length; l++) {
+          var lbl = String(labels[l]).toLowerCase().replace(/[\s_]/g, "");
+          if (lbl === "ipadhomescreen") return true;
+        }
         return false;
       }
 
@@ -8847,6 +9067,7 @@
       // ======== RENDER ========
       function renderDashboard(allStates) {
         checkLightningSafety(allStates);
+        updateFridgeAlertState(allStates);
         // Party-mode transitions flip activeTab BEFORE anything renders, so the
         // correct tab branch below executes within this same render pass.
         syncPartyModeState(allStates);
@@ -9111,6 +9332,16 @@
         if (backToPartyEl) {
           backToPartyEl.style.display = (isPartyModeActive() && activeTab === "home") ? "-webkit-flex" : "none";
           backToPartyEl.style.display = (isPartyModeActive() && activeTab === "home") ? "flex" : "none";
+        }
+
+        // Home-screen Party Mode button: highlight when party is active
+        var homePartyBtn = document.getElementById("homePartyModeBtn");
+        if (homePartyBtn) {
+          if (isPartyModeActive()) {
+            homePartyBtn.classList.add("party-active");
+          } else {
+            homePartyBtn.classList.remove("party-active");
+          }
         }
 
         if (activeTab === "home") {
@@ -11530,6 +11761,7 @@
             for (var c = 0; c < candidates.length; c++) {
               if (candidates[c].title === mTitle && candidates[c].artist === mArtist) {
                 duplicate = true;
+                candidates[c].count++;
                 break;
               }
             }
@@ -11538,7 +11770,8 @@
                 title: mTitle,
                 artist: mArtist || "",
                 entity_picture: mAttrs.entity_picture || "",
-                state: mp.state
+                state: mp.state,
+                count: 1
               });
             }
           }
@@ -11563,7 +11796,18 @@
 
           var chosen = null;
           if (freshCandidates.length > 0) {
-            chosen = freshCandidates[0];
+            // Pick the track the most group members agree on. During a natural
+            // track switch players catch up one at a time, so majority-voting
+            // keeps ONE stable title/cover (the new track appears the moment
+            // the majority has it) instead of flapping between old/new.
+            var bestCount = 0;
+            for (var cc = 0; cc < freshCandidates.length; cc++) {
+              if (freshCandidates[cc].count > bestCount) {
+                bestCount = freshCandidates[cc].count;
+                chosen = freshCandidates[cc];
+              }
+            }
+            if (!chosen) chosen = freshCandidates[0];
           } else {
             title = "Skipping...";
             artist = "";
@@ -11636,6 +11880,68 @@
           return (title.trim() + "|||" + artist.trim()).toLowerCase();
         }
         return null;
+      }
+
+      // Track-only diff (ignores volume). Used to detect a real track switch,
+      // which in a multi-speaker group arrives one player at a time over WS —
+      // exactly the window where grouping-by-title splits the group apart.
+      function mediaTrackDiff(prev, next) {
+        if (!prev) return true;
+        var pa = prev.attributes || {};
+        var na = next.attributes || {};
+        return pa.media_title !== na.media_title ||
+          pa.media_artist !== na.media_artist ||
+          pa.media_album_name !== na.media_album_name ||
+          pa.entity_picture !== na.entity_picture;
+      }
+
+      // When one member of a group starts reporting the NEW track while the
+      // others still hold the OLD title/artist, glue the whole group into a
+      // sticky group so they stay in ONE card during the switch instead of
+      // separating and re-merging (the "glitch"). Stays alive for the normal
+      // 15s sticky window; each member's arriving update refreshes it.
+      function bufferTrackSwitchGroup(entityId, prevAttrs) {
+        if (!prevAttrs) return;
+        var oldTitle = prevAttrs.media_title;
+        if (!oldTitle) return;
+        var oldArtist = prevAttrs.media_artist || "";
+
+        var members = [entityId];
+        var snap = lastStatesCache;
+        for (var i = 0; i < snap.length; i++) {
+          var s = snap[i];
+          if (s.entity_id === entityId || s.entity_id.indexOf("media_player.") !== 0) continue;
+          var sa = s.attributes || {};
+          if (sa.media_title && sa.media_title === oldTitle && (sa.media_artist || "") === oldArtist) {
+            members.push(s.entity_id);
+          }
+        }
+        if (members.length < 2) return;
+
+        // Merge with any existing sticky group that shares a member (players
+        // catch up one at a time; we never want two competing sticky keys).
+        var mergedIndexes = {};
+        for (var g = 0; g < activeStickyGroups.length; g++) {
+          var grp = activeStickyGroups[g];
+          for (var m = 0; m < grp.entities.length; m++) {
+            if (members.indexOf(grp.entities[m]) !== -1) {
+              for (var m2 = 0; m2 < grp.entities.length; m2++) {
+                if (members.indexOf(grp.entities[m2]) === -1) members.push(grp.entities[m2]);
+              }
+              mergedIndexes[g] = true;
+              break;
+            }
+          }
+        }
+        var keptGroups = [];
+        for (var g2 = 0; g2 < activeStickyGroups.length; g2++) {
+          if (!mergedIndexes[g2]) keptGroups.push(activeStickyGroups[g2]);
+        }
+        activeStickyGroups = keptGroups;
+        activeStickyGroups.push({
+          timestamp: Date.now(),
+          entities: members
+        });
       }
 
       function optimisticSkipUpdate(entityId) {
@@ -12690,6 +12996,13 @@
               if (existing && !isNewerState(existing, s)) continue;
               if (mediaDisplayDiff(existing, s)) {
                 syncEntityCaches(s);
+                // Same transition buffer as the WS path: if this poll shows one
+                // group member already on the NEW track while others still hold
+                // the old title, glue the group before the render so it cannot
+                // split apart mid-switch.
+                if (existing && mediaTrackDiff(existing, s)) {
+                  bufferTrackSwitchGroup(s.entity_id, existing.attributes || null);
+                }
                 var stChanged = !existing || existing.state !== s.state;
                 if (stChanged) mediaStateChanged = true;
                 mediaDisplayChanged = true;

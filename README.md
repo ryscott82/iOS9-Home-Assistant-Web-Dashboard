@@ -66,6 +66,7 @@ A ultra-minimal, high-readability Home Assistant web dashboard designed specific
 ### 8. Tactile Audio Feedback & Dynamic Sparse Home Layout
 - **Zero-Dependency Web Audio Clicks**: Synthesizes a subtle 12ms tactile frequency sweep (`1400Hz → 300Hz`) on all button/tile presses, with a footer audio toggle.
 - **Dynamic Sparse Layout**: Automatically scales welcome header font size to `68px` bold and renders a large digital clock at the bottom of the Home screen when $\le 4$ card rows are present.
+- **Large Home Screen Action Buttons**: "All Controls", "Party Mode", and "Log Chemicals" buttons use 62px height and 22px bold font for easy reading and tapping from across the room. The Party Mode button highlights pink when a party is active.
 
 ### 9. Dual-Protocol Communication Engine
 - **WebSocket Protocol**: Connects directly to Home Assistant WebSocket API (`ws://<HA_IP>:8123/api/websocket`) for real-time state synchronization.
