@@ -4768,7 +4768,7 @@
         <span style="font-weight:500;">Connection Status</span>
         <span
           style="color:#8e8e93; font-size:11px; margin-left:8px; font-weight:700; font-family:-apple-system, sans-serif;"
-          id="versionLabel">v4.9.1</span>
+          id="versionLabel">v4.10.3</span>
       </div>
     </footer>
   </main>
@@ -4791,7 +4791,7 @@
       "use strict";
 
       // ======== APP VERSION (bump this on every change) ========
-      var DASHBOARD_VERSION = "v4.9.1";
+      var DASHBOARD_VERSION = "v4.10.3";
       try {
         console.log("Dashboard version: " + DASHBOARD_VERSION);
         var versionLabelEl = document.getElementById("versionLabel");
@@ -5085,6 +5085,50 @@
       var PARTY_SPA_LIGHT_ENTITY = "light.spa_light";
       // Where the 🎉 header toggle sends house_mode when switching a party OFF
       var PARTY_EXIT_MODE = "Home";
+
+      // ======== OCCUPANT PRESENCE BACKGROUND GRADIENT ========
+      // Config mapping each family member to their presence boolean entity ID and iOS HIG colors.
+      // Standard iOS HIG system colors (Light & Dark variants):
+      // Ryan: Blue (#007AFF / #0A84FF), Mason: Green (#34C759 / #30D158),
+      // Chad: Orange (#FF9500 / #FF9F0A), Keira: Pink (#FF2D55 / #FF375F),
+      // Elise: Purple (#AF52DE / #BF5AF2).
+      var OCCUPANT_CONFIG = [
+        {
+          id: "ryan",
+          name: "Ryan",
+          entity: "input_boolean.ryan_is_home",
+          lightRgb: [0, 122, 255],   // iOS System Blue (Light: #007AFF)
+          darkRgb: [10, 132, 255]    // iOS System Blue (Dark: #0A84FF)
+        },
+        {
+          id: "mason",
+          name: "Mason",
+          entity: "input_boolean.mason_is_home",
+          lightRgb: [52, 199, 89],   // iOS System Green (Light: #34C759)
+          darkRgb: [48, 209, 88]     // iOS System Green (Dark: #30D158)
+        },
+        {
+          id: "chad",
+          name: "Chad",
+          entity: "input_boolean.chad_is_home",
+          lightRgb: [255, 149, 0],   // iOS System Orange (Light: #FF9500)
+          darkRgb: [255, 159, 10]    // iOS System Orange (Dark: #FF9F0A)
+        },
+        {
+          id: "keira",
+          name: "Keira",
+          entity: "input_boolean.keira_is_home",
+          lightRgb: [255, 45, 85],   // iOS System Pink (Light: #FF2D55)
+          darkRgb: [255, 55, 95]     // iOS System Pink (Dark: #FF375F)
+        },
+        {
+          id: "elise",
+          name: "Elise",
+          entity: "input_boolean.elise_is_home",
+          lightRgb: [175, 82, 222],  // iOS System Purple (Light: #AF52DE)
+          darkRgb: [191, 90, 242]    // iOS System Purple (Dark: #BF5AF2)
+        }
+      ];
       var refreshTimer = null;
       var globalMsgId = 100;
       function getNextMsgId() { return globalMsgId++; }
@@ -6675,9 +6719,72 @@
         document.documentElement.style.background = bgOrNull;
       }
 
+      function getActiveOccupantColors(allStates, forDark) {
+        var activeColors = [];
+        if (!allStates || !allStates.length) return activeColors;
+        var stateMap = {};
+        for (var i = 0; i < allStates.length; i++) {
+          if (allStates[i] && allStates[i].entity_id) {
+            stateMap[allStates[i].entity_id] = allStates[i].state;
+          }
+        }
+        for (var c = 0; c < OCCUPANT_CONFIG.length; c++) {
+          var cfg = OCCUPANT_CONFIG[c];
+          var st = stateMap[cfg.entity];
+          if (st === "on" || st === "home") {
+            activeColors.push(forDark ? cfg.darkRgb : cfg.lightRgb);
+          }
+        }
+        return activeColors;
+      }
+
+      function rawRgbStr(rgb) {
+        return 'rgb(' + Math.round(rgb[0]) + ',' + Math.round(rgb[1]) + ',' + Math.round(rgb[2]) + ')';
+      }
+
+      function buildOccupantBackgroundGradient(colors, forDark) {
+        if (!colors || colors.length === 0) return null;
+        if (colors.length === 1) {
+          var c0 = colors[0];
+          var c1 = [
+            Math.round(c0[0] * 0.35),
+            Math.round(c0[1] * 0.35),
+            Math.round(c0[2] * 0.35)
+          ];
+          return 'linear-gradient(135deg, ' + rawRgbStr(c0) + ' 0%, ' + rawRgbStr(c1) + ' 100%)';
+        }
+        var lchColors = [];
+        for (var i = 0; i < colors.length; i++) {
+          lchColors.push({
+            rgb: colors[i],
+            lch: srgbToPerceptual(colors[i][0], colors[i][1], colors[i][2])
+          });
+        }
+        lchColors.sort(function (a, b) {
+          return a.lch[2] - b.lch[2];
+        });
+        var segs = lchColors.length - 1;
+        var stepsPerSeg = 12;
+        var stops = [];
+        for (var s = 0; s < segs; s++) {
+          for (var j = 0; j < stepsPerSeg; j++) {
+            var t = j / stepsPerSeg;
+            var pct = ((s + t) / segs) * 100;
+            var blended = blendPerceptual(lchColors[s].lch, lchColors[s + 1].lch, t);
+            var rgb = perceptualToSrgb(blended[0], blended[1], blended[2]);
+            stops.push(rawRgbStr(rgb) + ' ' + pct.toFixed(1) + '%');
+          }
+        }
+        var lastLch = lchColors[lchColors.length - 1].lch;
+        var lastRgb = perceptualToSrgb(lastLch[0], lastLch[1], lastLch[2]);
+        stops.push(rawRgbStr(lastRgb) + ' 100%');
+        return 'linear-gradient(135deg, ' + stops.join(', ') + ')';
+      }
+
       var lastAllStates = [];
 
       function updateAlbumPageTint(allStates) {
+        if (!allStates) allStates = lastAllStates || [];
         lastAllStates = allStates;
         if (!tintEnabled) {
           applyAlbumPageTint(null);
@@ -6700,7 +6807,13 @@
           }
         }
         if (playingPics.length === 0) {
-          applyAlbumPageTint(null);
+          var isDarkTheme = document.body.classList.contains("dark-theme");
+          var occupantColors = getActiveOccupantColors(allStates, isDarkTheme);
+          if (occupantColors.length > 0) {
+            applyAlbumPageTint(buildOccupantBackgroundGradient(occupantColors, isDarkTheme));
+          } else {
+            applyAlbumPageTint(null);
+          }
           return;
         }
         var colors = [];

@@ -67,6 +67,11 @@ The dashboard relies on specific Home Assistant **Helpers** (`input_boolean` and
 | **Text** (`input_text`) | `input_text.dashboard_welcome_message` | `Dashboard Welcome Message` | Sets the custom welcome text shown at the top-left of the header bar (e.g., "Welcome Home, Family!"). Defaults to "Welcome Home" if unavailable. |
 | **Toggle** (`input_boolean`) | `input_boolean.chemicals_checked_today` | `Chemicals Checked Today` | Tracks whether chemical levels have been logged today. Displays a yellow warning banner when turned `off`. |
 | **Toggle** (`input_boolean`) | `input_boolean.chlorine_logged_since_changing` | `Chlorine Logged Since Changing` | Safety gate used by pool/spa chemical dosage recommendations to prevent accidental chlorine overdosing. |
+| **Toggle** (`input_boolean`) | `input_boolean.ryan_is_home` | `Ryan Is Home` | Occupant presence toggle for Ryan. Renders iOS System Blue (`#007AFF`/`#0A84FF`) background tint when no media is playing. |
+| **Toggle** (`input_boolean`) | `input_boolean.mason_is_home` | `Mason Is Home` | Occupant presence toggle for Mason. Renders iOS System Green (`#34C759`/`#30D158`) background tint when no media is playing. |
+| **Toggle** (`input_boolean`) | `input_boolean.chad_is_home` | `Chad Is Home` | Occupant presence toggle for Chad. Renders iOS System Orange (`#FF9500`/`#FF9F0A`) background tint when no media is playing. |
+| **Toggle** (`input_boolean`) | `input_boolean.keira_is_home` | `Keira Is Home` | Occupant presence toggle for Keira. Renders iOS System Pink (`#FF2D55`/`#FF375F`) background tint when no media is playing. |
+| **Toggle** (`input_boolean`) | `input_boolean.elise_is_home` | `Elise Is Home` | Occupant presence toggle for Elise. Renders iOS System Purple (`#AF52DE`/`#BF5AF2`) background tint when no media is playing. |
 | **Dropdown** (`input_select`) | `input_select.house_mode` | `House Mode` | House mode selector used for theming and the **Party page**. Include a `Party` option — selecting it switches the dashboard to the Party page until the mode changes. |
 
 ---

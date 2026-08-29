@@ -2,6 +2,19 @@
 
 All notable changes and features to the Home Assistant iPad Mini Web Dashboard are documented chronologically in this file by version number.
 
+## [v4.10.3] - 2026-08-27
+- **Media Page & Background Tint Fix**: Restored missing `var lastAllStates = [];` declaration and added defensive array fallback inside `updateAlbumPageTint()`. This prevents async artwork color callbacks from throwing a TypeError when called before state caching completes, fixing Media page rendering and background tint updates.
+
+## [v4.10.2] - 2026-08-27
+- **Max-Saturation Occupant Presence Gradients (Unwashed Raw RGB)**: Completely removed white/black color desaturation from occupant presence background gradients. Gradients now emit 100% raw, unmuted iOS HIG system colors (`#007AFF`, `#34C759`, `#FF9500`, `#FF2D55`, `#AF52DE`) across the entire screen. For a single occupant, the gradient spans from their full vibrant signature color to a deep 35% shade of that same color; for multiple occupants, Oklch perceptual interpolation connects raw vibrant hues directly.
+
+## [v4.10.1] - 2026-08-27
+- **High-Saturation Occupant Presence Gradients**: Increased color saturation for presence background gradients across both light and dark themes. Created dedicated `occupantSaturatedWash` and `occupantDarkSaturatedWash` color transformations that preserve up to 70% of raw iOS HIG system color vibrancy in light mode and 55% in dark mode, producing punchy, glowing gradients behind translucent control cards.
+
+## [v4.10.0] - 2026-08-27
+- **Dynamic Occupant Presence Background Gradient**: When no media is playing, the dashboard background renders a dynamic ambient gradient based on which family members are currently home. Each occupant is mapped to standard iOS Human Interface Guidelines (HIG) system colors with dedicated Light Mode and Dark Mode variants.
+- **Oklch Perceptual Gradient Math (Non-Muddy Transitions)**: Active colors are sorted by Oklch hue angle and interpolated in perceptual space (`srgbToPerceptual`, `blendPerceptual`, `perceptualToSrgb`) across 12 steps per segment before applying `albumPastelWash` (light mode) or `albumDarkWash` (dark mode). This prevents muddy gray/brown colors from appearing during multi-person transitions. When media playback starts, album artwork tinting seamlessly takes priority.
+
 ## [v4.9.2] - 2026-08-27
 - **Buffered grouped media players through automatic track switches**: When a track changes on a group of speakers (e.g. one track auto-advancing on a HomesPod-equivalent / multi-room group), Home Assistant reports the new title/artist/artwork one player at a time. Previously each arriving update ran the grouping logic immediately, so mid-switch one player already reported the NEW track while the others still held the OLD one — the group got different grouping keys and briefly split into separate cards before re-merging (the card separation/glitch). Now a transition buffer glues the whole group together for a 15-second window: the moment any member reports a new track, everyone still on the old title is locked into a shared sticky group until the laggards catch up, so the group stays in ONE card throughout the switch and re-groups naturally once everyone agrees. The buffer triggers from both the WebSocket realtime path and the REST poll path, merges with overlapping sticky groups (so players finishing the switch one-at-a-time never get competing keys), and only fires on track-relevant attribute changes (volume nudges are ignored). The card's displayed title/cover now majority-votes among the group members' reported tracks instead of picking the first member, so a single lagging player can't flap the title between old and new — the new track/cove appears the moment the majority has it.
 

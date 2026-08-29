@@ -1,0 +1,4 @@
+Important information to remember:
+* Never push API Keys. Make sure to replace API keys with a placeholder before pushing, you can replace API keys after push to git in the local copy of the code.
+* All code MUST be iOS 9 webkit compliant. No HTML or CSS can be used if it isn't supported by Safari in iOS 9.
+* Update the version number with every change. X.X.1 update for backend/bug fixes. X.1 update for new features. Full version update only to be done upon user request.
